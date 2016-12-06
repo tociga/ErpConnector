@@ -1,3 +1,9 @@
-*/bin
-
-*/obj
+/AGR5ODataService/AGR5ODataService/bin
+/AGR5ODataService/AGR5ODataService/obj
+/AGR5ODataService/AxConCommon/obj
+/AGR5ODataService/AxConCommon/bin
+/AGR5ODataService/AxConnect/bin
+/AGR5ODataService/AxConnect/obj
+/AGR5ODataService/DataAccess/bin
+/AGR5ODataService/DataAccess/obj
+/AGR5ODataService/packages
