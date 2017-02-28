@@ -16,9 +16,8 @@ namespace AxConnect
 {
     public class AXODataConnector
     {
-
+        static string header = "";
         private Resources context;
-        private static string header = "";
         public AXODataConnector()
         {
             Authorize().Wait();
@@ -29,65 +28,37 @@ namespace AxConnect
         private Task Authorize()
         {
             return Task.Run(() => {
-                WithoutADAL().Wait();
-                //AdalAuthenticate().Wait();
+                header = AdalAuthenticate().Result;
             });
         }
 
         public void RunTransfer()
         {
-            DataAccess.DataWriter.TruncateTables(true, false, false);
+            DataAccess.DataWriter.TruncateTables(true, false, false,true);
             //SalesValueTransactions.WriteSalesValueTrans(context);
-            ItemCategoryTransfer.WriteCategories(context);
-            //LocationsAndVendorsTransfer.WriteLocationsAndVendors(context);
-            ItemTransfer.WriteItems(context);
+            ItemCategoryTransfer.WriteCategories(header);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
+            ItemTransfer.WriteItems(context, header);
             //ItemAttributeLookup.ReadItemAttributes(context);
+            //WritePO writeTest = new WritePO(context);
+            //writeTest.WriteTestPO();
         }
         private static void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
             e.RequestMessage.SetHeader("Authorization", header);
         }
 
-        private static async Task WithoutADAL()
+        private static async Task<string> AdalAuthenticate()
         {
-            var postData = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("resource", "https://agrax7u2devaos.cloudax.dynamics.com"),
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("username", "dadi@reynd.is"),
-                new KeyValuePair<string, string>("password", "ZiK289dt"),
-                new KeyValuePair<string, string>("client_id", "b15e9fb9-68ba-4bec-8ce5-f1094689a573")
-            };
-
-            using (var client = new HttpClient())
-            {
-
-                string baseUrl = "https://login.windows.net/reynd.is/oauth2/";
-                client.BaseAddress = new Uri(baseUrl);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new FormUrlEncodedContent(postData);
-
-                HttpResponseMessage response = await client.PostAsync("token", content);
-                string jsonString = await response.Content.ReadAsStringAsync();
-                var responseData = JsonConvert.DeserializeObject<dynamic>(jsonString);
-                header = responseData.token_type + " " + responseData.access_token;
-                //return jsonString;
-            }
-        }
-
-        private static async Task AdalAuthenticate()
-        {
-            UriBuilder uri = new UriBuilder("https://login.windows.net/reynd.is/oauth2/");
+            UriBuilder uri = new UriBuilder("https://login.windows.net/reynd.is/oauth2/token");
             UriBuilder redirectUri = new UriBuilder("http://agrdynamics.com/agr5ax7");
 
             AuthenticationContext authenticationContext = new AuthenticationContext(uri.ToString());
-            ClientCredential cred = new ClientCredential("ef354935-1a94-4c76-bd66-ac83b21a9590", "JwaY47/JdiO8liltYobBUGEcl5SFTyaZboO6FooeejQ=");
+            ClientCredential cred = new ClientCredential("4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns=");
 
             var authResult = await authenticationContext.AcquireTokenAsync("https://agrax7u2devaos.cloudax.dynamics.com", cred);
 
-            header = authResult.CreateAuthorizationHeader();
+            return authResult.CreateAuthorizationHeader();
         }
  
     }

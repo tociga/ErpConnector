@@ -1,5 +1,6 @@
 ﻿using AxConnect.Microsoft.Dynamics.DataEntities;
 using AxConCommon.Extensions;
+using AxConnect.DTO;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,19 +12,19 @@ namespace AxConnect.Modules
 {
     public class ItemCategoryTransfer
     {
-        public static void WriteCategories(Resources context)
+        public static void WriteCategories(string authHeader)
         {
-            var roles = ReadCategoryRole(context);
-            DataAccess.DataWriter.WriteToTable(roles, "[ax].[ECORESCATEGORYHIERARCHYROLE]");
+            var roles = AXServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(roles.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHYROLE]");
 
-            var hierarchy = ReadHierarchy(context);
-            DataAccess.DataWriter.WriteToTable(hierarchy, "[ax].[ECORESCATEGORYHIERARCHY]");
+            var hierarchy = AXServiceConnector.CallOdataEndpoint<CategoryHierarchyDTO>("RetailEcoResCategoryHierarchy", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(hierarchy.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHY]");
 
-            var category = ReadCategory(context);
-            DataAccess.DataWriter.WriteToTable(category, "[ax].[ECORESCATEGORY]");
+            var category = AXServiceConnector.CallOdataEndpoint<CategoryDTO>("RetailEcoResCategory", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(category.GetDataReader(), "[ax].[ECORESCATEGORY]");
 
-            var prodCat = ReadProductCategory(context);
-            DataAccess.DataWriter.WriteToTable(prodCat, "[ax].[ECORESPRODUCTCATEGORY]");
+            var prodCat = AXServiceConnector.CallOdataEndpoint<EcoResProductCategoryDTO>("AGREcoResProductCategories", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(prodCat.GetDataReader(), "[ax].[ECORESPRODUCTCATEGORY]");
         }
 
         private static IGenericDataReader ReadHierarchy(Resources context)
@@ -59,7 +60,7 @@ namespace AxConnect.Modules
         private static IGenericDataReader ReadCategory(Resources context)
         {
             var categories = from c in context.RetailEcoResCategory select c;
-            List<dynamic> list = new List<dynamic>();
+            List<dynamic> list = new List<dynamic>();            
             foreach (var category in categories)
             {
                 list.Add(new

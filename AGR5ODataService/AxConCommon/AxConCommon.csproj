@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Extensions\GenericListDataReader.cs" />
     <Compile Include="Extensions\IGenericDataReader.cs" />
+    <Compile Include="Extensions\PropertyCopy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

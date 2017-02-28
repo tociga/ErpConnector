@@ -6,14 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AxConCommon.Extensions;
+using AxConnect.DTO;
 
 namespace AxConnect.Modules
 {
     public class LocationsAndVendorsTransfer
     {
-        public static void WriteLocationsAndVendors(Resources context)
+        public static void WriteLocationsAndVendors(Resources context, string authHeader)
         {
-            var channel = ReadRetailChannel(context);
+            //var channel = ReadRetailChannel(context);
+            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels", "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", authHeader).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable(channel, "[ax].[RETAILCHANNELTABLE]");
 
             var locSetup = ReadLocations(context);
@@ -39,7 +41,7 @@ namespace AxConnect.Modules
         {
             var retailChannels = context.RetailChannels.Where(r => r.ChannelType == RetailChannelType.RetailStore);
             var list = new List<dynamic>();
-            foreach(var ch in retailChannels)
+            foreach(RetailChannel ch in retailChannels)
             {
                 list.Add(new
                 {

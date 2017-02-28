@@ -5,45 +5,81 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AxConnect;
+using AxConnect.DTO;
 
 namespace AxConnect.Modules
 {
     public class ItemTransfer
     {
-        public static void WriteItems(Resources context)
+        public static void WriteItems(Resources context, string authHeader)
         {
-            var items = ReadProducts(context);
-            DataAccess.DataWriter.WriteToTable(items, "[ax].[INVENTTABLE]");
+            //var items = ReadProducts(context);
+            var items = AXServiceConnector.CallOdataEndpoint<DistinctProductDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");
 
-            var inventDim = ReadInventDim(context);
-            DataAccess.DataWriter.WriteToTable(inventDim, "[ax].[INVENTDIM]");
+            var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(inventDim.GetDataReader(), "[ax].[INVENTDIM]");
 
             var variants = ReadVariants(context);
             DataAccess.DataWriter.WriteToTable(variants, "[ax].[ReleasedProductVariants]");
 
-            var combos = ReadInventDimCombo(context);
-            DataAccess.DataWriter.WriteToTable(combos, "[ax].[INVENTDIMCOMBINATIONS]");
+            var combos = AXServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(combos.GetDataReader(), "[ax].[INVENTDIMCOMBINATIONS]");
+
+            var reqItems = ReadReqItemTable(context);
+            DataAccess.DataWriter.WriteToTable(reqItems, "[ax].[REQITEMTABLE]");
+
+            var reqKey = ReadReqSafetyKey(context);
+            DataAccess.DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
+
+            WriteSafetyLines();
         }
 
-        private static IGenericDataReader ReadInventDimCombo(Resources context)
+        private static void WriteSafetyLines()
         {
-            var combos = context.AGRInventDimCombinations.ToList();
-            var list = new List<dynamic>();
-            foreach(var c in combos)
+            Int64 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[REQSAFETYLINE]");
+            Int64 pageSize = 20000;
+            bool foundData = true;
+            while(foundData)
             {
-                list.Add(
-                    new
-                    {
-                        ItemId = c.ItemId,
-                        InventDimId = c.InventDimId,
-                        DataAreaId = c.DataAreaId,
-                        DisplayProductNumber = c.EcoResDistinctProductVariant_DisplayProductNumber,
-                        RetailVariantId = c.RetailVariantId
-                    });
+                foundData = WriteFromService<ReqSafetyLineDTO>(recId, pageSize, "GetSafetyLines", "[ax].[REQSAFETYLINE]");
+                recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[REQSAFETYLINE]");
             }
-            return list.GetDataReader<dynamic>();
 
         }
+        private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
+        {
+            AXServiceConnector connector = new AXServiceConnector();
+            string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
+            var result = connector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
+
+            var reader = result.Result.GetDataReader();
+
+            DataAccess.DataWriter.WriteToTable(reader, "[ax]." + destTable);
+
+            return result.Result.Any();
+        }
+
+        //private static IGenericDataReader ReadInventDimCombo(Resources context)
+        //{
+        //    var combos = context.AGRInventDimCombinations.ToList();                                
+        //    var list = new List<dynamic>();
+        //    foreach(var c in combos)
+        //    {
+        //        list.Add(
+        //            new
+        //            {
+        //                ItemId                  = c.ItemId,
+        //                InventDimId             = c.InventDimId,
+        //                DataAreaId              = c.DataAreaId,
+        //                DisplayProductNumber    = c.EcoResDistinctProductVariant_DisplayProductNumber,
+        //                RetailVariantId         = c.RetailVariantId
+        //            });
+        //    }
+        //    return list.GetDataReader<dynamic>();
+
+        //}
         private static IGenericDataReader ReadProducts(Resources context)
         {
             var resProducts = from p in context.ReleasedDistinctProducts select p;
@@ -71,8 +107,8 @@ namespace AxConnect.Modules
                     NAMEALIAS = prod.SearchName,
                     PRODUCTGROUPID = prod.ProductGroupId,
                     PROJCATEGORYID = prod.ProjectCategoryId,
-                    STANDARDPALLETQUANTITY = 0.0m,//prodInvent.StandardPalletQty,
-                    QTYPERLAYER = 0.0m,//prodInvent.QtyPerLayer,
+                    STANDARDPALLETQUANTITY = 0m,///prod.StandardPalletQty,
+                    QTYPERLAYER = 0.0m,//prod.QtyPerLayer,
                     ITEMBUYERGROUPID = prod.BuyerGroupId,
                     PRODUCT = prodInvent.Product,//,
                     SALEPRICE = prod.FixedSalesPriceCharges,
@@ -115,7 +151,7 @@ namespace AxConnect.Modules
 
         private static IGenericDataReader ReadInventDim(Resources context)
         {
-            var dims = context.AGRInventDims;
+            var dims = context.InventDims;
             var list = new List<dynamic>();
             foreach(var dim in dims)
             {
@@ -141,7 +177,7 @@ namespace AxConnect.Modules
             return list.GetDataReader<dynamic>();
         }
 
-        private IGenericDataReader ReadReqItemTable(Resources Context)
+        private static IGenericDataReader ReadReqItemTable(Resources Context)
         {
             var reqItemTable = Context.AGRReqItemTables;
             var list = new List<dynamic>();
@@ -165,6 +201,24 @@ namespace AxConnect.Modules
                     REQPOTYPE = req.ReqPOType,
                     REQPOTYPEACTIVE = req.ReqPOTypeActive.GetValueOrDefault() == NoYes.Yes
                 });
+            }
+            return list.GetDataReader<dynamic>();
+        }
+
+        private static IGenericDataReader ReadReqSafetyKey(Resources context)
+        {
+            var list = new List<dynamic>();
+            var keys = context.AGRReqSafetyKeys.ToList();
+            foreach(var key in keys)
+            {
+                list.Add(
+                    new
+                    {
+                        FIXED = key.Fixed.GetValueOrDefault() == NoYes.Yes ? 1 : 0,
+                        NAME = key.Name,
+                        SAFETYKEY = key.SafetyKeyId,
+                        FIXEDDATE = key.FixedDate.DateTime
+                    });
             }
             return list.GetDataReader<dynamic>();
         }

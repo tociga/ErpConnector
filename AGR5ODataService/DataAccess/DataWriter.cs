@@ -37,7 +37,7 @@ namespace DataAccess
             }
         }
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -47,6 +47,7 @@ namespace DataAccess
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@truncate_items", clearItems);
                     cmd.Parameters.AddWithValue("@truncate_sales_trans_dumb", clearTrans);
+                    cmd.Parameters.AddWithValue("@truncate_locations_and_vendors", clearLocations);
                     cmd.Parameters.AddWithValue("@truncate_sales_trans_refresh", clearTransRefresh);
 
                     cmd.ExecuteNonQuery();

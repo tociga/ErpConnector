@@ -80,14 +80,27 @@
     </Compile>
     <Compile Include="AXODataConnector.cs" />
     <Compile Include="AXServiceConnector.cs" />
+    <Compile Include="DTO\CategoryDTO.cs" />
+    <Compile Include="DTO\CategoryHierarchyDTO.cs" />
+    <Compile Include="DTO\CategoryRoleDTO.cs" />
+    <Compile Include="DTO\DistinctProductDTO.cs" />
+    <Compile Include="DTO\EcoResProductCategoryDTO.cs" />
+    <Compile Include="DTO\GenericJsonOdata.cs" />
+    <Compile Include="DTO\InventDimCombinationDTO.cs" />
+    <Compile Include="DTO\InventDimComboDTO.cs" />
+    <Compile Include="DTO\InventDimDTO.cs" />
+    <Compile Include="DTO\InventModuleTableDTO.cs" />
     <Compile Include="DTO\InventTransDTO.cs" />
     <Compile Include="DTO\InventTransOriginDTO.cs" />
+    <Compile Include="DTO\ReqSafetyLineDTO.cs" />
+    <Compile Include="DTO\RetailChannelDTO.cs" />
     <Compile Include="Modules\ItemAttributeLookup.cs" />
     <Compile Include="Modules\ItemCategoryTransfer.cs" />
     <Compile Include="Modules\ItemTransfer.cs" />
     <Compile Include="Modules\LocationsAndVendorsTransfer.cs" />
     <Compile Include="Modules\ProductHistory.cs" />
     <Compile Include="Modules\SalesValueTransactions.cs" />
+    <Compile Include="Modules\WritePO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

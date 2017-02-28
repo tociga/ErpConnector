@@ -57,11 +57,45 @@ namespace AxConnect
             }
         }
 
+        public static async Task<DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
+        {
+            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
+
+            var request = HttpWebRequest.Create(endpoint);
+            request.Headers["Authorization"] = adalHeader;
+
+            request.Method = "GET";
+            //request.ContentLength = postData != null ? postData.Length : 0;
+
+            //using (var requestStream = request.GetRequestStream())
+            //{
+            //    using (StreamWriter writer = new StreamWriter(requestStream))
+            //    {
+            //        writer.Write(postData);
+            //        writer.Flush();
+            //    }
+            //}
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    using (StreamReader streamReader = new StreamReader(responseStream))
+                    {
+                        string responseString = streamReader.ReadToEnd();
+                        //string sanitized = SanitizeJsonString(responseString);
+                        return JsonConvert.DeserializeObject<DTO.GenericJsonOdata<T>>(responseString);
+
+                    }
+                }
+            }
+        }
         public async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string serviceGroup = System.Configuration.ConfigurationManager.AppSettings["ServiceGroup"];
-            string endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
+            string standardServiceGroup = System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
+            string endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = header;
@@ -96,8 +130,8 @@ namespace AxConnect
         public async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string serviceGroup = System.Configuration.ConfigurationManager.AppSettings["ServiceGroup"];
-            string endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
+            string standardServiceGroup = System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
+            string endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = header;
