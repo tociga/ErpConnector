@@ -15,8 +15,16 @@ namespace AxConnect.Modules
         public static void WriteLocationsAndVendors(Resources context, string authHeader)
         {
             //var channel = ReadRetailChannel(context);
-            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels", "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", authHeader).Result.value.GetDataReader();
+            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels", 
+                "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", 
+                authHeader).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable(channel, "[ax].[RETAILCHANNELTABLE]");
+
+            //var assortment = ReadRetailAssortment(context);
+            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortmentDTO>("RetailAssortments", 
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", 
+                authHeader).Result.value.GetDataReader();
+            DataAccess.DataWriter.WriteToTable(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
             var locSetup = ReadLocations(context);
             DataAccess.DataWriter.WriteToTable(locSetup, "[ax].[INVENTLOCATION]");
@@ -27,9 +35,7 @@ namespace AxConnect.Modules
             var vendor = ReadVendorTable(context);
             DataAccess.DataWriter.WriteToTable(vendor, "[ax].[VENDTABLE]");
 
-            var assortment = ReadRetailAssortment(context);
-            DataAccess.DataWriter.WriteToTable(assortment, "[ax].[RETAILASSORTMENTTABLE]");
-
+            
             var channelLines = ReadRetailAssortmentChannelLines(context);
             DataAccess.DataWriter.WriteToTable(channelLines, "[ax].[RETAILASSORTMENTCHANNELLINE]");
 
@@ -89,7 +95,7 @@ namespace AxConnect.Modules
 
         private static IGenericDataReader ReadDirParty(Resources context)
         {
-            var dirParties = context.AGRDirParties;
+            var dirParties = context.DirParties;
             var list = new List<dynamic>();
             foreach(var d in dirParties)
             {

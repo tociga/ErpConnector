@@ -13,13 +13,13 @@ namespace AxConnect.Modules
         public static void ReadItemAttributes(Resources context)
         {
             var season = ReadSeasonTable(context);
-            //DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
+            DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
 
             var inventSeason = ReadInventSeasonTable(context);
-            //DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
+            DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
 
             var colorGroups = ReadColorGroupLines(context);
-            //DataAccess.DataWriter.WriteToTable(colorGroups, "[ax].[ProductColorGroupLine]");
+            DataAccess.DataWriter.WriteToTable(colorGroups, "[ax].[ProductColorGroupLine]");
 
             var sizeGroups = ReadSizeGroupLines(context);
             DataAccess.DataWriter.WriteToTable(sizeGroups, "[ax].[ProductSizeGroupLine]");

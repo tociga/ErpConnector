@@ -34,12 +34,23 @@ namespace AxConnect
 
         public void RunTransfer()
         {
-            DataAccess.DataWriter.TruncateTables(true, false, false,true);
+            DateTime start = DateTime.Now;
+            DataAccess.DataWriter.TruncateTables(true, false, false,true, true);
+            DateTime truncate = DateTime.Now;
+            System.Diagnostics.Debug.WriteLine("Truncate = " + truncate.Subtract(start).TotalSeconds);
             //SalesValueTransactions.WriteSalesValueTrans(context);
             ItemCategoryTransfer.WriteCategories(header);
+            DateTime cat = DateTime.Now;
+            System.Diagnostics.Debug.WriteLine("Category = " + cat.Subtract(truncate).TotalSeconds);
             LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
+            DateTime loc = DateTime.Now;
+            System.Diagnostics.Debug.WriteLine("Locations = " + loc.Subtract(cat).TotalSeconds);
             ItemTransfer.WriteItems(context, header);
-            //ItemAttributeLookup.ReadItemAttributes(context);
+            DateTime items = DateTime.Now;
+            System.Diagnostics.Debug.WriteLine("Items = " + items.Subtract(loc).TotalSeconds);
+            ItemAttributeLookup.ReadItemAttributes(context);
+            DateTime lookup = DateTime.Now;
+            System.Diagnostics.Debug.WriteLine("Lookup = " + lookup.Subtract(items).TotalSeconds);
             //WritePO writeTest = new WritePO(context);
             //writeTest.WriteTestPO();
         }

@@ -21,11 +21,17 @@ namespace AxConnect.Modules
             var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(inventDim.GetDataReader(), "[ax].[INVENTDIM]");
 
+            var custVendExt = AXServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(custVendExt.GetDataReader(), "[ax].[CUSTVENDEXTERNALITEM]");
+
             var variants = ReadVariants(context);
             DataAccess.DataWriter.WriteToTable(variants, "[ax].[ReleasedProductVariants]");
 
             var combos = AXServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(combos.GetDataReader(), "[ax].[INVENTDIMCOMBINATIONS]");
+
+            WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
+            WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup");
 
             var reqItems = ReadReqItemTable(context);
             DataAccess.DataWriter.WriteToTable(reqItems, "[ax].[REQITEMTABLE]");
@@ -33,21 +39,33 @@ namespace AxConnect.Modules
             var reqKey = ReadReqSafetyKey(context);
             DataAccess.DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
 
-            WriteSafetyLines();
+            WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines");
+
+            // item_order_routes
+            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetupDTO>("ItemPurchSetups", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
+
+            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetupsDTO>("ItemInventSetups", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
+
+            WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure");
+            WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion");
         }
 
-        private static void WriteSafetyLines()
+        
+        private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName)
         {
-            Int64 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[REQSAFETYLINE]");
+            Int64 recId = DataAccess.DataWriter.GetMaxRecId(schemaName, tableName);
             Int64 pageSize = 20000;
             bool foundData = true;
-            while(foundData)
+            while (foundData)
             {
-                foundData = WriteFromService<ReqSafetyLineDTO>(recId, pageSize, "GetSafetyLines", "[ax].[REQSAFETYLINE]");
-                recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[REQSAFETYLINE]");
+                foundData = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "."+tableName);
+                recId = DataAccess.DataWriter.GetMaxRecId("[ax]", tableName);
             }
 
         }
+ 
         private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
             AXServiceConnector connector = new AXServiceConnector();
@@ -56,7 +74,7 @@ namespace AxConnect.Modules
 
             var reader = result.Result.GetDataReader();
 
-            DataAccess.DataWriter.WriteToTable(reader, "[ax]." + destTable);
+            DataAccess.DataWriter.WriteToTable(reader, destTable);
 
             return result.Result.Any();
         }
@@ -88,7 +106,7 @@ namespace AxConnect.Modules
             List<dynamic> products = new List<dynamic>();
             foreach (var prod in resProducts)
             {
-                var prodInvent = retailInvent.Single(s => s.ItemId == prod.ItemNumber);
+                //var prodInvent = retailInvent.Single(s => s.ItemId == prod.ItemNumber);
                 products.Add(new
                 {
                     DATAAREAID = prod.DataAreaId,
@@ -110,7 +128,7 @@ namespace AxConnect.Modules
                     STANDARDPALLETQUANTITY = 0m,///prod.StandardPalletQty,
                     QTYPERLAYER = 0.0m,//prod.QtyPerLayer,
                     ITEMBUYERGROUPID = prod.BuyerGroupId,
-                    PRODUCT = prodInvent.Product,//,
+                    PRODUCT = prod.ProductRecId,//,
                     SALEPRICE = prod.FixedSalesPriceCharges,
 
                 });
@@ -141,7 +159,8 @@ namespace AxConnect.Modules
                     INVENTCOLORID = v.ProductColorId,
                     //INVENTSITEID = v.S,
                     INVENTSTYLEID = v.ProductStyleId,
-                    PRODUCTMASTERNUMBER = v.ProductMasterNumber//,
+                    PRODUCTMASTERNUMBER = v.ProductMasterNumber,
+                    RECID = v.PublicRecId 
                     //MODIFIEDDATETIME = 
                     //RECVERSION = v.ProductMaster.Re
                 });

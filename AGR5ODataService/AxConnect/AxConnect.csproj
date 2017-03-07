@@ -83,7 +83,9 @@
     <Compile Include="DTO\CategoryDTO.cs" />
     <Compile Include="DTO\CategoryHierarchyDTO.cs" />
     <Compile Include="DTO\CategoryRoleDTO.cs" />
+    <Compile Include="DTO\CustVendExternalItemsDTO.cs" />
     <Compile Include="DTO\DistinctProductDTO.cs" />
+    <Compile Include="DTO\DTOUtil.cs" />
     <Compile Include="DTO\EcoResProductCategoryDTO.cs" />
     <Compile Include="DTO\GenericJsonOdata.cs" />
     <Compile Include="DTO\InventDimCombinationDTO.cs" />
@@ -92,8 +94,16 @@
     <Compile Include="DTO\InventModuleTableDTO.cs" />
     <Compile Include="DTO\InventTransDTO.cs" />
     <Compile Include="DTO\InventTransOriginDTO.cs" />
+    <Compile Include="DTO\ItemInventSetupsDTO.cs" />
+    <Compile Include="DTO\ItemPurchSetupDTO.cs" />
     <Compile Include="DTO\ReqSafetyLineDTO.cs" />
+    <Compile Include="DTO\RetailAssortmentDTO.cs" />
+    <Compile Include="DTO\RetailAssortmentLookupChannelGroupDTO.cs" />
+    <Compile Include="DTO\RetailAssortmentLookupDTO.cs" />
     <Compile Include="DTO\RetailChannelDTO.cs" />
+    <Compile Include="DTO\RetailProductTranslationDTO.cs" />
+    <Compile Include="DTO\UnitOfMeasureConversionDTO.cs" />
+    <Compile Include="DTO\UnitOfMeasureDTO.cs" />
     <Compile Include="Modules\ItemAttributeLookup.cs" />
     <Compile Include="Modules\ItemCategoryTransfer.cs" />
     <Compile Include="Modules\ItemTransfer.cs" />

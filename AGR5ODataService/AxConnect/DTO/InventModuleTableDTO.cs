@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AxConnect.Microsoft.Dynamics.DataEntities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,31 +9,121 @@ namespace AxConnect.DTO
 {
     public class InventModuleTableDTO
     {
-        public string AllocateMarkup { get; set; }
+        private NoYes _allocateMarkup;
+        private NoYes _taxwithold_th;
+        private NoYes _endDisc;
+        private ModuleInventPurchSales _moduleType;
+        private NoYes _interCompanyBlocked;
+        public object AllocateMarkup
+        {
+            get
+            {
+                return (int)_allocateMarkup;
+            }
+            set
+            {
+                if (value is NoYes)
+                {
+                    _allocateMarkup = (NoYes)value;
+                }
+                else
+                {
+                    _allocateMarkup = NoYes.No;
+                }
+            }
+        }
         public string MultiLineDisc { get; set; }
-        public string TaxWithholdCalculate_TH { get; set; }
+        public object TaxWithholdCalculate_TH
+        {
+            get
+            {
+                return (int)_taxwithold_th;
+            }
+            set
+            {
+                if (value is NoYes)
+                {
+                    _taxwithold_th = (NoYes)value;
+                }
+                else
+                {
+                    _taxwithold_th = NoYes.No;
+                }
+            }
+        }
         public string TaxGSTReliefCategory_MY_ReliefCategoryId { get; set; }
-        public string PDSPricingPrecision { get; set; }
-        public string PriceDate { get; set; }
+        public int PDSPricingPrecision { get; set; }
+        public DateTime PriceDate { get; set; }
         public string UnitId { get; set; }
         public string MarkupGroupId { get; set; }
         public string SuppItemGroupId { get; set; }
-        public string PriceUnit { get; set; }
+        public decimal PriceUnit { get; set; }
         public string LineDisc { get; set; }
-        public string Markup { get; set; }
-        public string MaximumRetailPrice_IN { get; set; }
-        public string PriceSecCur_RU { get; set; }
-        public string MarkupSecCur_RU { get; set; }
+        public decimal Markup { get; set; }
+        public decimal MaximumRetailPrice_IN { get; set; }
+        public decimal PriceSecCur_RU { get; set; }
+        public decimal MarkupSecCur_RU { get; set; }
         public string TaxItemGroupId { get; set; }
-        public string EndDisc { get; set; }
-        public string PriceQty { get; set; }
-        public string Price { get; set; }
-        public string UnderDeliveryPct { get; set; }
+        public object EndDisc
+        {
+            get
+            {
+                return (NoYes)_endDisc;
+            }
+            set
+            {
+                if (value is NoYes)
+                {
+                    _endDisc = (NoYes)value;
+                }
+                else
+                {
+                    _endDisc = NoYes.No;
+                }
+            }
+        }
+        public decimal PriceQty { get; set; }
+        public decimal Price { get; set; }
+        public decimal UnderDeliveryPct { get; set; }
         public string TaxWithholdItemGroupHeading_TH_TaxWithholdItemGroup { get; set; }
         public string ItemId { get; set; }
-        public string OverDeliveryPct { get; set; }
+        public decimal OverDeliveryPct { get; set; }
         public string dataAreaId { get; set; }
-        public string ModuleType { get; set; }
-        public string InterCompanyBlocked { get; set; }
+        public object ModuleType
+        {
+            get
+            {
+                return (ModuleInventPurchSales)_moduleType;
+            }
+            set
+            {
+                if (value is ModuleInventPurchSales)
+                {
+                    _moduleType = (ModuleInventPurchSales)value;
+                }
+                else
+                {
+                    _moduleType = ModuleInventPurchSales.Invent;
+                }
+            }
+        }
+        public object InterCompanyBlocked
+        {
+            get
+            {
+                return (NoYes)_interCompanyBlocked;
+            }
+            set
+            {
+                if (value is NoYes)
+                {
+                    _interCompanyBlocked = (NoYes)value;
+                }
+                else
+                {
+                    _interCompanyBlocked = NoYes.No;
+                }
+            }
+        }
     }
 }

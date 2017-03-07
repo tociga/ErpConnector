@@ -37,7 +37,7 @@ namespace DataAccess
             }
         }
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -49,6 +49,7 @@ namespace DataAccess
                     cmd.Parameters.AddWithValue("@truncate_sales_trans_dumb", clearTrans);
                     cmd.Parameters.AddWithValue("@truncate_locations_and_vendors", clearLocations);
                     cmd.Parameters.AddWithValue("@truncate_sales_trans_refresh", clearTransRefresh);
+                    cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
 
                     cmd.ExecuteNonQuery();
                 }

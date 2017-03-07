@@ -34,7 +34,7 @@ namespace AGR5ODataService
                 //context.SaveChanges();
 
                 
-                System.Threading.Thread.Sleep(100000);
+                System.Threading.Thread.Sleep(1000);
 
             }
             catch(Exception e)

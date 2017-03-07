@@ -75,10 +75,11 @@ namespace AxConnect.DTO
                 }
             }
         }
-        public long PublicCategoryHierarchy { get; set; }
         public string OperatingUnitPartyNumber { get; set; }
         public string RetailChannelId { get; set; }
         public long PublicOMOperatingUnitID { get; set; }
+        public long PublicCategoryHierarchy { get; set; }
+        public long PublicPartition { get; set; }
 
 
 
