@@ -14,6 +14,8 @@ namespace AxConnect.Modules
     {
         public static void WriteItems(Resources context, string authHeader)
         {
+            var releasedMasters = AXServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<ReleasedProductMasterReadDTO>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
             //var items = ReadProducts(context);
             var items = AXServiceConnector.CallOdataEndpoint<DistinctProductDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");

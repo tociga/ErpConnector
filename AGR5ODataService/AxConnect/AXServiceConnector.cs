@@ -56,6 +56,58 @@ namespace AxConnect
                 //return jsonString;
             }
         }
+        public static async Task<string> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject)
+        {
+            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+
+            var request = HttpWebRequest.Create(endpoint);
+            request.Headers["Authorization"] = adalHeader;
+            //request.Headers["Content-Type"] = "application/json";
+
+            request.Method = "POST";
+            var postData = JsonConvert.SerializeObject(postDataObject, new Converters.AxEnumConverter());
+            request.ContentLength = postData != null ? postData.Length : 0;
+            request.ContentType = "application/json";
+
+            using (var requestStream = request.GetRequestStream())
+            {
+                using (StreamWriter writer = new StreamWriter(requestStream))
+                {
+                    writer.Write(postData);
+                    writer.Flush();
+                }
+            }
+
+            try
+            {
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        using (StreamReader streamReader = new StreamReader(responseStream))
+                        {
+                            string responseString = streamReader.ReadToEnd();
+                            //string sanitized = SanitizeJsonString(responseString);
+
+                            //JsonConvert.DeserializeObject<DTO.GenericJsonOdata<T>>(responseString);
+                            return responseString;
+                        }
+                    }
+                }
+            }
+            catch (WebException e)
+            {
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+                        var r = reader.ReadToEnd();
+                        return r;
+                    }
+                }
+            }
+        }
 
         public static async Task<DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
         {

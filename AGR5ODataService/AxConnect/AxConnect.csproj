@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="AXODataConnector.cs" />
     <Compile Include="AXServiceConnector.cs" />
+    <Compile Include="Converters\AxEnumConverter.cs" />
     <Compile Include="DTO\CategoryDTO.cs" />
     <Compile Include="DTO\CategoryHierarchyDTO.cs" />
     <Compile Include="DTO\CategoryRoleDTO.cs" />
@@ -96,6 +97,11 @@
     <Compile Include="DTO\InventTransOriginDTO.cs" />
     <Compile Include="DTO\ItemInventSetupsDTO.cs" />
     <Compile Include="DTO\ItemPurchSetupDTO.cs" />
+    <Compile Include="DTO\ProductMasterDTO.cs" />
+    <Compile Include="DTO\ReleasedDistinctProductsDTO.cs" />
+    <Compile Include="DTO\ReleasedProductMasterReadDTO.cs" />
+    <Compile Include="DTO\ReleasedProductMasterWriteDTO.cs" />
+    <Compile Include="DTO\ReleasedProductVariantDTO.cs" />
     <Compile Include="DTO\ReqSafetyLineDTO.cs" />
     <Compile Include="DTO\RetailAssortmentDTO.cs" />
     <Compile Include="DTO\RetailAssortmentLookupChannelGroupDTO.cs" />
@@ -104,6 +110,8 @@
     <Compile Include="DTO\RetailProductTranslationDTO.cs" />
     <Compile Include="DTO\UnitOfMeasureConversionDTO.cs" />
     <Compile Include="DTO\UnitOfMeasureDTO.cs" />
+    <Compile Include="DTO\VariantGroupDTO.cs" />
+    <Compile Include="Modules\CreateItems.cs" />
     <Compile Include="Modules\ItemAttributeLookup.cs" />
     <Compile Include="Modules\ItemCategoryTransfer.cs" />
     <Compile Include="Modules\ItemTransfer.cs" />

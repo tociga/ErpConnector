@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 using AxConCommon.Extensions;
+using System.Reflection;
 
 namespace DataAccess
 {
@@ -19,6 +20,29 @@ namespace DataAccess
             }
         }
 
+        public static void WriteToTable<T>(IGenericDataReader reader, string tableName)
+        {
+            if (reader.HasRows())
+            {
+                using (var con = new SqlConnection(ConnectionString))
+                {
+                    using (var copy = new SqlBulkCopy(con))
+                    {
+                        con.Open();
+                        var mappings = GetDynamicBulkCopyColumnMapping<T>();
+                        foreach(var m in mappings)
+                        {
+                            copy.ColumnMappings.Add(m);
+                        }
+                        copy.DestinationTableName = tableName;
+                        copy.BulkCopyTimeout = 3600;
+                        copy.WriteToServer(reader);
+
+                    }
+                }
+            }
+        }
+
         public static void WriteToTable(IGenericDataReader reader, string tableName)
         {
             if (reader.HasRows())
@@ -28,7 +52,7 @@ namespace DataAccess
                     using (var copy = new SqlBulkCopy(con))
                     {
                         con.Open();
-                        copy.DestinationTableName = tableName;
+                        copy.DestinationTableName = tableName;                        
                         copy.BulkCopyTimeout = 3600;
                         copy.WriteToServer(reader);
                  
@@ -77,5 +101,17 @@ namespace DataAccess
                 }
             }
         }
+
+        public static List<SqlBulkCopyColumnMapping> GetDynamicBulkCopyColumnMapping<T>()
+        {
+            List<SqlBulkCopyColumnMapping> mappings = new List<SqlBulkCopyColumnMapping>();
+            Type baseType = typeof(T);
+            foreach (var pi in baseType.GetProperties(BindingFlags.Public|BindingFlags.Instance))
+            {
+                mappings.Add(new SqlBulkCopyColumnMapping(pi.Name, pi.Name));
+            }
+            return mappings;
+        }
+
     }
 }

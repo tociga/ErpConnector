@@ -1,4 +1,5 @@
 ﻿using AxConCommon.Extensions;
+using AxConnect.DTO;
 using AxConnect.Microsoft.Dynamics.DataEntities;
 using System;
 using System.Collections.Generic;
@@ -10,22 +11,31 @@ namespace AxConnect.Modules
 {
     public class ItemAttributeLookup
     {
-        public static void ReadItemAttributes(Resources context)
+        public static void ReadItemAttributes(Resources context, string autheader)
         {
+            var colorGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", autheader).Result.value;
+            DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(colorGroups.GetDataReader(), "[ax].[ProductColorGroup]");
+
+            var sizeGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", autheader).Result.value;
+            DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(sizeGroups.GetDataReader(), "[ax].[ProductSizeGroup]");
+
+            var styleGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", autheader).Result.value;
+            DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(styleGroups.GetDataReader(), "[ax].[ProductStyleGroup]");
+
             var season = ReadSeasonTable(context);
             DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
 
             var inventSeason = ReadInventSeasonTable(context);
             DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
 
-            var colorGroups = ReadColorGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(colorGroups, "[ax].[ProductColorGroupLine]");
+            var colorGroupLines = ReadColorGroupLines(context);
+            DataAccess.DataWriter.WriteToTable(colorGroupLines, "[ax].[ProductColorGroupLine]");
 
-            var sizeGroups = ReadSizeGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(sizeGroups, "[ax].[ProductSizeGroupLine]");
+            var sizeGroupLines = ReadSizeGroupLines(context);
+            DataAccess.DataWriter.WriteToTable(sizeGroupLines, "[ax].[ProductSizeGroupLine]");
 
-            var styleGroups = ReadStyleGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(styleGroups, "[ax].[ProductStyleGroupLine]");
+            var styleGroupLines = ReadStyleGroupLines(context);
+            DataAccess.DataWriter.WriteToTable(styleGroupLines, "[ax].[ProductStyleGroupLine]");
         }
 
         private static IGenericDataReader ReadColorGroupLines(Resources context)

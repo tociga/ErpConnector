@@ -21,7 +21,7 @@ namespace AxConnect.Modules
             bool foundData = true;
             while(foundData)
             {
-                foundData =  WriteInventTrans< InventTransDTO>(recId, 20000, "GetInventTransLines", "[INVENTTRANS]");
+                foundData =  WriteInventTrans<InventTransDTO>(recId, 20000, "GetInventTransLines", "[INVENTTRANS]");
                 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");
                 recId = GetNextRecId(recId, "GetNextRecId");
             }
