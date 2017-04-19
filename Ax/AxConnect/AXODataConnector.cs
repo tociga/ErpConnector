@@ -15,7 +15,7 @@ namespace AxConnect
         private Resources context;
         public AXODataConnector()
         {
-            Authorize().Wait();
+            //Authorize().Wait();
             context = new Resources(new Uri("https://agrax7u2devaos.cloudax.dynamics.com/data"));
             context.SendingRequest2 += Context_SendingRequest2;           
         }
