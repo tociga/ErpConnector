@@ -11,7 +11,7 @@ namespace AxConnect.Modules
 {
     public class CreateItems
     {
-        public static void CreateSku(Resources context, string adalHeader, DistinctProduct distinctProduct, ReleasedDistinctProductsDTO releasedDistinctProduct,
+        public static void CreateSku(Resources context, string adalHeader, DistinctProduct distinctProduct, ReleasedDistinctProductsWriteDTO releasedDistinctProduct,
             List<ReleasedProductVariantDTO> variants)
         {
             //First add distinct product

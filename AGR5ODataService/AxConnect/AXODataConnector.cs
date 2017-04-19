@@ -37,17 +37,17 @@ namespace AxConnect
         {
             DateTime start = DateTime.Now;
             //CreateItemTest();
-            DataAccess.DataWriter.TruncateTables(false, false, false,false, true);
+            DataAccess.DataWriter.TruncateTables(true, false, false,true, true);
             //DateTime truncate = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Truncate = " + truncate.Subtract(start).TotalSeconds);
             ////SalesValueTransactions.WriteSalesValueTrans(context);
-            //ItemCategoryTransfer.WriteCategories(header);
+            ItemCategoryTransfer.WriteCategories(header);
             //DateTime cat = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Category = " + cat.Subtract(truncate).TotalSeconds);
-            //LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
             //DateTime loc = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Locations = " + loc.Subtract(cat).TotalSeconds);
-            //ItemTransfer.WriteItems(context, header);
+            ItemTransfer.WriteItems(context, header);
             //DateTime items = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Items = " + items.Subtract(loc).TotalSeconds);
             ItemAttributeLookup.ReadItemAttributes(context, header);
@@ -89,7 +89,7 @@ namespace AxConnect
 
 
             #region Released Distinct Product
-            ReleasedDistinctProductsDTO rdp = new ReleasedDistinctProductsDTO();
+            ReleasedDistinctProductsWriteDTO rdp = new ReleasedDistinctProductsWriteDTO();
             rdp.AlternativeItemNumber = "";
             rdp.AlternativeProductColorId = "";
             rdp.AlternativeProductConfigurationId = "";
@@ -275,7 +275,7 @@ namespace AxConnect
             rdp.YieldPercentage = 0m;
             #endregion
             //ProductColorGroup
-            ProductMasterDTO master = new ProductMasterDTO();
+            ProductMasterWriteDTO master = new ProductMasterWriteDTO();
             master.AreIdenticalConfigurationsAllowed = NoYes.No;
             master.HarmonizedSystemCode = "";
             master.IsAutomaticVariantGenerationEnabled = NoYes.Yes;

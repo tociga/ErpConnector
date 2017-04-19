@@ -44,7 +44,7 @@ namespace AxConnect.Modules
         {
             AXServiceConnector connector = new AXServiceConnector();
             string postData = "{ \"minRecId\": " + recId.ToString()+ ", \"maxRecId\" : "+ (recId + pageSize).ToString() +"}";
-            var result = connector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData);
+            var result = AXServiceConnector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData);
 
             var reader = result.Result.GetDataReader();
 
@@ -55,9 +55,8 @@ namespace AxConnect.Modules
 
         public long GetNextRecId(long recId, string webMethod)
         {
-            AXServiceConnector connector = new AXServiceConnector();
             string postData = "{ \"lastRecId\": " + recId.ToString()+" }";
-            var result = connector.CallAGRServiceScalar<Int64>("AGRInventTransService", webMethod, postData);
+            var result = AXServiceConnector.CallAGRServiceScalar<Int64>("AGRInventTransService", webMethod, postData);
 
             return result.Result;
         }

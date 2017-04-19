@@ -22,11 +22,11 @@ namespace AxConnect.Modules
             var styleGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", autheader).Result.value;
             DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(styleGroups.GetDataReader(), "[ax].[ProductStyleGroup]");
 
+            var seasonGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", autheader).Result.value;
+            DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(seasonGroups.GetDataReader(), "[ax].[SeasonGroup]");
+
             var season = ReadSeasonTable(context);
             DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
-
-            var inventSeason = ReadInventSeasonTable(context);
-            DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
 
             var colorGroupLines = ReadColorGroupLines(context);
             DataAccess.DataWriter.WriteToTable(colorGroupLines, "[ax].[ProductColorGroupLine]");
@@ -121,24 +121,6 @@ namespace AxConnect.Modules
             }
             return list.GetDataReader<dynamic>();
         }
-
-        private static IGenericDataReader ReadInventSeasonTable(Resources context)
-        {
-            var inventSeasons = context.InventSeasonTables.ToList();
-            List<dynamic> list = new List<dynamic>();
-            foreach(var i in inventSeasons)
-            {
-                list.Add(
-                    new
-                    {
-                        ItemId = i.ItemId,
-                        SeasonCode = i.SeasonCode,
-                        IsDefault = i.IsDefault
-                    });
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
 
     }
 }

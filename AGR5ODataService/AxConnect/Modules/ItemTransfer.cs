@@ -14,10 +14,16 @@ namespace AxConnect.Modules
     {
         public static void WriteItems(Resources context, string authHeader)
         {
+            var productMaster = AXServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductMasterReadDTO>(productMaster.GetDataReader(), "[ax].[ProductMaster]");
+
             var releasedMasters = AXServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable<ReleasedProductMasterReadDTO>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
             //var items = ReadProducts(context);
-            var items = AXServiceConnector.CallOdataEndpoint<DistinctProductDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
+            var distinctProducts = AXServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<DistinctProductsDTO>(distinctProducts.GetDataReader(), "[ax].[DistinctProduct]");
+
+            var items = AXServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");
 
             var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
@@ -52,9 +58,32 @@ namespace AxConnect.Modules
 
             WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure");
             WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion");
+
+            var inventSeason = ReadInventSeasonTable(context);
+            DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
+
+            //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
+            var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
+            DataAccess.DataWriter.WriteToTable(inventColorSeason.GetDataReader(), "[ax].[InventColorSeason]");
         }
 
-        
+        private static IGenericDataReader ReadInventSeasonTable(Resources context)
+        {
+            var inventSeasons = context.InventSeasonTables.ToList();
+            List<dynamic> list = new List<dynamic>();
+            foreach (var i in inventSeasons)
+            {
+                list.Add(
+                    new
+                    {
+                        ItemId = i.ItemId,
+                        SeasonCode = i.SeasonCode,
+                        IsDefault = i.IsDefault
+                    });
+            }
+            return list.GetDataReader<dynamic>();
+        }
+
         private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName)
         {
             Int64 recId = DataAccess.DataWriter.GetMaxRecId(schemaName, tableName);
@@ -70,17 +99,20 @@ namespace AxConnect.Modules
  
         private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
-            AXServiceConnector connector = new AXServiceConnector();
             string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
-            var result = connector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
-
-            var reader = result.Result.GetDataReader();
+            //var result = AXServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
+            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData);
+            var reader = result.GetDataReader();
 
             DataAccess.DataWriter.WriteToTable(reader, destTable);
 
-            return result.Result.Any();
+            return result.Any();
         }
 
+        private static List<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData)
+        {
+            return AXServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, serviceGroup).Result;
+        }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
         //    var combos = context.AGRInventDimCombinations.ToList();                                
@@ -104,6 +136,7 @@ namespace AxConnect.Modules
         {
             var resProducts = from p in context.ReleasedDistinctProducts select p;
             var retailInvent = context.RetailInventTable.ToList();
+            
             //context.ReleasedProductVariants.
             List<dynamic> products = new List<dynamic>();
             foreach (var prod in resProducts)

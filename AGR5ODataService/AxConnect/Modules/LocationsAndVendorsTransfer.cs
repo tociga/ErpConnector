@@ -16,8 +16,8 @@ namespace AxConnect.Modules
         {
             //var channel = ReadRetailChannel(context);
             var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels", 
-                "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", 
-                authHeader).Result.value.GetDataReader();
+               // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", 
+                "",authHeader).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);

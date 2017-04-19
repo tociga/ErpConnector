@@ -85,7 +85,10 @@
     <Compile Include="DTO\CategoryHierarchyDTO.cs" />
     <Compile Include="DTO\CategoryRoleDTO.cs" />
     <Compile Include="DTO\CustVendExternalItemsDTO.cs" />
-    <Compile Include="DTO\DistinctProductDTO.cs" />
+    <Compile Include="DTO\DistinctProductsDTO.cs" />
+    <Compile Include="DTO\InventColorSeasonDTO.cs" />
+    <Compile Include="DTO\ProductMasterReadDTO.cs" />
+    <Compile Include="DTO\ReleasedDistinctProductsReadDTO.cs" />
     <Compile Include="DTO\DTOUtil.cs" />
     <Compile Include="DTO\EcoResProductCategoryDTO.cs" />
     <Compile Include="DTO\GenericJsonOdata.cs" />
@@ -97,8 +100,8 @@
     <Compile Include="DTO\InventTransOriginDTO.cs" />
     <Compile Include="DTO\ItemInventSetupsDTO.cs" />
     <Compile Include="DTO\ItemPurchSetupDTO.cs" />
-    <Compile Include="DTO\ProductMasterDTO.cs" />
-    <Compile Include="DTO\ReleasedDistinctProductsDTO.cs" />
+    <Compile Include="DTO\ProductMasterWriteDTO.cs" />
+    <Compile Include="DTO\ReleasedDistinctProductsWriteDTO.cs" />
     <Compile Include="DTO\ReleasedProductMasterReadDTO.cs" />
     <Compile Include="DTO\ReleasedProductMasterWriteDTO.cs" />
     <Compile Include="DTO\ReleasedProductVariantDTO.cs" />
