@@ -5,11 +5,11 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxDataAccess", "Ax\AxDataAccess\AxDataAccess.csproj", "{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxDataAccess", "AxDataAccess\AxDataAccess.csproj", "{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConnect", "Ax\AxConnect\AxConnect.csproj", "{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConnect", "AxConnect\AxConnect.csproj", "{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConCommon", "Ax\AxConCommon\AxConCommon.csproj", "{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConCommon", "AxConCommon\AxConCommon.csproj", "{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -183,7 +183,7 @@
       <Project>{a8e95d64-c63d-4f1a-85e4-ebb7495feeda}</Project>
       <Name>AxConCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+    <ProjectReference Include="..\AxDataAccess\AxDataAccess.csproj">
       <Project>{a708abad-cf99-4e2e-a84c-d13ea83e36d7}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
