@@ -15,20 +15,29 @@ namespace AxConnect
 {
     public class AXServiceConnector
     {
-        private static string header = "";
+        private static string header = null;
 
         public AXServiceConnector()
         {
-            Authorize().Wait();
+            Authorize();
         }
-        private Task Authorize()
+        private static void Authorize()
         {
-            return Task.Run(() => {
-                WithoutADAL().Wait();
-                //AdalAuthenticate().Wait();
-            });
+            header = WithoutADAL().Result;
         }
-        private static async Task WithoutADAL()
+
+        private static string Header
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(header))
+                {
+                    Authorize();
+                }
+                return header;
+            }
+        }
+        private static async Task<string> WithoutADAL()
         {
             var postData = new List<KeyValuePair<string, string>>
             {
@@ -52,7 +61,7 @@ namespace AxConnect
                 HttpResponseMessage response = await client.PostAsync("token", content);
                 string jsonString = await response.Content.ReadAsStringAsync();
                 var responseData = JsonConvert.DeserializeObject<dynamic>(jsonString);
-                header = responseData.token_type + " " + responseData.access_token;
+                return responseData.token_type + " " + responseData.access_token;
                 //return jsonString;
             }
         }
@@ -143,27 +152,29 @@ namespace AxConnect
                 }
             }
         }
-        public async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData)
+        public static async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup = null)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string standardServiceGroup = System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
-            string endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
+            serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
+            string endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = header;
+            request.Headers["Authorization"] = Header;
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
-            request.ContentLength = postData.Length;
+            request.ContentLength = postData != null ? postData.Length : 0;
 
-            using (var requestStream = request.GetRequestStream())
+            if (request.ContentLength > 0)
             {
-                using (StreamWriter writer = new StreamWriter(requestStream))
+                using (var requestStream = request.GetRequestStream())
                 {
-                    writer.Write(postData);
-                    writer.Flush();
+                    using (StreamWriter writer = new StreamWriter(requestStream))
+                    {
+                        writer.Write(postData);
+                        writer.Flush();
+                    }
                 }
             }
-
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 using (Stream responseStream = response.GetResponseStream())
@@ -179,14 +190,14 @@ namespace AxConnect
             }
         }
 
-        public async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData)
+        public static async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string standardServiceGroup = System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
             string endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = header;
+            request.Headers["Authorization"] = Header;
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData.Length;

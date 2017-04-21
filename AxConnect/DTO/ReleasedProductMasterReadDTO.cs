@@ -594,6 +594,7 @@ namespace AxConnect.DTO
         public string BuyerGroupId { get; set; }
         public int GrossProductWidth { get; set; }
         public DateTime ShipStartDate { get; set; }
+        public long ProductRecId { get; set; }
 
     }
 }

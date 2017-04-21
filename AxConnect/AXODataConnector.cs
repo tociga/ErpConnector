@@ -1,11 +1,18 @@
 ﻿using AxConnect.Microsoft.Dynamics.DataEntities;
+using AxConCommon.Extensions;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using AxConnect.Modules;
 using AxConnect.DTO;
-using System.Configuration;
+using Simple.OData.Client;
 
 namespace AxConnect
 {
@@ -15,7 +22,7 @@ namespace AxConnect
         private Resources context;
         public AXODataConnector()
         {
-            //Authorize().Wait();
+            Authorize().Wait();
             context = new Resources(new Uri("https://agrax7u2devaos.cloudax.dynamics.com/data"));
             context.SendingRequest2 += Context_SendingRequest2;           
         }
@@ -31,17 +38,17 @@ namespace AxConnect
         {
             DateTime start = DateTime.Now;
             //CreateItemTest();
-            DataAccess.DataWriter.TruncateTables(false, false, false,false, true);
+            DataAccess.DataWriter.TruncateTables(true, false, false,true, true);
             //DateTime truncate = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Truncate = " + truncate.Subtract(start).TotalSeconds);
             ////SalesValueTransactions.WriteSalesValueTrans(context);
-            //ItemCategoryTransfer.WriteCategories(header);
+            ItemCategoryTransfer.WriteCategories(header);
             //DateTime cat = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Category = " + cat.Subtract(truncate).TotalSeconds);
-            //LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
             //DateTime loc = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Locations = " + loc.Subtract(cat).TotalSeconds);
-            //ItemTransfer.WriteItems(context, header);
+            ItemTransfer.WriteItems(context, header);
             //DateTime items = DateTime.Now;
             //System.Diagnostics.Debug.WriteLine("Items = " + items.Subtract(loc).TotalSeconds);
             ItemAttributeLookup.ReadItemAttributes(context, header);
@@ -51,11 +58,20 @@ namespace AxConnect
             //writeTest.WriteTestPO();
         }
 
+        public async void strump()
+        {
+            var x = ODataDynamic.Expression;
+            var client = new ODataClient("https://agrax7u2devaos.cloudax.dynamics.com/data/ReleasedDistinctProducts");
+            var person = await client.For(x.Products).FindEntryAsync();
+            var userName = person.UserName;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public void CreateItemTest()
         {
+
             Random rand = new Random();
             //int randomInt = rand.Next();           
             DistinctProduct dp = new DistinctProduct();
@@ -83,7 +99,7 @@ namespace AxConnect
 
 
             #region Released Distinct Product
-            ReleasedDistinctProductsDTO rdp = new ReleasedDistinctProductsDTO();
+            ReleasedDistinctProductsWriteDTO rdp = new ReleasedDistinctProductsWriteDTO();
             rdp.AlternativeItemNumber = "";
             rdp.AlternativeProductColorId = "";
             rdp.AlternativeProductConfigurationId = "";
@@ -269,7 +285,7 @@ namespace AxConnect
             rdp.YieldPercentage = 0m;
             #endregion
             //ProductColorGroup
-            ProductMasterDTO master = new ProductMasterDTO();
+            ProductMasterWriteDTO master = new ProductMasterWriteDTO();
             master.AreIdenticalConfigurationsAllowed = NoYes.No;
             master.HarmonizedSystemCode = "";
             master.IsAutomaticVariantGenerationEnabled = NoYes.Yes;
@@ -546,13 +562,13 @@ namespace AxConnect
 
         private static async Task<string> AdalAuthenticate()
         {
-            var uri = new UriBuilder("https://login.windows.net/reynd.is/oauth2/token");
-            var redirectUri = new UriBuilder("http://agrdynamics.com/agr5ax7");
+            UriBuilder uri = new UriBuilder("https://login.windows.net/reynd.is/oauth2/token");
+            UriBuilder redirectUri = new UriBuilder("http://agrdynamics.com/agr5ax7");
 
-            var authenticationContext = new AuthenticationContext(uri.ToString());
-            var cred = new ClientCredential("4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns=");
+            AuthenticationContext authenticationContext = new AuthenticationContext(uri.ToString());
+            ClientCredential cred = new ClientCredential("4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns=");
 
-            var authResult = await authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["ax_base_url"], cred);
+            var authResult = await authenticationContext.AcquireTokenAsync(System.Configuration.ConfigurationManager.AppSettings["ax_base_url"], cred);
 
             return authResult.CreateAuthorizationHeader();
         }

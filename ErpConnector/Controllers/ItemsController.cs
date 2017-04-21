@@ -12,6 +12,7 @@ namespace ErpConnector.Controllers
         public IHttpActionResult Create()
         {
             var connector = new AxConnect.AXODataConnector();
+            //connector.strump();
             connector.CreateItemTest();
             return Ok();
         }
