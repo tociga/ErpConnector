@@ -58,14 +58,6 @@ namespace AxConnect
             //writeTest.WriteTestPO();
         }
 
-        public async void strump()
-        {
-            var x = ODataDynamic.Expression;
-            var client = new ODataClient("https://agrax7u2devaos.cloudax.dynamics.com/data/ReleasedDistinctProducts");
-            var person = await client.For(x.Products).FindEntryAsync();
-            var userName = person.UserName;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -572,6 +564,5 @@ namespace AxConnect
 
             return authResult.CreateAuthorizationHeader();
         }
- 
     }
 }

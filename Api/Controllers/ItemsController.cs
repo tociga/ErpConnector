@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using AxConnect.DTO;
 using System.Web.Http;
 
 namespace ErpConnector.Controllers
@@ -6,19 +6,17 @@ namespace ErpConnector.Controllers
     [RoutePrefix("items")]
     public class ItemsController : ApiController
     {
-        [HttpGet]
+        [HttpPost]
         [Route("")]
-        public IHttpActionResult Create()
+        public IHttpActionResult Create([FromBody] ItemDTO item)
         {
             var connector = new AxConnect.AXODataConnector();
-            //connector.strump();
-            connector.CreateItemTest();
-            return Ok();
+            var result = connector.CreateItem(item);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
-    }
-
-    public class Item
-    {
-        public int id { get; set; }
     }
 }

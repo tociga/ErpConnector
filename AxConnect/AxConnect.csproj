@@ -127,6 +127,7 @@
     <Compile Include="DTO\CustVendExternalItemsDTO.cs" />
     <Compile Include="DTO\DistinctProductsDTO.cs" />
     <Compile Include="DTO\InventColorSeasonDTO.cs" />
+    <Compile Include="DTO\ItemDTO.cs" />
     <Compile Include="DTO\ProductMasterReadDTO.cs" />
     <Compile Include="DTO\ReleasedDistinctProductsReadDTO.cs" />
     <Compile Include="DTO\DTOUtil.cs" />

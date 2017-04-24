@@ -213,9 +213,6 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\ProductsController.cs" />
-    <Compile Include="Controllers\SalesController.cs" />
-    <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -241,7 +238,7 @@
       <Project>{0281e8bc-c0ba-433d-b2c6-d16f6246b3ac}</Project>
       <Name>AxConnect</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+    <ProjectReference Include="..\AxDataAccess\AxDataAccess.csproj">
       <Project>{a708abad-cf99-4e2e-a84c-d13ea83e36d7}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
