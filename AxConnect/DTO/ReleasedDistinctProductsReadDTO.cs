@@ -164,8 +164,8 @@ namespace AxConnect.DTO
             get { return (int)_isPOSRegistrationQuantityNegative; }
             set { _isPOSRegistrationQuantityNegative = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No); }
         }
-        public decimal POSRegistrationPlannedBlockedDate { get; set; }
-        public decimal SellEndDate { get; set; }
+        public DateTime POSRegistrationPlannedBlockedDate { get; set; }
+        public DateTime SellEndDate { get; set; }
         public object IsPurchaseWithholdingTaxCalculated
         {
             get { return (int)_isPurchaseWithholdingTaxCalculated; }
