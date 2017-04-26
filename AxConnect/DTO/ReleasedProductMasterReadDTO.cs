@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AxConnect.DTO
 {
-    public class ReleasedProductMasterReadDTO 
+    public class ReleasedProductMasterReadDTO
     {
 
         EcoResProductType _productType;
@@ -61,7 +61,7 @@ namespace AxConnect.DTO
         SalesPriceModel _salesPriceCalculationModel;
         ABC _marginABCCode;
         NoYes _isUnitCostProductVariantSpecific;
- 
+
 
         public int BOMLevel { get; set; }
         public string ProductSearchName { get; set; }

@@ -96,7 +96,7 @@ namespace AxConnect.Modules
             }
 
         }
- 
+
         private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
             string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
@@ -115,7 +115,7 @@ namespace AxConnect.Modules
         }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
-        //    var combos = context.AGRInventDimCombinations.ToList();                                
+        //    var combos = context.AGRInventDimCombinations.ToList();
         //    var list = new List<dynamic>();
         //    foreach(var c in combos)
         //    {
@@ -136,7 +136,7 @@ namespace AxConnect.Modules
         {
             var resProducts = from p in context.ReleasedDistinctProducts select p;
             var retailInvent = context.RetailInventTable.ToList();
-            
+
             //context.ReleasedProductVariants.
             List<dynamic> products = new List<dynamic>();
             foreach (var prod in resProducts)
@@ -185,18 +185,18 @@ namespace AxConnect.Modules
                     DATAAREAID = v.DataAreaId,
                     INVENTDIMID = v.ProductVariantNumber,
                     INVENTBATCHID = v.ReleasedProductMaster != null ?  v.ReleasedProductMaster.BatchNumberGroupCode : "",
-                    //WMSLOCATIONID = 
+                    //WMSLOCATIONID =
                     //WMSPALLETID =
                     INVENTSERIALID = v.ReleasedProductMaster != null ? v.ReleasedProductMaster.SerialNumberGroupCode : "",
-                    //INVENTLOCATIONID = 
+                    //INVENTLOCATIONID =
                     CONFIGID = v.ProductConfigurationId,
                     INVENTSIZEID = v.ProductSizeId,
                     INVENTCOLORID = v.ProductColorId,
                     //INVENTSITEID = v.S,
                     INVENTSTYLEID = v.ProductStyleId,
                     PRODUCTMASTERNUMBER = v.ProductMasterNumber,
-                    RECID = v.PublicRecId 
-                    //MODIFIEDDATETIME = 
+                    RECID = v.PublicRecId
+                    //MODIFIEDDATETIME =
                     //RECVERSION = v.ProductMaster.Re
                 });
             }
@@ -225,7 +225,7 @@ namespace AxConnect.Modules
                     INVENTSTYLEID = dim.Style,
                     INVENTSTATUSID = dim.InventoryStatus,
                     //MODIFIEDDATETIME =
-                    //RECVERSION = 
+                    //RECVERSION =
                 });
             }
             return list.GetDataReader<dynamic>();
@@ -237,11 +237,11 @@ namespace AxConnect.Modules
             var list = new List<dynamic>();
             foreach(var req in reqItemTable)
             {
-                list.Add(new { 
+                list.Add(new {
                     DATAAREAID = req.DataAreaId,
                     ITEMID = req.ItemId,
                     MININVENTONHAND = req.MinInventOnhand,
-                    MAXINVENTONHAND = req.MaxInventOnhand,       
+                    MAXINVENTONHAND = req.MaxInventOnhand,
                     LEADTIMETRANSFER = req.LeadTimeTransfer,
                     LEADTIMETRANSFERACTIVE = req.LeadTimeTransferActive.GetValueOrDefault() == NoYes.Yes,
                     LEADTIMEPURCHASE = req.LeadTimePurchase,

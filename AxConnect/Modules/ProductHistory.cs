@@ -36,7 +36,7 @@ namespace AxConnect.Modules
             {
                 foundData = WriteInventTrans<InventTransOriginDTO>(recId, 20000, "GetInventTransOriginLines", "[INVENTTRANSORIGIN]");
                 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-                recId = GetNextRecId(recId, "GetNextTransOriginRecId");       
+                recId = GetNextRecId(recId, "GetNextTransOriginRecId");
     }
         }
 

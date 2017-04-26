@@ -15,14 +15,14 @@ namespace AxConnect.Modules
         public static void WriteLocationsAndVendors(Resources context, string authHeader)
         {
             //var channel = ReadRetailChannel(context);
-            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels", 
-               // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'", 
+            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels",
+               // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
                 "",authHeader).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);
-            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortmentDTO>("RetailAssortments", 
-                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", 
+            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortmentDTO>("RetailAssortments",
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'",
                 authHeader).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
@@ -35,7 +35,7 @@ namespace AxConnect.Modules
             var vendor = ReadVendorTable(context);
             DataAccess.DataWriter.WriteToTable(vendor, "[ax].[VENDTABLE]");
 
-            
+
             var channelLines = ReadRetailAssortmentChannelLines(context);
             DataAccess.DataWriter.WriteToTable(channelLines, "[ax].[RETAILASSORTMENTCHANNELLINE]");
 
@@ -43,7 +43,7 @@ namespace AxConnect.Modules
             DataAccess.DataWriter.WriteToTable(productLines, "[ax].[RETAILASSORTMENTPRODUCTLINE]");
         }
 
-        private static IGenericDataReader ReadRetailChannel(Resources context) 
+        private static IGenericDataReader ReadRetailChannel(Resources context)
         {
             var retailChannels = context.RetailChannels.Where(r => r.ChannelType == RetailChannelType.RetailStore);
             var list = new List<dynamic>();
@@ -83,7 +83,7 @@ namespace AxConnect.Modules
                     INVENTLOCATIONID = loc.Warehouse,
                     NAME = loc.Name,
                     REQREFILL = loc.Refilling.GetValueOrDefault() == NoYes.Yes,
-                    INVENTLOCATIONTYPE = loc.Type,                    
+                    INVENTLOCATIONTYPE = loc.Type,
                     FSHSTORE = (int)loc.Store.GetValueOrDefault(),
                     RETAILWEIGHTEX1 = loc.Weight,
                     INVENTSITEID = loc.Site,

@@ -184,7 +184,7 @@ namespace AxConnect
                         string responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
                         return JsonConvert.DeserializeObject<List<T>>(responseString);
-                      
+
                     }
                 }
             }

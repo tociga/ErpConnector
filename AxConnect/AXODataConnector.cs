@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AxConnect.Modules;
 using AxConnect.DTO;
-using Simple.OData.Client;
 
 namespace AxConnect
 {
@@ -24,7 +23,7 @@ namespace AxConnect
         {
             Authorize().Wait();
             context = new Resources(new Uri("https://agrax7u2devaos.cloudax.dynamics.com/data"));
-            context.SendingRequest2 += Context_SendingRequest2;           
+            context.SendingRequest2 += Context_SendingRequest2;
         }
 
         private Task Authorize()
@@ -59,13 +58,12 @@ namespace AxConnect
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void CreateItemTest()
         {
-
             Random rand = new Random();
-            //int randomInt = rand.Next();           
+            //int randomInt = rand.Next();
             DistinctProduct dp = new DistinctProduct();
             dp.NMFCCode = "";
             dp.ProductType = EcoResProductType.Item;
@@ -304,10 +302,10 @@ namespace AxConnect
             master.ProductType = EcoResProductType.Item;
             master.STCCCode = "";
             master.TrackingDimensionGroupName = "None";
-            master.StorageDimensionGroupName = "Ware";     
-               
+            master.StorageDimensionGroupName = "Ware";
 
-            ReleasedProductMasterWriteDTO rpm = new ReleasedProductMasterWriteDTO();        
+
+            ReleasedProductMasterWriteDTO rpm = new ReleasedProductMasterWriteDTO();
             rpm.TransferOrderOverdeliveryPercentage =  0;
             rpm.SalesUnitSymbol =  "Ea";
             rpm.ProductionConsumptionWidthConversionFactor =  0;
@@ -475,7 +473,7 @@ namespace AxConnect
             rpm.ComparisonPriceBaseUnitSymbol = "";
             rpm.WillWorkCenterPickingAllowNegativeInventory = NoYes.No;
             rpm.IsICMSTaxAppliedOnService = NoYes.No;
-            //rpm.ProductType = EcoResProductType.Item;            
+            //rpm.ProductType = EcoResProductType.Item;
             rpm.KeyInPriceRequirementsAtPOSRegister = RetailPriceKeyingRequirement.NotMandatory;
             rpm.ApproximateSalesTaxPercentage = 0;
             rpm.POSRegistrationActivationDate = new DateTimeOffset(new DateTime(1900, 1, 1, 12, 0, 0, 0)); ;
@@ -521,12 +519,12 @@ namespace AxConnect
             v.ProductName = master.ProductName + "_" + v.ProductColorId + "_" + v.ProductSizeId;
             v.ProductSearchName = v.ProductName;
             v.ProductMasterNumber = master.ProductNumber;
-           
+
 
             ProductTranslation pt = new ProductTranslation { LanguageId = "en-us", ProductNumber = master.ProductNumber, ProductName = master.ProductName };
             var list = new List<ProductTranslation>();
             list.Add(pt);
-            //v.ProductTranslation = list; 
+            //v.ProductTranslation = list;
             ReleasedProductVariant vv = new ReleasedProductVariant();
 
             //ProductTranslation t = new ProductTranslation();
