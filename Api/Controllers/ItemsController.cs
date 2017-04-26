@@ -10,12 +10,12 @@ namespace ErpConnector.Controllers
         [Route("")]
         public IHttpActionResult Create([FromBody] ItemDTO item)
         {
-            var connector = new AxConnect.AXODataConnector();
-            var result = connector.CreateItem(item);
-            if (result)
-            {
-                return Ok();
-            }
+            //var connector = new AxConnect.AXODataConnector();
+            //var result = connector.CreateItemTest(item);
+            //if (result)
+            //{
+            //    return Ok();
+            //}
             return BadRequest();
         }
     }
