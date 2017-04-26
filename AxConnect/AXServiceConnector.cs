@@ -42,10 +42,9 @@ namespace AxConnect
             var postData = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("resource", "https://agrax7u2devaos.cloudax.dynamics.com"),
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("username", "dadi@reynd.is"),
-                new KeyValuePair<string, string>("password", "ZiK289dt"),
-                new KeyValuePair<string, string>("client_id", "b15e9fb9-68ba-4bec-8ce5-f1094689a573")
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_secret", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns="),
+                new KeyValuePair<string, string>("client_id", "4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3")
             };
 
             using (var client = new HttpClient())
