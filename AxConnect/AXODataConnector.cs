@@ -1,5 +1,4 @@
-﻿using AxConnect.Microsoft.Dynamics.DataEntities;
-using AxConCommon.Extensions;
+﻿using AxConCommon.Extensions;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using System;
@@ -11,7 +10,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using AxConnect.Modules;
-using AxConnect.DTO;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
+using ErpDTO.DTO;
+using ErpDTO.Microsoft;
 
 namespace AxConnect
 {

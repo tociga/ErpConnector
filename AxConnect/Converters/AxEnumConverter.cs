@@ -1,4 +1,4 @@
-﻿using AxConnect.Microsoft.Dynamics.DataEntities;
+﻿using ErpDTO.Microsoft.Dynamics.DataEntities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

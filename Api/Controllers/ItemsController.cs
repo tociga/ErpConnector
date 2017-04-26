@@ -1,5 +1,4 @@
-﻿using AxConnect.DTO;
-using System.Web.Http;
+﻿using System.Web.Http;
 
 namespace ErpConnector.Controllers
 {
@@ -8,7 +7,7 @@ namespace ErpConnector.Controllers
     {
         [HttpPost]
         [Route("")]
-        public IHttpActionResult Create([FromBody] ItemDTO item)
+        public IHttpActionResult Create()
         {
             //var connector = new AxConnect.AXODataConnector();
             //var result = connector.CreateItemTest(item);

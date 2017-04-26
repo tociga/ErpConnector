@@ -10,6 +10,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ErpDTO.DTO;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
 
 namespace AxConnect
 {
@@ -117,7 +119,7 @@ namespace AxConnect
             }
         }
 
-        public static async Task<DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
+        public static async Task<ErpDTO.DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
@@ -145,7 +147,7 @@ namespace AxConnect
                     {
                         string responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
-                        return JsonConvert.DeserializeObject<DTO.GenericJsonOdata<T>>(responseString);
+                        return JsonConvert.DeserializeObject<ErpDTO.DTO.GenericJsonOdata<T>>(responseString);
 
                     }
                 }

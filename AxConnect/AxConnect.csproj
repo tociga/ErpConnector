@@ -113,48 +113,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AGRODataClient.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AGRODataClient.tt</DependentUpon>
-    </Compile>
     <Compile Include="AXODataConnector.cs" />
     <Compile Include="AXServiceConnector.cs" />
     <Compile Include="Converters\AxEnumConverter.cs" />
-    <Compile Include="DTO\CategoryDTO.cs" />
-    <Compile Include="DTO\CategoryHierarchyDTO.cs" />
-    <Compile Include="DTO\CategoryRoleDTO.cs" />
-    <Compile Include="DTO\CustVendExternalItemsDTO.cs" />
-    <Compile Include="DTO\DistinctProductsDTO.cs" />
-    <Compile Include="DTO\InventColorSeasonDTO.cs" />
-    <Compile Include="DTO\ItemDTO.cs" />
-    <Compile Include="DTO\ProductMasterReadDTO.cs" />
-    <Compile Include="DTO\ReleasedDistinctProductsReadDTO.cs" />
-    <Compile Include="DTO\DTOUtil.cs" />
-    <Compile Include="DTO\EcoResProductCategoryDTO.cs" />
-    <Compile Include="DTO\GenericJsonOdata.cs" />
-    <Compile Include="DTO\InventDimCombinationDTO.cs" />
-    <Compile Include="DTO\InventDimComboDTO.cs" />
-    <Compile Include="DTO\InventDimDTO.cs" />
-    <Compile Include="DTO\InventModuleTableDTO.cs" />
-    <Compile Include="DTO\InventTransDTO.cs" />
-    <Compile Include="DTO\InventTransOriginDTO.cs" />
-    <Compile Include="DTO\ItemInventSetupsDTO.cs" />
-    <Compile Include="DTO\ItemPurchSetupDTO.cs" />
-    <Compile Include="DTO\ProductMasterWriteDTO.cs" />
-    <Compile Include="DTO\ReleasedDistinctProductsWriteDTO.cs" />
-    <Compile Include="DTO\ReleasedProductMasterReadDTO.cs" />
-    <Compile Include="DTO\ReleasedProductMasterWriteDTO.cs" />
-    <Compile Include="DTO\ReleasedProductVariantDTO.cs" />
-    <Compile Include="DTO\ReqSafetyLineDTO.cs" />
-    <Compile Include="DTO\RetailAssortmentDTO.cs" />
-    <Compile Include="DTO\RetailAssortmentLookupChannelGroupDTO.cs" />
-    <Compile Include="DTO\RetailAssortmentLookupDTO.cs" />
-    <Compile Include="DTO\RetailChannelDTO.cs" />
-    <Compile Include="DTO\RetailProductTranslationDTO.cs" />
-    <Compile Include="DTO\UnitOfMeasureConversionDTO.cs" />
-    <Compile Include="DTO\UnitOfMeasureDTO.cs" />
-    <Compile Include="DTO\VariantGroupDTO.cs" />
     <Compile Include="Modules\CreateItems.cs" />
     <Compile Include="Modules\ItemAttributeLookup.cs" />
     <Compile Include="Modules\ItemCategoryTransfer.cs" />
@@ -166,7 +127,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AGRODataClient.ttinclude" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -174,12 +134,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AGRODataClient.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AGRODataClient.cs</LastGenOutput>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\..\ErpDTO\ErpDTO\ErpDTO.csproj">
+      <Project>{fdee1c20-5c29-47c5-9136-f961a11f8e70}</Project>
+      <Name>ErpDTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AxConCommon\AxConCommon.csproj">
       <Project>{a8e95d64-c63d-4f1a-85e4-ebb7495feeda}</Project>
       <Name>AxConCommon</Name>

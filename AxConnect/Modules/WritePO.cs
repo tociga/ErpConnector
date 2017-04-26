@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AxConnect.Microsoft.Dynamics.DataEntities;
 using AxConCommon.Extensions;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
 
 namespace AxConnect.Modules
 {

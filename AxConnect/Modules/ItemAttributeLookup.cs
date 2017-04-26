@@ -1,6 +1,6 @@
 ﻿using AxConCommon.Extensions;
-using AxConnect.DTO;
-using AxConnect.Microsoft.Dynamics.DataEntities;
+using ErpDTO.DTO;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

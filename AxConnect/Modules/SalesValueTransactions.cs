@@ -1,5 +1,5 @@
 ﻿using AxConCommon.Extensions;
-using AxConnect.Microsoft.Dynamics.DataEntities;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

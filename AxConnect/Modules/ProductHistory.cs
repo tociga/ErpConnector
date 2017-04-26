@@ -7,7 +7,7 @@ using AxConnect;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using AxConCommon.Extensions;
-using AxConnect.DTO;
+using ErpDTO.DTO;
 
 namespace AxConnect.Modules
 {

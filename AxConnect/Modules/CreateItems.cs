@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ErpDTO.DTO;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AxConnect.Microsoft.Dynamics.DataEntities;
-using AxConnect.DTO;
 
 
 namespace AxConnect.Modules

@@ -1,12 +1,12 @@
-﻿using AxConnect.Microsoft.Dynamics.DataEntities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AxConCommon.Extensions;
-using AxConnect.DTO;
+using ErpDTO.Microsoft.Dynamics.DataEntities;
+using ErpDTO.DTO;
 
 namespace AxConnect.Modules
 {
