@@ -13,14 +13,14 @@ namespace AxConnect.Modules
     {
         public static void GetBom(string header)
         {
-            var bomHeaders = AXServiceConnector.CallOdataEndpoint<BomHeaderDTO>("BillOfMaterialsHeaders", null, header).Result;
-            DataAccess.DataWriter.WriteToTable<BomHeaderDTO>(bomHeaders.value.GetDataReader(), "[ax].[BillOfMaterialsHeaders]");
+            var bomHeaders = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsHeader>("BillOfMaterialsHeaders", null, header).Result;
+            DataAccess.DataWriter.WriteToTable<BillOfMaterialsHeader>(bomHeaders.value.GetDataReader(), "[ax].[BillOfMaterialsHeaders]");
 
-            var bomLines = AXServiceConnector.CallOdataEndpoint<BomLinesDTO>("BillOfMaterialsLines", null, header).Result;
-            DataAccess.DataWriter.WriteToTable<BomLinesDTO>(bomLines.value.GetDataReader(), "[ax].[BillOfMaterialsLines]");
+            var bomLines = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsLine>("BillOfMaterialsLines", null, header).Result;
+            DataAccess.DataWriter.WriteToTable<BillOfMaterialsLine>(bomLines.value.GetDataReader(), "[ax].[BillOfMaterialsLines]");
 
-            var bomVersion = AXServiceConnector.CallOdataEndpoint<BomVersionDTO>("BillOfMaterialsVersions", null, header).Result;
-            DataAccess.DataWriter.WriteToTable<BomVersionDTO>(bomVersion.value.GetDataReader(), "[ax].[BillOfMaterialsVersions]");
+            var bomVersion = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsVersion>("BillOfMaterialsVersions", null, header).Result;
+            DataAccess.DataWriter.WriteToTable<BillOfMaterialsVersion>(bomVersion.value.GetDataReader(), "[ax].[BillOfMaterialsVersions]");
 
         }
     }
