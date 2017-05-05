@@ -21,6 +21,23 @@ namespace ErpConnector.Controllers
         }
 
         [HttpGet]
+        [Route("bom")]
+        public IHttpActionResult GetBom()
+        {
+            AXODataConnector ax = new AXODataConnector();
+            ax.GetBom();
+            return Ok();
+        }
+
+        [Route("po_to")]
+        public IHttpActionResult GetPoTo()
+        {
+            AXODataConnector ax = new AXODataConnector();
+            ax.GetPoTo();
+            return Ok();
+        }
+
+        [HttpGet]
         [Route("token")]
         public IHttpActionResult GetAuthToken()
         {

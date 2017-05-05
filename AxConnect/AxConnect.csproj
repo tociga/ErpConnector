@@ -116,11 +116,13 @@
     <Compile Include="AXODataConnector.cs" />
     <Compile Include="AXServiceConnector.cs" />
     <Compile Include="Converters\AxEnumConverter.cs" />
+    <Compile Include="Modules\BomTransfer.cs" />
     <Compile Include="Modules\CreateItems.cs" />
     <Compile Include="Modules\ItemAttributeLookup.cs" />
     <Compile Include="Modules\ItemCategoryTransfer.cs" />
     <Compile Include="Modules\ItemTransfer.cs" />
     <Compile Include="Modules\LocationsAndVendorsTransfer.cs" />
+    <Compile Include="Modules\POTransfer.cs" />
     <Compile Include="Modules\ProductHistory.cs" />
     <Compile Include="Modules\SalesValueTransactions.cs" />
     <Compile Include="Modules\WritePO.cs" />

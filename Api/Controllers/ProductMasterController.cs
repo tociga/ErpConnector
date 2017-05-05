@@ -11,11 +11,11 @@ namespace ErpConnector.Controllers
         public IHttpActionResult Create([FromBody] ProductMasterWriteDTO productMaster)
         {
             var connector = new AxConnect.AXODataConnector();
-            var pm = connector.CreateProductMaster(productMaster);
-            if (pm != null)
-            {
-                return Ok(pm);
-            }
+            //var pm = connector.CreateProductMaster(productMaster);
+            //if (pm != null)
+            //{
+            //    return Ok(pm);
+            //}
             return BadRequest();
         }
     }

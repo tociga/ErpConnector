@@ -11,11 +11,11 @@ namespace ErpConnector.Controllers
         public IHttpActionResult Create([FromBody] DistinctProductDTO distinctProduct)
         {
             var connector = new AxConnect.AXODataConnector();
-            var dp = connector.CreateDistinctProduct(distinctProduct).Result;
-            if (dp != null)
-            {
-                return Ok(dp);
-            }
+            //var dp = connector.CreateDistinctProduct(distinctProduct).Result;
+            //if (dp != null)
+            //{
+            //    return Ok(dp);
+            //}
             return BadRequest();
         }
     }

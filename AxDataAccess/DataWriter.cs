@@ -61,7 +61,7 @@ namespace DataAccess
             }
         }
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -74,6 +74,7 @@ namespace DataAccess
                     cmd.Parameters.AddWithValue("@truncate_locations_and_vendors", clearLocations);
                     cmd.Parameters.AddWithValue("@truncate_sales_trans_refresh", clearTransRefresh);
                     cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
+                    cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -108,7 +109,10 @@ namespace DataAccess
             Type baseType = typeof(T);
             foreach (var pi in baseType.GetProperties(BindingFlags.Public|BindingFlags.Instance))
             {
-                mappings.Add(new SqlBulkCopyColumnMapping(pi.Name, pi.Name));
+                if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
+                {
+                    mappings.Add(new SqlBulkCopyColumnMapping(pi.Name, pi.Name));
+                }
             }
             return mappings;
         }

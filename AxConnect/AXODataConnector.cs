@@ -36,13 +36,26 @@ namespace AxConnect
             header = AdalAuthenticate();
             return ItemTransfer.CreateItem(item, header);
         }
+
+        public void GetBom()
+        {
+            header = AdalAuthenticate();
+            DataAccess.DataWriter.TruncateTables(false, false, false, false, false, true);
+            BomTransfer.GetBom(header);
+        }
+
+        public void GetPoTo()
+        {
+            header = AdalAuthenticate();
+            POTransfer.GetPosAndTos(header, context);
+        }
         public void RunTransfer()
         {
             //Authorize().Wait();
             header = AdalAuthenticate();
             DateTime start = DateTime.Now;
             //CreateItemTest();
-            DataAccess.DataWriter.TruncateTables(true, false, false,true, true);
+            DataAccess.DataWriter.TruncateTables(true, false, false,true, true, false);
             DateTime truncate = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Truncate = " + truncate.Subtract(start).TotalSeconds);
             ////SalesValueTransactions.WriteSalesValueTrans(context);

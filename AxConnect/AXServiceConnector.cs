@@ -73,12 +73,14 @@ namespace AxConnect
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = adalHeader;
+            //request.Headers["Accept"] = "application/json;odata.metadata=none";
             //request.Headers["Content-Type"] = "application/json";
 
             request.Method = "POST";
             var postData = JsonConvert.SerializeObject(postDataObject, new Converters.AxEnumConverter());
             request.ContentLength = postData != null ? postData.Length : 0;
             request.ContentType = "application/json";
+           
 
             using (var requestStream = request.GetRequestStream())
             {
@@ -120,6 +122,8 @@ namespace AxConnect
                 }
             }
         }
+
+        
 
         public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject, List<string> errorMessage)
         {
@@ -181,10 +185,11 @@ namespace AxConnect
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
 
-            var request = HttpWebRequest.Create(endpoint);
+            var request =(HttpWebRequest)HttpWebRequest.Create(endpoint);
+            request.Accept = "application/json;odata.metadata=none";
             request.Headers["Authorization"] = adalHeader;
-
             request.Method = "GET";
+            request.Timeout = 1000 * 60 * 3;
             //request.ContentLength = postData != null ? postData.Length : 0;
 
             //using (var requestStream = request.GetRequestStream())

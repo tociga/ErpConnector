@@ -17,6 +17,7 @@ namespace AxConCommon.Extensions
 
     public class GenericListDataReader<T> : IGenericDataReader
     {
+
         private IEnumerator<T> list = null;
         private List<PropertyInfo> properties = new List<PropertyInfo>();
         private Dictionary<string, int> nameLookup = new Dictionary<string, int>();
@@ -26,16 +27,18 @@ namespace AxConCommon.Extensions
         {
             baseList = inputlist;
             if (baseList.Any())
-            {                
+            {
                 list = baseList.GetEnumerator();
 
-                properties.AddRange(inputlist.First().GetType()
-                    .GetProperties(
-                        //BindingFlags.GetProperty |
-                        BindingFlags.Instance |
-                        BindingFlags.Public //|
-                                            //BindingFlags.DeclaredOnly
-                        ));
+                var p = inputlist.First().GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToList();
+                for (int i = 0; i < p.Count; i++)
+                {
+                    if (p[i].PropertyType.IsValueType || p[i].PropertyType == typeof(String))
+                    {
+                        properties.Add(p[i]);
+                        //nameLookup[p[i].Name] = i;
+                    }
+                }
 
                 for (int i = 0; i < properties.Count; i++)
                 {
@@ -207,6 +210,14 @@ namespace AxConCommon.Extensions
 
         public object GetValue(int i)
         {
+            if(properties[i].PropertyType.IsEnum)
+            {
+                return (int)properties[i].GetValue(list.Current, null);
+            }
+            else if (properties[i].PropertyType == typeof(DateTimeOffset))
+            {
+                return ((DateTimeOffset)properties[i].GetValue(list.Current, null)).DateTime;
+            }
             return properties[i].GetValue(list.Current, null);
         }
 
