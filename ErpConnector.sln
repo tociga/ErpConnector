@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConnect", "AxConnect\AxCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConCommon", "AxConCommon\AxConCommon.csproj", "{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErpDTO", "..\..\ErpDTO\ErpDTO\ErpDTO.csproj", "{FDEE1C20-5C29-47C5-9136-F961A11F8E70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErpDTO", "..\ErpDTO\ErpDTO\ErpDTO.csproj", "{FDEE1C20-5C29-47C5-9136-F961A11F8E70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -93,6 +93,10 @@
       <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.13.5\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.OData.Client, Version=6.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Client.6.16.0\lib\net40\Microsoft.OData.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.OData.Core, Version=6.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.OData.Core.6.16.0\lib\portable-net45+win+wpa81\Microsoft.OData.Core.dll</HintPath>
       <Private>True</Private>
@@ -234,7 +238,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ErpDTO\ErpDTO\ErpDTO.csproj">
+    <ProjectReference Include="..\..\ErpDTO\ErpDTO\ErpDTO.csproj">
       <Project>{fdee1c20-5c29-47c5-9136-f961a11f8e70}</Project>
       <Name>ErpDTO</Name>
     </ProjectReference>
@@ -245,10 +249,12 @@
     <ProjectReference Include="..\AxConnect\AxConnect.csproj">
       <Project>{0281e8bc-c0ba-433d-b2c6-d16f6246b3ac}</Project>
       <Name>AxConnect</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\AxDataAccess\AxDataAccess.csproj">
       <Project>{a708abad-cf99-4e2e-a84c-d13ea83e36d7}</Project>
       <Name>DataAccess</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
