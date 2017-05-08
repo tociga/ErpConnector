@@ -31,6 +31,10 @@ namespace AxConnect
         //    header = await AdalAuthenticate();            
         //}
 
+        public static string GetDBScript(string entity)
+        {
+            return ScriptGeneratorModule.GenerateScript(entity);
+        }
         public ItemDTO CreateItem(ItemDTO item)
         {
             header = AdalAuthenticate();

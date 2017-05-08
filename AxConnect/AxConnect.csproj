@@ -125,6 +125,7 @@
     <Compile Include="Modules\POTransfer.cs" />
     <Compile Include="Modules\ProductHistory.cs" />
     <Compile Include="Modules\SalesValueTransactions.cs" />
+    <Compile Include="Modules\ScriptGeneratorModule.cs" />
     <Compile Include="Modules\WritePO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

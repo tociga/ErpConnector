@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AxConnect;
+using System.Net.Http.Headers;
 
 namespace ErpConnector.Controllers
 {
@@ -42,6 +43,16 @@ namespace ErpConnector.Controllers
         public IHttpActionResult GetAuthToken()
         {
             return Ok(AXODataConnector.GetAdalToken());
+        }
+
+        [HttpGet]
+        [Route("db_scripts")]
+        public HttpResponseMessage GetDBScript([FromUri]string entity)
+        {
+            var response = new HttpResponseMessage();
+            response.Content = new StringContent(AXODataConnector.GetDBScript(entity));
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
         }
     }
 }

@@ -26,11 +26,11 @@ namespace AxConCommon.Extensions
         public GenericListDataReader(IEnumerable<T> inputlist)
         {
             baseList = inputlist;
-            if (baseList.Any())
+            if (baseList != null)
             {
                 list = baseList.GetEnumerator();
-
-                var p = inputlist.First().GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToList();
+               
+                var p = (typeof(T)).GetProperties(BindingFlags.Instance | BindingFlags.Public).ToList();
                 for (int i = 0; i < p.Count; i++)
                 {
                     if (p[i].PropertyType.IsValueType || p[i].PropertyType == typeof(String))
@@ -202,7 +202,7 @@ namespace AxConCommon.Extensions
                 return -1;
             }
         }
-
+       
         public string GetString(int i)
         {
             return (string)GetValue(i);
