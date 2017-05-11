@@ -45,9 +45,15 @@ namespace AxConCommon.GenerateScripts
 
         private string TypeToDBType(Type type)
         {
+            Type underLyingType =  Nullable.GetUnderlyingType(type);
+            if (underLyingType != null)
+            {
+                type = underLyingType;
+            }
+
             if (type == typeof(String))
             {
-                return "[nvarchar](50)";
+                return "[nvarchar](500)";
             }
             else if (type == typeof(int))
             {
@@ -71,7 +77,7 @@ namespace AxConCommon.GenerateScripts
             }
             else
             {
-                return "[nvarchar](50)";
+                return "[nvarchar](500)";
             }
         }
     }

@@ -12,6 +12,7 @@ namespace ErpConnector.Controllers
     [RoutePrefix("daily_transfer")]
     public class DailyTransferController : ApiController
     {
+
         [HttpGet]
         [Route("items")]
         public IHttpActionResult GetItems()

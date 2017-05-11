@@ -15,25 +15,25 @@ namespace AxConnect.Modules
         public static void WriteLocationsAndVendors(Resources context, string authHeader)
         {
             //var channel = ReadRetailChannel(context);
-            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannelDTO>("RetailChannels",
+            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
                 "",authHeader).Result.value.GetDataReader();
-            DataAccess.DataWriter.WriteToTable(channel, "[ax].[RETAILCHANNELTABLE]");
+            DataAccess.DataWriter.WriteToTable<RetailChannel>(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);
-            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortmentDTO>("RetailAssortments",
+            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'",
                 authHeader).Result.value.GetDataReader();
-            DataAccess.DataWriter.WriteToTable(assortment, "[ax].[RETAILASSORTMENTTABLE]");
+            DataAccess.DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
-            var locSetup = ReadLocations(context);
-            DataAccess.DataWriter.WriteToTable(locSetup, "[ax].[INVENTLOCATION]");
+            var locSetup = context.Locations.ToList().GetDataReader<Location>();
+            DataAccess.DataWriter.WriteToTable<Location>(locSetup, "[ax].[INVENTLOCATION]");
 
-            var dir = ReadDirParty(context);
-            DataAccess.DataWriter.WriteToTable(dir, "[ax].[DIRPARTYTABLE]");
+            var dir = context.DirParties.ToList().GetDataReader<DirParty>();
+            DataAccess.DataWriter.WriteToTable<DirParty>(dir, "[ax].[DIRPARTYTABLE]");
 
-            var vendor = ReadVendorTable(context);
-            DataAccess.DataWriter.WriteToTable(vendor, "[ax].[VENDTABLE]");
+            var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
+            DataAccess.DataWriter.WriteToTable<Vendor>(vendor, "[ax].[VENDTABLE]");
 
 
             var channelLines = ReadRetailAssortmentChannelLines(context);
@@ -68,43 +68,6 @@ namespace AxConnect.Modules
                     RETAILCHANNELID = ch.RetailChannelId
                 });
 
-            }
-            return list.GetDataReader<dynamic>();
-        }
-        private static IGenericDataReader ReadLocations(Resources context)
-        {
-            var locations = context.AGRInventLocations;
-            var list = new List<dynamic>();
-            foreach(var loc in locations)
-            {
-                list.Add(new
-                {
-                    DataAreaId = loc.DataAreaId,
-                    INVENTLOCATIONID = loc.Warehouse,
-                    NAME = loc.Name,
-                    REQREFILL = loc.Refilling.GetValueOrDefault() == NoYes.Yes,
-                    INVENTLOCATIONTYPE = loc.Type,
-                    FSHSTORE = (int)loc.Store.GetValueOrDefault(),
-                    RETAILWEIGHTEX1 = loc.Weight,
-                    INVENTSITEID = loc.Site,
-                    INVENTLOCATIONIDREQMAIN = loc.MainWarehouse
-                });
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadDirParty(Resources context)
-        {
-            var dirParties = context.DirParties;
-            var list = new List<dynamic>();
-            foreach(var d in dirParties)
-            {
-                list.Add(new
-                {
-
-                    PARTYID = d.PartyID,
-                    NAME = d.Name,
-                });
             }
             return list.GetDataReader<dynamic>();
         }

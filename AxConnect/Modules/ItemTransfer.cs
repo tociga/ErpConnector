@@ -40,8 +40,8 @@ namespace AxConnect.Modules
             WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup", authHeader);
             WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup", authHeader);
 
-            var reqItems = ReadReqItemTable(context);
-            DataAccess.DataWriter.WriteToTable(reqItems, "[ax].[REQITEMTABLE]");
+            var reqItems = context.AGRReqItemTables.ToList().GetDataReader<AGRReqItemTable>();
+            DataAccess.DataWriter.WriteToTable<AGRReqItemTable>(reqItems, "[ax].[REQITEMTABLE]");
 
             var reqKey = ReadReqSafetyKey(context);
             DataAccess.DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
@@ -49,17 +49,17 @@ namespace AxConnect.Modules
             WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines", authHeader);
 
             // item_order_routes
-            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetupDTO>("ItemPurchSetups", "", authHeader).Result.value;
-            DataAccess.DataWriter.WriteToTable(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
+            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<ItemPurchSetup>(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
 
-            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetupsDTO>("ItemInventSetups", "", authHeader).Result.value;
-            DataAccess.DataWriter.WriteToTable(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
+            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<ItemInventSetup>(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
 
             WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure", authHeader);
             WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion", authHeader);
 
-            var inventSeason = ReadInventSeasonTable(context);
-            DataAccess.DataWriter.WriteToTable(inventSeason, "[ax].[InventSeasonTable]");
+            var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
+            DataAccess.DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
             //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
             var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null, authHeader);
@@ -103,7 +103,7 @@ namespace AxConnect.Modules
             var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData, adalHeader);
             var reader = result.GetDataReader();
 
-            DataAccess.DataWriter.WriteToTable(reader, destTable);
+            DataAccess.DataWriter.WriteToTable<T>(reader, destTable);
 
             return result.Any();
         }
@@ -225,34 +225,6 @@ namespace AxConnect.Modules
                     INVENTSTATUSID = dim.InventoryStatus,
                     //MODIFIEDDATETIME =
                     //RECVERSION =
-                });
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadReqItemTable(Resources Context)
-        {
-            var reqItemTable = Context.AGRReqItemTables;
-            var list = new List<dynamic>();
-            foreach(var req in reqItemTable)
-            {
-                list.Add(new {
-                    DATAAREAID = req.DataAreaId,
-                    ITEMID = req.ItemId,
-                    MININVENTONHAND = req.MinInventOnhand,
-                    MAXINVENTONHAND = req.MaxInventOnhand,
-                    LEADTIMETRANSFER = req.LeadTimeTransfer,
-                    LEADTIMETRANSFERACTIVE = req.LeadTimeTransferActive.GetValueOrDefault() == NoYes.Yes,
-                    LEADTIMEPURCHASE = req.LeadTimePurchase,
-                    LEADTIMEPURCHASEACTIVE = req.LeadTimePurchaseActive.GetValueOrDefault() == NoYes.Yes,
-                    COVINVENTDIMID = req.CovInventDimId,
-                    ITEMCOVFIELDSACTIVE = req.ItemCovFieldsActive.GetValueOrDefault() == NoYes.Yes,
-                    VENDID =req.VendId,
-                    MINSAFETYKEYID = req.MinSafetyKeyId,
-                    MAXSAFETYKEYID = req.MaxSafetyKeyId,
-                    INVENTLOCATIONIDREQMAIN = req.InventLocationIdReqMain,
-                    REQPOTYPE = req.ReqPOType,
-                    REQPOTYPEACTIVE = req.ReqPOTypeActive.GetValueOrDefault() == NoYes.Yes
                 });
             }
             return list.GetDataReader<dynamic>();

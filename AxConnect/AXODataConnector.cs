@@ -23,7 +23,7 @@ namespace AxConnect
         public AXODataConnector()
         {            
             context = new Resources(new Uri("https://agrax7u2devaos.cloudax.dynamics.com/data"));
-            context.SendingRequest2 += Context_SendingRequest2;           
+            context.SendingRequest2 += Context_SendingRequest2;                      
         }
 
         //private async Task Authorize()
@@ -569,7 +569,7 @@ namespace AxConnect
         }
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            e.RequestMessage.SetHeader("Authorization", header);
+            e.RequestMessage.SetHeader("Authorization", AdalAuthenticate());
         }
 
         private static string AdalAuthenticate()

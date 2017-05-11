@@ -222,5 +222,10 @@ namespace AxConnect.Modules
 			return list.GetDataReader<dynamic>();
 		}
 
+        //private static IGenericDataReader ReadTransActions(Resources context)
+        //{
+        //    var list = context.RetailTr
+        //}
+
 	}
 }

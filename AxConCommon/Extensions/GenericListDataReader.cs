@@ -210,9 +210,14 @@ namespace AxConCommon.Extensions
 
         public object GetValue(int i)
         {
-            if(properties[i].PropertyType.IsEnum)
+
+            Type underLyingType = Nullable.GetUnderlyingType(properties[i].PropertyType);
+            
+            //if (underLyingType != null)
+            if (properties[i].PropertyType.IsEnum || (underLyingType != null && underLyingType.IsEnum))
             {
-                return (int)properties[i].GetValue(list.Current, null);
+                var obj = properties[i].GetValue(list.Current, null);
+                return obj == null ? (object)null : (int)obj;
             }
             else if (properties[i].PropertyType == typeof(DateTimeOffset))
             {

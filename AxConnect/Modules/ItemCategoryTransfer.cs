@@ -17,14 +17,14 @@ namespace AxConnect.Modules
             var roles = AXServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(roles.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHYROLE]");
 
-            var hierarchy = AXServiceConnector.CallOdataEndpoint<CategoryHierarchyDTO>("RetailEcoResCategoryHierarchy", "", authHeader).Result.value;
+            var hierarchy = AXServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", authHeader).Result.value;
             DataAccess.DataWriter.WriteToTable(hierarchy.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHY]");
 
-            var category = AXServiceConnector.CallOdataEndpoint<CategoryDTO>("RetailEcoResCategory", "", authHeader).Result.value;
-            DataAccess.DataWriter.WriteToTable(category.GetDataReader(), "[ax].[ECORESCATEGORY]");
+            var category = AXServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable<RetailEcoResCategory>(category.GetDataReader(), "[ax].[ECORESCATEGORY]");
 
-            var prodCat = AXServiceConnector.CallOdataEndpoint<EcoResProductCategoryDTO>("AGREcoResProductCategories", "", authHeader).Result.value;
-            DataAccess.DataWriter.WriteToTable(prodCat.GetDataReader(), "[ax].[ECORESPRODUCTCATEGORY]");
+            var prodCat = AXServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", authHeader).Result.value;
+            DataAccess.DataWriter.WriteToTable< AGREcoResProductCategory>(prodCat.GetDataReader(), "[ax].[ECORESPRODUCTCATEGORY]");
         }
 
         private static IGenericDataReader ReadHierarchy(Resources context)
