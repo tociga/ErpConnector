@@ -250,6 +250,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Authentication\ApplicationOAuthProvider.cs" />
     <Compile Include="Authentication\ApplicationRefreshTokenProvider.cs" />
+    <Compile Include="Authentication\AgrAuthorizeAttribute.cs" />
     <Compile Include="Controllers\DailyTransferController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
     <Compile Include="Controllers\DistinctProductController.cs" />
@@ -313,7 +314,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>20784</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/Api</IISUrl>
+          <IISUrl>http://localhost:20784</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -4,6 +4,7 @@ using AxConnect;
 
 namespace ErpConnector.Controllers
 {
+    [AgrAuthorize]
     [RoutePrefix("items")]
     public class ItemsController : ApiController
     {
