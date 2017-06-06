@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ErpListener
+namespace ErpConnector.Listener
 {
     class IocModule : Ninject.Modules.NinjectModule
     {
@@ -18,7 +18,7 @@ namespace ErpListener
                 return LogManager.GetLogger(type);
             });
 
-            Bind<Service.WinService>().ToSelf();
+            Bind<WinService>().ToSelf();
 
         }
     }

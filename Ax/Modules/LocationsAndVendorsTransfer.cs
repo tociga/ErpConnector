@@ -14,13 +14,13 @@ namespace ErpConnector.Ax.Modules
         public static void WriteLocationsAndVendors(Resources context, string authHeader)
         {
             //var channel = ReadRetailChannel(context);
-            var channel = AXServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
+            var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
                 "",authHeader).Result.value.GetDataReader();
             DataWriter.WriteToTable<RetailChannel>(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);
-            var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
+            var assortment = ServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'",
                 authHeader).Result.value.GetDataReader();
             DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");

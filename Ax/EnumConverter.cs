@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Ax
 {
-    public class AxEnumConverter : JsonConverter
+    public class EnumConverter : JsonConverter
     {
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

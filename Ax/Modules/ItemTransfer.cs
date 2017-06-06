@@ -12,28 +12,28 @@ namespace ErpConnector.Ax.Modules
     {
         public static void WriteItems(Resources context, string authHeader)
         {
-            var productMaster = AXServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", authHeader).Result.value;
+            var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", authHeader).Result.value;
             DataWriter.WriteToTable<ProductMasterReadDTO>(productMaster.GetDataReader(), "[ax].[ProductMaster]");
 
-            var releasedMasters = AXServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
+            var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
             DataWriter.WriteToTable<ReleasedProductMasterReadDTO>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
             //var items = ReadProducts(context);
-            var distinctProducts = AXServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", authHeader).Result.value;
+            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", authHeader).Result.value;
             DataWriter.WriteToTable<DistinctProductsDTO>(distinctProducts.GetDataReader(), "[ax].[DistinctProduct]");
 
-            var items = AXServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
+            var items = ServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
             DataWriter.WriteToTable<ReleasedDistinctProductsReadDTO>(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");
 
-            var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
+            var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
             DataWriter.WriteToTable(inventDim.GetDataReader(), "[ax].[INVENTDIM]");
 
-            var custVendExt = AXServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "", authHeader).Result.value;
+            var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "", authHeader).Result.value;
             DataWriter.WriteToTable(custVendExt.GetDataReader(), "[ax].[CUSTVENDEXTERNALITEM]");
 
             var variants = ReadVariants(context);
             DataWriter.WriteToTable(variants, "[ax].[ReleasedProductVariants]");
 
-            var combos = AXServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
+            var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
             DataWriter.WriteToTable(combos.GetDataReader(), "[ax].[INVENTDIMCOMBINATIONS]");
 
             WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup", authHeader);
@@ -48,10 +48,10 @@ namespace ErpConnector.Ax.Modules
             WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines", authHeader);
 
             // item_order_routes
-            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", authHeader).Result.value;
+            var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", authHeader).Result.value;
             DataWriter.WriteToTable<ItemPurchSetup>(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
 
-            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", authHeader).Result.value;
+            var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", authHeader).Result.value;
             DataWriter.WriteToTable<ItemInventSetup>(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
 
             WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure", authHeader);
@@ -109,7 +109,7 @@ namespace ErpConnector.Ax.Modules
 
         private static List<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData, string adalHeader)
         {
-            return AXServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, adalHeader, serviceGroup).Result;
+            return ServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, adalHeader, serviceGroup).Result;
         }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
@@ -278,7 +278,7 @@ namespace ErpConnector.Ax.Modules
             //master.TrackingDimensionGroupName = "None";
             //master.StorageDimensionGroupName = "Ware";
             
-            var r = AXServiceConnector.CreateEntity<ProductMasterWriteDTO>("ProductMasters", null, header, item.productMaster, item.ErrorMessages).Result;
+            var r = ServiceConnector.CreateEntity<ProductMasterWriteDTO>("ProductMasters", null, header, item.productMaster, item.ErrorMessages).Result;
             item.productMaster = r;            
             return item;
         }

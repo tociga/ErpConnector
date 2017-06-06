@@ -10,7 +10,7 @@ using Topshelf;
 using Topshelf.Common.Logging;
 using Topshelf.Ninject;
 
-namespace ErpListener
+namespace ErpConnector.Listener
 {
     class Program
     {
@@ -32,7 +32,7 @@ namespace ErpListener
                 x.UseCommonLogging();
                 x.UseNinject(new IocModule());
 
-                x.Service<Service.WinService>(sc =>
+                x.Service<WinService>(sc =>
                 {
                     sc.ConstructUsingNinject();
 

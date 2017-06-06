@@ -16,11 +16,11 @@ using System.Configuration;
 
 namespace ErpConnector.Ax
 {
-    public class AXServiceConnector
+    public class ServiceConnector
     {
         private static string header = null;
 
-        public AXServiceConnector()
+        public ServiceConnector()
         {
             //Authorize();
         }
@@ -78,7 +78,7 @@ namespace ErpConnector.Ax
             //request.Headers["Content-Type"] = "application/json";
 
             request.Method = "POST";
-            var postData = JsonConvert.SerializeObject(postDataObject, new AxEnumConverter());
+            var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
             request.ContentLength = postData != null ? postData.Length : 0;
             request.ContentType = "application/json";
            
@@ -136,7 +136,7 @@ namespace ErpConnector.Ax
             //request.Headers["Content-Type"] = "application/json";
 
             request.Method = "POST";
-            var postData = JsonConvert.SerializeObject(postDataObject, new AxEnumConverter());
+            var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
             request.ContentLength = postData != null ? postData.Length : 0;
             request.ContentType = "application/json";
 
@@ -210,7 +210,7 @@ namespace ErpConnector.Ax
                     {
                         var responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
-                        return JsonConvert.DeserializeObject<ErpDTO.DTO.GenericJsonOdata<T>>(responseString);
+                        return JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
 
                     }
                 }

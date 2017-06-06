@@ -40,9 +40,9 @@ namespace ErpConnector.Ax.Modules
 
         private bool WriteInventTrans<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable, string adalHeader)
         {
-            AXServiceConnector connector = new AXServiceConnector();
+            ServiceConnector connector = new ServiceConnector();
             string postData = "{ \"minRecId\": " + recId.ToString()+ ", \"maxRecId\" : "+ (recId + pageSize).ToString() +"}";
-            var result = AXServiceConnector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData, adalHeader);
+            var result = ServiceConnector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData, adalHeader);
 
             var reader = result.Result.GetDataReader();
 
@@ -54,7 +54,7 @@ namespace ErpConnector.Ax.Modules
         public long GetNextRecId(long recId, string webMethod, string adalHeader)
         {
             string postData = "{ \"lastRecId\": " + recId.ToString()+" }";
-            var result = AXServiceConnector.CallAGRServiceScalar<Int64>("AGRInventTransService", webMethod, postData, adalHeader);
+            var result = ServiceConnector.CallAGRServiceScalar<Int64>("AGRInventTransService", webMethod, postData, adalHeader);
 
             return result.Result;
         }

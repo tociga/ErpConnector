@@ -12,16 +12,16 @@ namespace ErpConnector.Ax.Modules
     {
         public static void ReadItemAttributes(Resources context, string autheader)
         {
-            var colorGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", autheader).Result.value;
+            var colorGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", autheader).Result.value;
             DataWriter.WriteToTable<VariantGroupDTO>(colorGroups.GetDataReader(), "[ax].[ProductColorGroup]");
 
-            var sizeGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", autheader).Result.value;
+            var sizeGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", autheader).Result.value;
             DataWriter.WriteToTable<VariantGroupDTO>(sizeGroups.GetDataReader(), "[ax].[ProductSizeGroup]");
 
-            var styleGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", autheader).Result.value;
+            var styleGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", autheader).Result.value;
             DataWriter.WriteToTable<VariantGroupDTO>(styleGroups.GetDataReader(), "[ax].[ProductStyleGroup]");
 
-            var seasonGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", autheader).Result.value;
+            var seasonGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", autheader).Result.value;
             DataWriter.WriteToTable<VariantGroupDTO>(seasonGroups.GetDataReader(), "[ax].[SeasonGroup]");
 
             var season = ReadSeasonTable(context);

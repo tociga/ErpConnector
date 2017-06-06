@@ -1,4 +1,4 @@
-﻿namespace ErpConnector.AX.DTO
+﻿namespace ErpConnector.Ax.DTO
 {
     public class InventTransOriginDTO
     {

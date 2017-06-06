@@ -7,8 +7,8 @@
     <ProjectGuid>{A24666DD-5448-40B4-A943-CB04FAB700FB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ErpListener</RootNamespace>
-    <AssemblyName>ErpListener</AssemblyName>
+    <RootNamespace>ErpConnector.Listener</RootNamespace>
+    <AssemblyName>ErpConnector.Listener</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -63,6 +63,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -87,22 +88,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContext\StagingDbContext.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>StagingDbContext.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DbContext\StagingDbContext.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>StagingDbContext.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DbContext\StagingDbContext.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>StagingDbContext.edmx</DependentUpon>
-    </Compile>
     <Compile Include="DbService.cs" />
+    <Compile Include="GenericConnector.cs" />
     <Compile Include="IocModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -110,31 +97,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EntityDeploy Include="DbContext\StagingDbContext.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>StagingDbContext.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="DbContext\StagingDbContext.edmx.diagram">
-      <DependentUpon>StagingDbContext.edmx</DependentUpon>
-    </None>
     <None Include="Log.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DbContext\StagingDbContext.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>StagingDbContext.edmx</DependentUpon>
-      <LastGenOutput>StagingDbContext.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="DbContext\StagingDbContext.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>StagingDbContext.edmx</DependentUpon>
-      <LastGenOutput>StagingDbContext.cs</LastGenOutput>
-    </Content>
     <Content Include="LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ax\Ax.csproj">
+      <Project>{473F244B-5273-4747-94FE-291FBF30D218}</Project>
+      <Name>Ax</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{ffe8994e-25da-45be-9ef3-c548fad8563a}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

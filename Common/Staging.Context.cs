@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ErpListener.DbContext
+namespace ErpConnector.Common
 {
     using System;
     using System.Data.Entity;

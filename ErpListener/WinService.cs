@@ -2,8 +2,9 @@
 using System;
 using Topshelf;
 using System.Timers;
+using System.Configuration;
 
-namespace ErpListener.Service
+namespace ErpConnector.Listener
 {
     class WinService
     {
@@ -29,7 +30,9 @@ namespace ErpListener.Service
 
             Log.Info($"{nameof(WinService)} Start command received.");
             // Set up a timer to trigger every minute.  
-            _timer.Interval = 60 * 60 * 1000; // 60 minutes  
+            double interval = 0;
+            double.TryParse(ConfigurationManager.AppSettings["sync_time_interval_ms"], out interval);
+            _timer.Interval = interval == 0 ? 60 * 60 * 1000 : interval; // Default to 60 minutes if nothing in config
             _timer.Elapsed += new ElapsedEventHandler(ShouldSync);
             _timer.Start();
             //TODO: Implement your service start routine.
@@ -48,8 +51,6 @@ namespace ErpListener.Service
                 _timer.Start();
             }
         }
-
-
 
         public bool Stop(HostControl hostControl)
         {

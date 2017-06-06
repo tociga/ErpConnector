@@ -5,7 +5,9 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ax", "Ax\Ax.csproj", "{473F244B-5273-4747-94FE-291FBF30D218}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErpListener", "ErpListener\ErpListener.csproj", "{A24666DD-5448-40B4-A943-CB04FAB700FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Listener", "ErpListener\Listener.csproj", "{A24666DD-5448-40B4-A943-CB04FAB700FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

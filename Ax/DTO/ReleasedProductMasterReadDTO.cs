@@ -1,7 +1,7 @@
 ﻿using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using System;
 
-namespace ErpConnector.AX.DTO
+namespace ErpConnector.Ax.DTO
 {
     public class ReleasedProductMasterReadDTO 
     {
