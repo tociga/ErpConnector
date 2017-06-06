@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using ErpConnector.Ax.DTO;
+using ErpConnector.Ax.Utils;
 
 namespace ErpConnector.Ax.Modules
 {

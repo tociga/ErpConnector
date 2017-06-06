@@ -6,6 +6,7 @@ using ErpConnector.Ax.DTO;
 using System.Diagnostics;
 using System.Configuration;
 using ErpConnector.Common;
+using ErpConnector.Ax.Utils;
 
 namespace ErpConnector.Ax
 {

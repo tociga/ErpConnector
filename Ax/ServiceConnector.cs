@@ -13,13 +13,12 @@ using System.Threading.Tasks;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using System.Configuration;
+using ErpConnector.Ax.Utils;
 
 namespace ErpConnector.Ax
 {
     public class ServiceConnector
     {
-        private static string header = null;
-
         public ServiceConnector()
         {
             //Authorize();

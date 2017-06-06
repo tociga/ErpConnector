@@ -1,5 +1,6 @@
 ﻿using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
+using ErpConnector.Ax.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

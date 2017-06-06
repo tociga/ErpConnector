@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ErpConnector.Ax
+namespace ErpConnector.Ax.Utils
 {
     public interface IGenericDataReader : IDataReader
     {

@@ -4,7 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Linq;
 
-namespace ErpConnector.Ax
+namespace ErpConnector.Ax.Utils
 {
     public class ScriptGenerator
     {

@@ -8,7 +8,7 @@ using System.Data;
 using System.Reflection;
 using System.Configuration;
 
-namespace ErpConnector.Ax
+namespace ErpConnector.Ax.Utils
 {
     public class DataWriter
     {

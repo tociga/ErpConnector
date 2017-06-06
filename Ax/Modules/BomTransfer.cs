@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.DTO;
+using ErpConnector.Ax.Utils;
 
 namespace ErpConnector.Ax.Modules
 {
