@@ -3,15 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ax", "Ax\Ax.csproj", "{473F244B-5273-4747-94FE-291FBF30D218}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxDataAccess", "AxDataAccess\AxDataAccess.csproj", "{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConnect", "AxConnect\AxConnect.csproj", "{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxConCommon", "AxConCommon\AxConCommon.csproj", "{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErpDTO", "..\ErpDTO\ErpDTO\ErpDTO.csproj", "{FDEE1C20-5C29-47C5-9136-F961A11F8E70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErpListener", "ErpListener\ErpListener.csproj", "{A24666DD-5448-40B4-A943-CB04FAB700FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,26 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0ECD835C-FC19-4B6D-AF41-9AE58C5CF1B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A708ABAD-CF99-4E2E-A84C-D13EA83E36D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0281E8BC-C0BA-433D-B2C6-D16F6246B3AC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8E95D64-C63D-4F1A-85E4-EBB7495FEEDA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDEE1C20-5C29-47C5-9136-F961A11F8E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDEE1C20-5C29-47C5-9136-F961A11F8E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDEE1C20-5C29-47C5-9136-F961A11F8E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDEE1C20-5C29-47C5-9136-F961A11F8E70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{473F244B-5273-4747-94FE-291FBF30D218}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{473F244B-5273-4747-94FE-291FBF30D218}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{473F244B-5273-4747-94FE-291FBF30D218}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{473F244B-5273-4747-94FE-291FBF30D218}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A24666DD-5448-40B4-A943-CB04FAB700FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
