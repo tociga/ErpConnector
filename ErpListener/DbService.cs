@@ -7,19 +7,29 @@ namespace ErpConnector.Listener
 {
     public class DbService
     {
-        public void Sync()
+        public bool? Sync()
         {
-            using (var db = new Staging())
+            try
             {
-                var erpActionsList = db.erp_actions.Where(a => a.success != true && a.action_type == "run_transfer").ToList();
-                foreach (var item in erpActionsList)
+                using (var db = new Staging())
                 {
-                    var erpType = ConfigurationManager.AppSettings["erp_type"];
-                    var connector = new GenericConnector(erpType);
-                    connector.RunTransfer();
-                    Console.WriteLine("action type: " + item.action_type + " finished running.");
+                    var pendingDataTransfer = db.erp_actions.Where(a => a.action_type == "run_transfer" && a.success != true).Any();
+                    if (pendingDataTransfer)
+                    {
+                        var erpType = ConfigurationManager.AppSettings["erp_type"];
+                        var connector = new GenericConnector(erpType);
+                        connector.RunTransfer();
+                        return true;
+                        //TODO: Log that data was transferred!
+                    }
+                    return null;
                 }
             }
+            catch (Exception)
+            {
+                return false;
+            }
+
         }
     }
 }
