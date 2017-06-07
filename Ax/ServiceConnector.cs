@@ -1,17 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ErpConnector.Ax.DTO;
-using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using System.Configuration;
 using ErpConnector.Ax.Utils;
 

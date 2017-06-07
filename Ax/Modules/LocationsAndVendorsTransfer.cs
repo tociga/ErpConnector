@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
-using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Utils;
 
 namespace ErpConnector.Ax.Modules

@@ -3,12 +3,10 @@ using ErpConnector.Ax.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ErpConnector.Ax.Modules
 {
-	public class SalesValueTransactions
+    public class SalesValueTransactions
 	{
 		public static void WriteSalesValueTrans(Resources context)
 		{
