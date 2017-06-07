@@ -19,53 +19,6 @@ namespace ErpConnector.Ax
 {
     public class ServiceConnector
     {
-        public ServiceConnector()
-        {
-            //Authorize();
-        }
-        //private static void Authorize()
-        //{
-        //    header = WithoutADAL().Result;
-        //}
-
-        //private static string Header
-        //{
-        //    get
-        //    {
-        //        if (string.IsNullOrEmpty(header))
-        //        {
-        //            Authorize();
-        //        }
-        //        return header;
-        //    }
-        //}
-        //private static async Task<string> WithoutADAL()
-        //{
-        //    var postData = new List<KeyValuePair<string, string>>
-        //    {
-        //        new KeyValuePair<string, string>("resource", "https://agrax7u2devaos.cloudax.dynamics.com"),
-        //        new KeyValuePair<string, string>("grant_type", "client_credentials"),
-        //        new KeyValuePair<string, string>("client_secret", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns="),
-        //        new KeyValuePair<string, string>("client_id", "4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3")
-        //    };
-
-        //    using (var client = new HttpClient())
-        //    {
-
-        //        string baseUrl = "https://login.windows.net/reynd.is/oauth2/";
-        //        client.BaseAddress = new Uri(baseUrl);
-        //        client.DefaultRequestHeaders.Accept.Clear();
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        //        var content = new FormUrlEncodedContent(postData);
-
-        //        HttpResponseMessage response = await client.PostAsync("token", content);
-        //        string jsonString = await response.Content.ReadAsStringAsync();
-        //        var responseData = JsonConvert.DeserializeObject<dynamic>(jsonString);
-        //        return responseData.token_type + " " + responseData.access_token;
-        //        //return jsonString;
-        //    }
-        //}
         public static async Task<T> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
