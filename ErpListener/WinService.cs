@@ -45,8 +45,22 @@ namespace ErpConnector.Listener
             if (_lastRun.Date < DateTime.Now.Date)
             {
                 _timer.Stop();
-                var db = new DbService();
-                db.Sync();
+                try
+                {
+                    if (new DbService().Sync() == true)
+                    {
+                        Log.Info("Data transfer run successfully");
+                    }
+                    else
+                    {
+                        Log.Info("Data transfer not needed. Already Synced data.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Data transfer was not run. Reason: ", ex);
+                }
+
                 _lastRun = DateTime.Now;
                 _timer.Start();
             }

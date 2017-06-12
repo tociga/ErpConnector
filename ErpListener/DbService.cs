@@ -1,4 +1,5 @@
-﻿using ErpConnector.Common;
+﻿using Common.Logging;
+using ErpConnector.Common;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -9,27 +10,24 @@ namespace ErpConnector.Listener
     {
         public bool? Sync()
         {
-            try
+            using (var db = new Staging())
             {
-                using (var db = new Staging())
+                var pendingDataTransfer = db.erp_actions.Where(a => a.action_type == "run_transfer" && a.success != true).Any();
+                if (pendingDataTransfer)
                 {
-                    var pendingDataTransfer = db.erp_actions.Where(a => a.action_type == "run_transfer" && a.success != true).Any();
-                    if (pendingDataTransfer)
+                    var erpType = ConfigurationManager.AppSettings["erp_type"];
+                    var connector = new GenericConnector(erpType);
+                    connector.RunTransfer();
+                    var actions = db.erp_actions.Where(a => a.action_type == "run_transfer").ToList();
+                    foreach (var item in actions)
                     {
-                        var erpType = ConfigurationManager.AppSettings["erp_type"];
-                        var connector = new GenericConnector(erpType);
-                        connector.RunTransfer();
-                        return true;
-                        //TODO: Log that data was transferred!
+                        item.success = true;
                     }
-                    return null;
+                    db.SaveChanges();
+                    return true;
                 }
+                return null;
             }
-            catch (Exception)
-            {
-                return false;
-            }
-
         }
     }
 }

@@ -18,13 +18,13 @@ namespace ErpConnector.Ax
         public AxODataConnector()
         {
             var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"]; 
+            _header = GetAdalToken();
             _context = new Resources(new Uri(axBaseUrl + "/data"));
             _context.SendingRequest2 += Context_SendingRequest2;                      
         }
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            _header = GetAdalToken();
             e.RequestMessage.SetHeader("Authorization", _header);
         }
 

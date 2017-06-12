@@ -7,9 +7,9 @@ using System.Configuration;
 
 namespace ErpConnector.Ax.Utils
 {
-    public class DataWriter
+    public static class DataWriter
     {
-        protected static string ConnectionString
+        static string ConnectionString
         {
             get
             {
