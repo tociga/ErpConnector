@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using Topshelf;
 using Topshelf.Common.Logging;
@@ -17,9 +18,9 @@ namespace ErpConnector.Listener
 
             // Specify the base name, display name and description for the service, as it is registered in the services control manager.
             // This information is visible through the Windows Service Monitor
-            const string serviceName = "ErpListenerService";
-            const string displayName = "ErpListenerService Service";
-            const string description = "A .NET Windows Service.";
+            const string serviceName = "ErpListener";
+            const string displayName = "ERP Listener";
+            const string description = "Syncs up data from ERP system(s) to AGR5 system.";
 
             HostFactory.Run(x =>
             {
@@ -44,9 +45,11 @@ namespace ErpConnector.Listener
 
                 //=> Service Identity
 
-                x.RunAsLocalSystem();
+                //x.RunAsLocalSystem();
 
-                //x.RunAs("username", "password"); // predefined user
+                var username = ConfigurationManager.AppSettings["run_as_username"];
+                var password = ConfigurationManager.AppSettings["run_as_password"];
+                x.RunAs(username, password); // predefined user
                 //x.RunAsPrompt(); // when service is installed, the installer will prompt for a username and password
                 //x.RunAsNetworkService(); // runs as the NETWORK_SERVICE built-in account
                 //x.RunAsLocalSystem(); // run as the local system account
@@ -69,7 +72,7 @@ namespace ErpConnector.Listener
 
                 //x.DependsOn("SomeOtherService");
                 //x.DependsOnMsmq(); // Microsoft Message Queueing
-                x.DependsOnMsSql(); // Microsoft SQL Server
+                //x.DependsOnMsSql(); // Microsoft SQL Server
                 x.DependsOnEventLog(); // Windows Event Log
                 //x.DependsOnIis(); // Internet Information Server
 

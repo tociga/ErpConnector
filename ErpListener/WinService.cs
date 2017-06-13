@@ -9,7 +9,7 @@ namespace ErpConnector.Listener
     class WinService
     {
         private Timer _timer = new Timer();
-        private DateTime _lastRun = DateTime.Now.AddDays(-1);
+        private DateTime _lastRun;
 
         public ILog Log { get; private set; }
 
@@ -17,7 +17,7 @@ namespace ErpConnector.Listener
         {
 
             // IocModule.cs needs to be updated in case new paramteres are added to this constructor
-
+            _lastRun = DateTime.Now;
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
@@ -30,9 +30,7 @@ namespace ErpConnector.Listener
 
             Log.Info($"{nameof(WinService)} Start command received.");
             // Set up a timer to trigger every minute.  
-            double interval = 0;
-            double.TryParse(ConfigurationManager.AppSettings["sync_time_interval_ms"], out interval);
-            _timer.Interval = interval == 0 ? 60 * 60 * 1000 : interval; // Default to 60 minutes if nothing in config
+            _timer.Interval = 1 * 60 * 1000; // Check every minute
             _timer.Elapsed += new ElapsedEventHandler(ShouldSync);
             _timer.Start();
             //TODO: Implement your service start routine.
@@ -41,26 +39,28 @@ namespace ErpConnector.Listener
 
         private void ShouldSync(object sender, ElapsedEventArgs e)
         {
-            // If sync hasn't run today
-            if (_lastRun.Date < DateTime.Now.Date)
+            double syncIntervalMs = 0;
+            double.TryParse(ConfigurationManager.AppSettings["sync_time_interval_ms"], out syncIntervalMs);
+            var timeSinceLastRunMs = DateTime.Now.Subtract(_lastRun).TotalMilliseconds;
+
+            if (timeSinceLastRunMs >= syncIntervalMs)
             {
                 _timer.Stop();
                 try
                 {
                     if (new DbService().Sync() == true)
                     {
-                        Log.Info("Data transfer run successfully");
+                        Log.Info("Data transfer ran successfully");
                     }
                     else
                     {
-                        Log.Info("Data transfer not needed. Already Synced data.");
+                        Log.Trace("Data transfer not performed. Already Synced data.");
                     }
                 }
                 catch (Exception ex)
                 {
                     Log.Error("Data transfer was not run. Reason: ", ex);
                 }
-
                 _lastRun = DateTime.Now;
                 _timer.Start();
             }

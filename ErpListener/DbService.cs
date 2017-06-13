@@ -1,8 +1,6 @@
-﻿using Common.Logging;
-using ErpConnector.Common;
-using System;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace ErpConnector.Listener
 {
@@ -10,20 +8,34 @@ namespace ErpConnector.Listener
     {
         public bool? Sync()
         {
-            using (var db = new Staging())
+            var connectionString = ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
+            using (var connection = new SqlConnection(connectionString))
             {
-                var pendingDataTransfer = db.erp_actions.Where(a => a.action_type == "run_transfer" && a.success != true).Any();
+                var command = new SqlCommand("[erp].[pending_transfers]", connection) {
+                    CommandType = CommandType.StoredProcedure
+                };
+                var pendingParam = command.Parameters.Add("@pendingDataTransfer", SqlDbType.Bit);
+                pendingParam.Direction = ParameterDirection.Output;
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                var pendingDataTransfer = false;
+                bool.TryParse(pendingParam.Value.ToString(), out pendingDataTransfer);
+            
                 if (pendingDataTransfer)
                 {
+                    // Run transfer
                     var erpType = ConfigurationManager.AppSettings["erp_type"];
                     var connector = new GenericConnector(erpType);
                     connector.RunTransfer();
-                    var actions = db.erp_actions.Where(a => a.action_type == "run_transfer").ToList();
-                    foreach (var item in actions)
-                    {
-                        item.success = true;
-                    }
-                    db.SaveChanges();
+
+                    // Mark as transferred in db
+                    var markTransferredParam = command.Parameters.Add("@markTransferred", SqlDbType.Bit);
+                    markTransferredParam.Direction = ParameterDirection.Input;
+                    markTransferredParam.Value = true;
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
                     return true;
                 }
                 return null;

@@ -51,52 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="erp_actions.cs">
-      <DependentUpon>Staging.tt</DependentUpon>
-    </Compile>
     <Compile Include="IErpConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Staging.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Staging.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Staging.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Staging.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Staging.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Staging.edmx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
     <None Include="packages.config" />
-    <EntityDeploy Include="Staging.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Staging.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="Staging.edmx.diagram">
-      <DependentUpon>Staging.edmx</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Staging.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Staging.edmx</DependentUpon>
-      <LastGenOutput>Staging.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Staging.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Staging.edmx</DependentUpon>
-      <LastGenOutput>Staging.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
