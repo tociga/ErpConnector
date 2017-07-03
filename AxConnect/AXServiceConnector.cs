@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ErpDTO.DTO;
 using ErpDTO.Microsoft.Dynamics.DataEntities;
+using System.Configuration;
 
 namespace AxConnect
 {
@@ -84,7 +85,7 @@ namespace AxConnect
 
             using (var requestStream = request.GetRequestStream())
             {
-                using (StreamWriter writer = new StreamWriter(requestStream))
+                using (var writer = new StreamWriter(requestStream))
                 {
                     writer.Write(postData);
                     writer.Flush();
@@ -95,11 +96,11 @@ namespace AxConnect
             {
                 using (var response = (HttpWebResponse)request.GetResponse())
                 {
-                    using (Stream responseStream = response.GetResponseStream())
+                    using (var responseStream = response.GetResponseStream())
                     {
-                        using (StreamReader streamReader = new StreamReader(responseStream))
+                        using (var streamReader = new StreamReader(responseStream))
                         {
-                            string responseString = streamReader.ReadToEnd();
+                            var responseString = streamReader.ReadToEnd();
                             //string sanitized = SanitizeJsonString(responseString);
 
                             return JsonConvert.DeserializeObject<T>(responseString);
@@ -141,7 +142,7 @@ namespace AxConnect
 
             using (var requestStream = request.GetRequestStream())
             {
-                using (StreamWriter writer = new StreamWriter(requestStream))
+                using (var writer = new StreamWriter(requestStream))
                 {
                     writer.Write(postData);
                     writer.Flush();
@@ -152,11 +153,11 @@ namespace AxConnect
             {
                 using (var response = (HttpWebResponse)request.GetResponse())
                 {
-                    using (Stream responseStream = response.GetResponseStream())
+                    using (var responseStream = response.GetResponseStream())
                     {
-                        using (StreamReader streamReader = new StreamReader(responseStream))
+                        using (var streamReader = new StreamReader(responseStream))
                         {
-                            string responseString = streamReader.ReadToEnd();
+                            var responseString = streamReader.ReadToEnd();
                             //string sanitized = SanitizeJsonString(responseString);
 
                             return JsonConvert.DeserializeObject<T>(responseString);
@@ -182,8 +183,8 @@ namespace AxConnect
         }
         public static async Task<ErpDTO.DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters)
         {
-            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
+            var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
 
             var request =(HttpWebRequest)HttpWebRequest.Create(endpoint);
             request.Accept = "application/json;odata.metadata=none";
@@ -203,11 +204,11 @@ namespace AxConnect
 
             using (var response = (HttpWebResponse)request.GetResponse())
             {
-                using (Stream responseStream = response.GetResponseStream())
+                using (var responseStream = response.GetResponseStream())
                 {
-                    using (StreamReader streamReader = new StreamReader(responseStream))
+                    using (var streamReader = new StreamReader(responseStream))
                     {
-                        string responseString = streamReader.ReadToEnd();
+                        var responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
                         return JsonConvert.DeserializeObject<ErpDTO.DTO.GenericJsonOdata<T>>(responseString);
 
@@ -217,9 +218,9 @@ namespace AxConnect
         }
         public static async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         {
-            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
-            string endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
+            var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
@@ -231,7 +232,7 @@ namespace AxConnect
             {
                 using (var requestStream = request.GetRequestStream())
                 {
-                    using (StreamWriter writer = new StreamWriter(requestStream))
+                    using (var writer = new StreamWriter(requestStream))
                     {
                         writer.Write(postData);
                         writer.Flush();
@@ -240,11 +241,11 @@ namespace AxConnect
             }
             using (var response = (HttpWebResponse)request.GetResponse())
             {
-                using (Stream responseStream = response.GetResponseStream())
+                using (var responseStream = response.GetResponseStream())
                 {
-                    using (StreamReader streamReader = new StreamReader(responseStream))
+                    using (var streamReader = new StreamReader(responseStream))
                     {
-                        string responseString = streamReader.ReadToEnd();
+                        var responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
                         return JsonConvert.DeserializeObject<List<T>>(responseString);
 
@@ -255,19 +256,18 @@ namespace AxConnect
 
         public static async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData, string adalHeader)
         {
-            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string standardServiceGroup = System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
-            string endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
+            var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var standardServiceGroup = ConfigurationManager.AppSettings["StandardServiceGroup"];
+            var endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = adalHeader;
-            //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData.Length;
 
             using (var requestStream = request.GetRequestStream())
             {
-                using (StreamWriter writer = new StreamWriter(requestStream))
+                using (var writer = new StreamWriter(requestStream))
                 {
                     writer.Write(postData);
                     writer.Flush();
@@ -276,9 +276,9 @@ namespace AxConnect
 
             using (var response = (HttpWebResponse)request.GetResponse())
             {
-                using (Stream responseStream = response.GetResponseStream())
+                using (var responseStream = response.GetResponseStream())
                 {
-                    using (StreamReader streamReader = new StreamReader(responseStream))
+                    using (var streamReader = new StreamReader(responseStream))
                     {
                         string responseString = streamReader.ReadToEnd();
                         //string sanitized = SanitizeJsonString(responseString);
