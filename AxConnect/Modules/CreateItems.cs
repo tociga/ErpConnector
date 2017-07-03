@@ -28,7 +28,7 @@ namespace AxConnect.Modules
             {
                 //context.AddToReleasedProductVariants(variant);
                 //context.SaveChanges();
-                var variantResult = AXServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, adalHeader, variant).Result;
+                var variantResult = AXServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
             }
         }
     }

@@ -133,6 +133,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ErpDTO\ErpDTO\ErpDTO.csproj">
+      <Project>{fdee1c20-5c29-47c5-9136-f961a11f8e70}</Project>
+      <Name>ErpDTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AxConCommon\AxConCommon.csproj">
       <Project>{a8e95d64-c63d-4f1a-85e4-ebb7495feeda}</Project>
       <Name>AxConCommon</Name>

@@ -11,15 +11,15 @@ namespace AxConnect.Modules
 {
     public class BomTransfer
     {
-        public static void GetBom(string header)
+        public static void GetBom()
         {
-            var bomHeaders = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsHeader>("BillOfMaterialsHeaders", null, header).Result;
+            var bomHeaders = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsHeader>("BillOfMaterialsHeaders", null).Result;
             DataAccess.DataWriter.WriteToTable<BillOfMaterialsHeader>(bomHeaders.value.GetDataReader(), "[ax].[BillOfMaterialsHeaders]");
 
-            var bomLines = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsLine>("BillOfMaterialsLines", null, header).Result;
+            var bomLines = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsLine>("BillOfMaterialsLines", null).Result;
             DataAccess.DataWriter.WriteToTable<BillOfMaterialsLine>(bomLines.value.GetDataReader(), "[ax].[BillOfMaterialsLines]");
 
-            var bomVersion = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsVersion>("BillOfMaterialsVersions", null, header).Result;
+            var bomVersion = AXServiceConnector.CallOdataEndpoint<BillOfMaterialsVersion>("BillOfMaterialsVersions", null).Result;
             DataAccess.DataWriter.WriteToTable<BillOfMaterialsVersion>(bomVersion.value.GetDataReader(), "[ax].[BillOfMaterialsVersions]");
 
         }

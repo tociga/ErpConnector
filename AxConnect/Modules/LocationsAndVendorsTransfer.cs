@@ -12,18 +12,18 @@ namespace AxConnect.Modules
 {
     public class LocationsAndVendorsTransfer
     {
-        public static void WriteLocationsAndVendors(Resources context, string authHeader)
+        public static void WriteLocationsAndVendors(Resources context)
         {
             //var channel = ReadRetailChannel(context);
             var channel = AXServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
-                "",authHeader).Result.value.GetDataReader();
+                "").Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable<RetailChannel>(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);
             var assortment = AXServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
-                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'",
-                authHeader).Result.value.GetDataReader();
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'"
+                ).Result.value.GetDataReader();
             DataAccess.DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
             var locSetup = context.Locations.ToList().GetDataReader<Location>();
@@ -41,6 +41,7 @@ namespace AxConnect.Modules
 
             var productLines = ReadRetailAssortmentProductLine(context);
             DataAccess.DataWriter.WriteToTable(productLines, "[ax].[RETAILASSORTMENTPRODUCTLINE]");
+            
         }
 
         private static IGenericDataReader ReadRetailChannel(Resources context)

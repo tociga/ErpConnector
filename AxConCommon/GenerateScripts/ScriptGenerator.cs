@@ -71,6 +71,10 @@ namespace AxConCommon.GenerateScripts
             {
                 return "[datetime]";
             }
+            else if (type == typeof(Guid))
+            {
+                return "[uniqueidentifier]";
+            }
             else if (type.IsEnum)
             {
                 return "[int]";

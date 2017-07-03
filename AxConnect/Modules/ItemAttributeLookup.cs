@@ -11,31 +11,53 @@ namespace AxConnect.Modules
 {
     public class ItemAttributeLookup
     {
-        public static void ReadItemAttributes(Resources context, string autheader)
+        public static void ReadItemAttributes(Resources context, bool includesFashion)
         {
-            var colorGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", autheader).Result.value;
+            var colorGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "").Result.value;
             DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(colorGroups.GetDataReader(), "[ax].[ProductColorGroup]");
 
-            var sizeGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", autheader).Result.value;
+            var sizeGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "").Result.value;
             DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(sizeGroups.GetDataReader(), "[ax].[ProductSizeGroup]");
 
-            var styleGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", autheader).Result.value;
+            var styleGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "").Result.value;
             DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(styleGroups.GetDataReader(), "[ax].[ProductStyleGroup]");
 
-            var seasonGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", autheader).Result.value;
-            DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(seasonGroups.GetDataReader(), "[ax].[SeasonGroup]");
+            if (includesFashion)
+            {
+                var seasonGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "").Result.value;
+                DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(seasonGroups.GetDataReader(), "[ax].[SeasonGroup]");
 
-            var season = ReadSeasonTable(context);
-            DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
+                var season = AXServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "").Result.value;
+                DataAccess.DataWriter.WriteToTable<SeasonTable>(season.GetDataReader(), "[ax].[SeasonTable]");
+            }
+            //var season = ReadSeasonTable(context);
+            //DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
 
-            var colorGroupLines = ReadColorGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(colorGroupLines, "[ax].[ProductColorGroupLine]");
+            //var colorGroupLines = ReadColorGroupLines(context);
+            //DataAccess.DataWriter.WriteToTable(colorGroupLines, "[ax].[ProductColorGroupLine]");
 
-            var sizeGroupLines = ReadSizeGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(sizeGroupLines, "[ax].[ProductSizeGroupLine]");
+            //var sizeGroupLines = ReadSizeGroupLines(context);
+            //DataAccess.DataWriter.WriteToTable(sizeGroupLines, "[ax].[ProductSizeGroupLine]");
 
-            var styleGroupLines = ReadStyleGroupLines(context);
-            DataAccess.DataWriter.WriteToTable(styleGroupLines, "[ax].[ProductStyleGroupLine]");
+            //var styleGroupLines = ReadStyleGroupLines(context);
+            //DataAccess.DataWriter.WriteToTable(styleGroupLines, "[ax].[ProductStyleGroupLine]");
+
+
+            var colorGroupLines = AXServiceConnector.CallOdataEndpoint<ProductColorGroupLine>("ProductColorGroupLines", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductColorGroupLine>(colorGroupLines.GetDataReader(), "[ax].[ProductColorGroupLine]");
+
+            var sizeGroupLines = AXServiceConnector.CallOdataEndpoint<ProductSizeGroupLine>("ProductSizeGroupLines", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductSizeGroupLine>(sizeGroupLines.GetDataReader(), "[ax].[ProductSizeGroupLine]");
+
+            var styleGroupLines = AXServiceConnector.CallOdataEndpoint<ProductStyleGroupLine>("ProductStyleGroupLines", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductStyleGroupLine>(styleGroupLines.GetDataReader(), "[ax].[ProductStyleGroupLine]");
+
+            var prodAttribute = AXServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductAttribute>(prodAttribute.GetDataReader(), "[ax].[ProductAttributes]");
+
+            var attrValue = AXServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ProductAttributeValue>(attrValue.GetDataReader(), "[ax][ProductAttributeValues]");
+            
         }
 
         private static IGenericDataReader ReadColorGroupLines(Resources context)

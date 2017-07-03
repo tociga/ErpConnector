@@ -14,51 +14,39 @@ namespace AxConnect.Modules
     public class ProductHistory
     {
 
-        public void WriteInventTrans(string adalHeader)
+        public void WriteInventTrans()
         {
-            Int64 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");
-            recId = GetNextRecId(recId, "GetNextRecId", adalHeader);
+            Int64 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");            
             bool foundData = true;
             while(foundData)
             {
-                foundData =  WriteInventTrans<InventTransDTO>(recId, 20000, "GetInventTransLines", "[INVENTTRANS]", adalHeader);
-                recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");
-                recId = GetNextRecId(recId, "GetNextRecId", adalHeader);
+                foundData =  WriteInventTrans<InventTransDTO>(recId, 5000, "GetInventTrans", "[INVENTTRANS]");
+                recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");                
             }
         }
 
-        public void WriteInventTransOrigin(string adalHeader)
+        public void WriteInventTransOrigin()
         {
             Int64 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-            recId = GetNextRecId(recId, "GetNextTransOriginRecId", adalHeader);
             bool foundData = true;
             while(foundData)
             {
-                foundData = WriteInventTrans<InventTransOriginDTO>(recId, 20000, "GetInventTransOriginLines", "[INVENTTRANSORIGIN]", adalHeader);
+                foundData = WriteInventTrans<InventTransOriginDTO>(recId, 5000, "GetInventTransOrigin", "[INVENTTRANSORIGIN]");
                 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-                recId = GetNextRecId(recId, "GetNextTransOriginRecId", adalHeader);
     }
         }
 
-        private bool WriteInventTrans<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable, string adalHeader)
+        private bool WriteInventTrans<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
             AXServiceConnector connector = new AXServiceConnector();
-            string postData = "{ \"minRecId\": " + recId.ToString()+ ", \"maxRecId\" : "+ (recId + pageSize).ToString() +"}";
-            var result = AXServiceConnector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData, adalHeader);
+            string postData = "{ \"lastRecId\": " + recId.ToString()+ ", \"pageSize\" : "+ (pageSize).ToString() +"}";
+            var result = AXServiceConnector.CallAGRServiceArray<T>("AGRInventTransService", webMethod , postData, null);
 
             var reader = result.Result.GetDataReader();
 
             DataAccess.DataWriter.WriteToTable(reader, "[ax]." + destTable);
 
             return result.Result.Any();
-        }
-
-        public long GetNextRecId(long recId, string webMethod, string adalHeader)
-        {
-            string postData = "{ \"lastRecId\": " + recId.ToString()+" }";
-            var result = AXServiceConnector.CallAGRServiceScalar<Int64>("AGRInventTransService", webMethod, postData, adalHeader);
-
-            return result.Result;
-        }
+        }      
     }
 }

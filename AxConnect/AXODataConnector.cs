@@ -20,10 +20,13 @@ namespace AxConnect
     {
         string header = "";
         private Resources context;
+        private bool includesFashion;
         public AXODataConnector()
-        {            
-            context = new Resources(new Uri("https://agrax7u2devaos.cloudax.dynamics.com/data"));
-            context.SendingRequest2 += Context_SendingRequest2;                      
+        {
+            context = new Resources(new Uri(System.Configuration.ConfigurationManager.AppSettings["ax_base_url"]+"/data"));
+            context.SendingRequest2 += Context_SendingRequest2;
+
+            Boolean.TryParse(System.Configuration.ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
         }
 
         //private async Task Authorize()
@@ -43,15 +46,21 @@ namespace AxConnect
 
         public void GetBom()
         {
-            header = AdalAuthenticate();
-            DataAccess.DataWriter.TruncateTables(false, false, false, false, false, true);
-            BomTransfer.GetBom(header);
+            DataAccess.DataWriter.TruncateTables(false, false, false, false, false, true, false);
+            BomTransfer.GetBom();
         }
 
         public void GetPoTo()
         {
+            DataAccess.DataWriter.TruncateTables(false, false, false, false, false, false, true);
             header = AdalAuthenticate();
-            POTransfer.GetPosAndTos(header, context);
+            POTransfer.GetPosAndTos(context);
+        }
+
+        public void GetLocations()
+        {
+            DataAccess.DataWriter.TruncateTables(false, false, false, true, false, false, false);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context);
         }
         public void RunTransfer()
         {
@@ -59,26 +68,38 @@ namespace AxConnect
             header = AdalAuthenticate();
             DateTime start = DateTime.Now;
             //CreateItemTest();
-            DataAccess.DataWriter.TruncateTables(true, false, false,true, true, false);
+            DataAccess.DataWriter.TruncateTables(true, true, true,true, true, true, true);
             DateTime truncate = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Truncate = " + truncate.Subtract(start).TotalSeconds);
-            ////SalesValueTransactions.WriteSalesValueTrans(context);
-            ItemCategoryTransfer.WriteCategories(header);
+            
+            ItemCategoryTransfer.WriteCategories();
             DateTime cat = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Category = " + cat.Subtract(truncate).TotalSeconds);
-            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context, header);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors(context);
             DateTime loc = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Locations = " + loc.Subtract(cat).TotalSeconds);
-            ItemTransfer.WriteItems(context, header);
+            ItemTransfer.WriteItems(context, includesFashion);
             DateTime items = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Items = " + items.Subtract(loc).TotalSeconds);
-            ItemAttributeLookup.ReadItemAttributes(context, header);
+            ItemAttributeLookup.ReadItemAttributes(context, includesFashion);
             DateTime lookup = DateTime.Now;
             System.Diagnostics.Debug.WriteLine("Lookup = " + lookup.Subtract(items).TotalSeconds);
+
+            GetFullIoTrans();
+            GetBom();
+            GetPoTo();
             //WritePO writeTest = new WritePO(context);
             //writeTest.WriteTestPO();
         }
 
+        public void GetFullIoTrans()
+        {
+            //header = AdalAuthenticate();
+            ProductHistory ph = new ProductHistory();
+            ph.WriteInventTrans();
+            ph.WriteInventTransOrigin();
+            SalesValueTransactions.WriteSalesValueTrans(context);
+        }
         /// <summary>
         ///
         /// </summary>
@@ -521,7 +542,7 @@ namespace AxConnect
             rpm.ShipStartDate = new DateTimeOffset(new DateTime(1900, 1, 1, 12, 0, 0, 0));
 
             //var r = AXServiceConnector.CallOdataEndpointPost("ProductMasters", null, header, master).Result;
-            var rpmr = AXServiceConnector.CallOdataEndpointPost("ReleasedProductMasters", null, header, rpm);
+            var rpmr = AXServiceConnector.CallOdataEndpointPost("ReleasedProductMasters", null, rpm);
             //ReleasedProductVariantDTO v = new ReleasedProductVariantDTO();
             ////v.DataAreaId = "usrt";
             //v.ItemNumber = "AGRPOC_176025568";
@@ -555,7 +576,7 @@ namespace AxConnect
             List<ReleasedProductVariantDTO> vars = new List<ReleasedProductVariantDTO>();
             vars.Add(v);
 
-            var rv = AXServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, header, v).Result;
+            var rv = AXServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
 
            // CreateItems.CreateSku(context, header, dp, rdp, vars);
             //foreach(var variant in  context.ReleasedProductVariants)
@@ -572,17 +593,9 @@ namespace AxConnect
             e.RequestMessage.SetHeader("Authorization", AdalAuthenticate());
         }
 
-        private static string AdalAuthenticate()
-        {
-            UriBuilder uri = new UriBuilder("https://login.windows.net/reynd.is/oauth2/token");
-            UriBuilder redirectUri = new UriBuilder("http://agrdynamics.com/agr5ax7");
-
-            AuthenticationContext authenticationContext = new AuthenticationContext(uri.ToString());
-            ClientCredential cred = new ClientCredential("4d2a3c5d-7e63-40a8-9c37-c8769b1c5af3", "px8O9/yP1alySqXxYBtHgKo2LdRlBYBJCr1mio/Quns=");
-
-            var authResult = authenticationContext.AcquireTokenAsync(System.Configuration.ConfigurationManager.AppSettings["ax_base_url"], cred).Result;
-
-            return authResult.CreateAuthorizationHeader();
+        public static string AdalAuthenticate()
+        {           
+            return GetAdalToken().CreateAuthorizationHeader();
         }
 
         public static AuthenticationResult GetAdalToken()

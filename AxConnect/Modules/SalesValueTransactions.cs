@@ -12,12 +12,11 @@ namespace AxConnect.Modules
 	{
 		public static void WriteSalesValueTrans(Resources context)
 		{
-			//DataAccess.DataWriter.TruncateTables(false, true, true);
-			var salesTransOld = ReadTransActionHeaders(context, new DateTimeOffset(new DateTime(2011,1,1)), 
-				new DateTimeOffset(new DateTime(2013,1,1))
+            //DataAccess.DataWriter.TruncateTables(false, true, true);
+            ReadTransActionHeaders(context);
                 //DateTime.Now.Date.AddDays(-30)
-				);
-			DataAccess.DataWriter.WriteToTable(salesTransOld, "[ax].[RetailTransactionTable]");
+				
+			//DataAccess.DataWriter.WriteToTable<RetailTransaction>(salesTransOld, "[ax].[RetailTransactionTable]");
 
 			//var salesTransNew = ReadTransActionHeaders(context, DateTime.Now.Date.AddDays(-30), DateTime.Now.Date);
 			//DataAccess.DataWriter.WriteToTable(salesTransNew, "[ax].[RetailTransactionTable_increment]");
@@ -29,9 +28,8 @@ namespace AxConnect.Modules
 
         private static void WriteSalesValueLines(Resources context)
         {
-            var list = new List<dynamic>();
             int pagesize = 3000;
-            int i = 49;
+            int i = 0;
             bool hasData = true;
             while (hasData)
             {
@@ -46,13 +44,8 @@ namespace AxConnect.Modules
                 }
                 if (lines.Count > 0)
                 {
-                    foreach(var l in lines)
-                    {
-                        list.Add(GetDynamicFromSalesTrans(l));
-                    }
                     //hasData = false;
-                    DataAccess.DataWriter.WriteToTable(list.GetDataReader<dynamic>(), "[ax].[RetailTransactionSalesLineTable]");
-                    list.Clear();
+                    DataAccess.DataWriter.WriteToTable<RetailTransactionSalesLine>(lines.GetDataReader(), "[ax].[RetailTransactionSalesLineTable]");
                 }
                 else
                 {
@@ -204,22 +197,47 @@ namespace AxConnect.Modules
 				DATAAREAID = trans.DataAreaId
 			};
 		}
-		private static IGenericDataReader ReadTransActionHeaders(Resources context, DateTimeOffset startDate, DateTimeOffset endDate)
+		private static void ReadTransActionHeaders(Resources context)
 		{
-			var list = new List<dynamic>();
-			for (DateTimeOffset d = startDate; d <= endDate; d = d.AddDays(1))
-			{
-				var headers = (from h in context.RetailTransactions
-							   where h.TransactionDate > d.AddDays(-1) && h.TransactionDate < d.AddDays(1)
-							   select h);
-				//var headers = context.RetailTransactions.Where(t=>t.TransactionDate <= d && t.TransactionDate > d.AddDays(-1));
+            int pagesize = 3000;
+            int i = 0;
+            bool hasData = true;
+            while (hasData)
+            {
+                List<RetailTransaction> lines = new List<RetailTransaction>();
+                if (i == 0)
+                {
+                    lines = context.RetailTransactions.Take(pagesize).ToList();
+                }
+                else
+                {
+                    lines = context.RetailTransactions.Skip(i * pagesize).Take(pagesize).ToList();
+                }
+                if (lines.Count > 0)
+                {
+                    //hasData = false;
+                    DataAccess.DataWriter.WriteToTable<RetailTransaction>(lines.GetDataReader(), "[ax].[RetailTransactionTable]");
+                }
+                else
+                {
+                    hasData = false;
+                }
+                i++;
+            }
+   //             var list = new List<RetailTransaction>();
+			//for (DateTimeOffset d = startDate; d <= endDate; d = d.AddDays(1))
+			//{
+			//	var headers = (from h in context.RetailTransactions
+			//				   where h.TransactionDate > d.AddDays(-1) && h.TransactionDate < d.AddDays(1)
+			//				   select h);
+			//	//var headers = context.RetailTransactions.Where(t=>t.TransactionDate <= d && t.TransactionDate > d.AddDays(-1));
 
-				foreach (var h in headers)
-				{
-					list.Add(GetDynamicFromTransAction(h));
-				}
-			}
-			return list.GetDataReader<dynamic>();
+			//	foreach (var h in headers)
+			//	{
+			//		list.Add(h);
+			//	}
+			//}
+			//return list.GetDataReader();
 		}
 
         //private static IGenericDataReader ReadTransActions(Resources context)

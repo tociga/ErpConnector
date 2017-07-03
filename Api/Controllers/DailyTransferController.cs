@@ -23,6 +23,24 @@ namespace ErpConnector.Controllers
         }
 
         [HttpGet]
+        [Route("locations")]
+        public IHttpActionResult GetLocations()
+        {
+            AXODataConnector ax = new AXODataConnector();
+            ax.GetLocations();
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("full_io_trans")]
+        public IHttpActionResult GetFullIoTrans()
+        {
+            AXODataConnector ax = new AXODataConnector();
+            ax.GetFullIoTrans();
+            return Ok();
+        }
+
+        [HttpGet]
         [Route("bom")]
         public IHttpActionResult GetBom()
         {

@@ -66,13 +66,13 @@ namespace AxConnect
         //        //return jsonString;
         //    }
         //}
-        public static async Task<T> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject)
+        public static async Task<T> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, T postDataObject)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
             //request.Headers["Accept"] = "application/json;odata.metadata=none";
             //request.Headers["Content-Type"] = "application/json";
 
@@ -125,13 +125,13 @@ namespace AxConnect
 
         
 
-        public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject, List<string> errorMessage)
+        public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
             //request.Headers["Content-Type"] = "application/json";
 
             request.Method = "POST";
@@ -180,14 +180,14 @@ namespace AxConnect
                 }
             }
         }
-        public static async Task<ErpDTO.DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
+        public static async Task<ErpDTO.DTO.GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
 
             var request =(HttpWebRequest)HttpWebRequest.Create(endpoint);
             request.Accept = "application/json;odata.metadata=none";
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
             request.Method = "GET";
             request.Timeout = 1000 * 60 * 3;
             //request.ContentLength = postData != null ? postData.Length : 0;
@@ -215,14 +215,14 @@ namespace AxConnect
                 }
             }
         }
-        public static async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string adalHeader, string serviceGroup = null)
+        public static async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
             string endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData != null ? postData.Length : 0;

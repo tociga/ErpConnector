@@ -11,34 +11,37 @@ namespace AxConnect.Modules
 {
     public class ItemTransfer
     {
-        public static void WriteItems(Resources context, string authHeader)
+        public static void WriteItems(Resources context, bool includeFashion)
         {
-            var productMaster = AXServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", authHeader).Result.value;
+            var productMaster = AXServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "").Result.value;
             DataAccess.DataWriter.WriteToTable<ProductMasterReadDTO>(productMaster.GetDataReader(), "[ax].[ProductMaster]");
 
-            var releasedMasters = AXServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
-            DataAccess.DataWriter.WriteToTable<ReleasedProductMasterReadDTO>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
+            var releasedMasters = AXServiceConnector.CallOdataEndpoint<ReleasedProductMaster>("ReleasedProductMasters", "").Result.value;
+            DataAccess.DataWriter.WriteToTable<ReleasedProductMaster>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
             //var items = ReadProducts(context);
-            var distinctProducts = AXServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", authHeader).Result.value;
+            var distinctProducts = AXServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "").Result.value;
             DataAccess.DataWriter.WriteToTable<DistinctProductsDTO>(distinctProducts.GetDataReader(), "[ax].[DistinctProduct]");
 
-            var items = AXServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
+            var items = AXServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "").Result.value;
             DataAccess.DataWriter.WriteToTable<ReleasedDistinctProductsReadDTO>(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");
 
-            var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
+            var inventDim = AXServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "").Result.value;
             DataAccess.DataWriter.WriteToTable(inventDim.GetDataReader(), "[ax].[INVENTDIM]");
 
-            var custVendExt = AXServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "", authHeader).Result.value;
+            var invTableModule = AXServiceConnector.CallOdataEndpoint<TableModule>("TableModules", "").Result.value;
+            DataAccess.DataWriter.WriteToTable(invTableModule.GetDataReader(), "[ax].[INVENTTABLEMODULE]");
+
+            var custVendExt = AXServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "").Result.value;
             DataAccess.DataWriter.WriteToTable(custVendExt.GetDataReader(), "[ax].[CUSTVENDEXTERNALITEM]");
 
-            var variants = ReadVariants(context);
-            DataAccess.DataWriter.WriteToTable(variants, "[ax].[ReleasedProductVariants]");
+            var variants = AXServiceConnector.CallOdataEndpoint<ReleasedProductVariant>("ReleasedProductVariants", "").Result.value.GetDataReader();
+            DataAccess.DataWriter.WriteToTable<ReleasedProductVariant>(variants, "[ax].[ReleasedProductVariants]");
 
-            var combos = AXServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
+            var combos = AXServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "").Result.value;
             DataAccess.DataWriter.WriteToTable(combos.GetDataReader(), "[ax].[INVENTDIMCOMBINATIONS]");
 
-            WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup", authHeader);
-            WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup", authHeader);
+            WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
+            WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup");
 
             var reqItems = context.AGRReqItemTables.ToList().GetDataReader<AGRReqItemTable>();
             DataAccess.DataWriter.WriteToTable<AGRReqItemTable>(reqItems, "[ax].[REQITEMTABLE]");
@@ -46,24 +49,26 @@ namespace AxConnect.Modules
             var reqKey = ReadReqSafetyKey(context);
             DataAccess.DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
 
-            WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines", authHeader);
+            WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines");
 
             // item_order_routes
-            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", authHeader).Result.value;
+            var itemPurchSetup = AXServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "").Result.value;
             DataAccess.DataWriter.WriteToTable<ItemPurchSetup>(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
 
-            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", authHeader).Result.value;
+            var itemInventSetup = AXServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "").Result.value;
             DataAccess.DataWriter.WriteToTable<ItemInventSetup>(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
 
-            WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure", authHeader);
-            WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion", authHeader);
+            WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure");
+            WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion");
+            if (includeFashion)
+            {
+                var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
+                DataAccess.DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
-            var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
-            DataAccess.DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
-
-            //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
-            var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null, authHeader);
-            DataAccess.DataWriter.WriteToTable(inventColorSeason.GetDataReader(), "[ax].[InventColorSeason]");
+                //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
+                var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
+                DataAccess.DataWriter.WriteToTable(inventColorSeason.GetDataReader(), "[ax].[InventColorSeason]");
+            }
         }
 
         private static IGenericDataReader ReadInventSeasonTable(Resources context)
@@ -83,24 +88,24 @@ namespace AxConnect.Modules
             return list.GetDataReader<dynamic>();
         }
 
-        private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName, string adalHeader)
+        private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName)
         {
             Int64 recId = DataAccess.DataWriter.GetMaxRecId(schemaName, tableName);
             Int64 pageSize = 20000;
             bool foundData = true;
             while (foundData)
             {
-                foundData = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "."+tableName, adalHeader);
+                foundData = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "."+tableName);
                 recId = DataAccess.DataWriter.GetMaxRecId("[ax]", tableName);
             }
 
         }
 
-        private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable, string adalHeader)
+        private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
             string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
             //var result = AXServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
-            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData, adalHeader);
+            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData);
             var reader = result.GetDataReader();
 
             DataAccess.DataWriter.WriteToTable<T>(reader, destTable);
@@ -108,9 +113,9 @@ namespace AxConnect.Modules
             return result.Any();
         }
 
-        private static List<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData, string adalHeader)
+        private static List<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData)
         {
-            return AXServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, adalHeader, serviceGroup).Result;
+            return AXServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, serviceGroup).Result;
         }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
@@ -279,7 +284,7 @@ namespace AxConnect.Modules
             //master.TrackingDimensionGroupName = "None";
             //master.StorageDimensionGroupName = "Ware";
             
-            var r = AXServiceConnector.CreateEntity<ProductMasterWriteDTO>("ProductMasters", null, header, item.productMaster, item.ErrorMessages).Result;
+            var r = AXServiceConnector.CreateEntity<ProductMasterWriteDTO>("ProductMasters", null, item.productMaster, item.ErrorMessages).Result;
             item.productMaster = r;            
             return item;
         }
