@@ -124,7 +124,63 @@ namespace AxConnect
             }
         }
 
-        
+        public static async Task<T> CallOdataEndpointPut<T>(string oDataEndpoint, string filters, T postDataObject)
+        {
+            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+
+            var request = HttpWebRequest.Create(endpoint);
+            request.Headers["Authorization"] = AXODataConnector.AdalAuthenticate();
+            //request.Headers["Accept"] = "application/json;odata.metadata=none";
+            //request.Headers["Content-Type"] = "application/json";
+
+            request.Method = "PUT";
+            var postData = JsonConvert.SerializeObject(postDataObject, new Converters.AxEnumConverter());
+            request.ContentLength = postData != null ? postData.Length : 0;
+            request.ContentType = "application/json";
+
+
+            using (var requestStream = request.GetRequestStream())
+            {
+                using (var writer = new StreamWriter(requestStream))
+                {
+                    writer.Write(postData);
+                    writer.Flush();
+                }
+            }
+
+            try
+            {
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        using (var streamReader = new StreamReader(responseStream))
+                        {
+                            var responseString = streamReader.ReadToEnd();
+                            //string sanitized = SanitizeJsonString(responseString);
+
+                            return JsonConvert.DeserializeObject<T>(responseString);
+                            //return responseString;
+                        }
+                    }
+                }
+            }
+            catch (WebException e)
+            {
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+                        var r = reader.ReadToEnd();
+
+                        // TODO: Need to log error;
+                        return default(T);
+                    }
+                }
+            }
+        }
+
 
         public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
         {

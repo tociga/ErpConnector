@@ -62,8 +62,8 @@ namespace AxConnect.Modules
             WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion");
             if (includeFashion)
             {
-                var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
-                DataAccess.DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
+                //var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
+                //DataAccess.DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
                 //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
                 var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
@@ -73,18 +73,18 @@ namespace AxConnect.Modules
 
         private static IGenericDataReader ReadInventSeasonTable(Resources context)
         {
-            var inventSeasons = context.InventSeasonTables.ToList();
+            ////var inventSeasons = context.InventSeasonTables.ToList();
             List<dynamic> list = new List<dynamic>();
-            foreach (var i in inventSeasons)
-            {
-                list.Add(
-                    new
-                    {
-                        ItemId = i.ItemId,
-                        SeasonCode = i.SeasonCode,
-                        IsDefault = i.IsDefault
-                    });
-            }
+            //foreach (var i in inventSeasons)
+            //{
+            //    list.Add(
+            //        new
+            //        {
+            //            ItemId = i.ItemId,
+            //            SeasonCode = i.SeasonCode,
+            //            IsDefault = i.IsDefault
+            //        });
+            //}
             return list.GetDataReader<dynamic>();
         }
 

@@ -73,5 +73,32 @@ namespace ErpConnector.Controllers
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
+
+        [HttpGet]
+        [Route("create_item")]
+        public IHttpActionResult CreateItem()
+        {
+            AXODataConnector a = new AXODataConnector();
+            a.CreateItemTest();
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("po_test")]
+        public IHttpActionResult CreatePoTest()
+        {
+            AXODataConnector a = new AXODataConnector();
+            a.CreatePoTest();
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("to_test")]
+        public IHttpActionResult CreateToTest()
+        {
+            AXODataConnector a = new AXODataConnector();
+            a.CreateToTest();
+            return Ok();
+        }
     }
 }

@@ -27,8 +27,8 @@ namespace AxConnect.Modules
                 var seasonGroups = AXServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "").Result.value;
                 DataAccess.DataWriter.WriteToTable<VariantGroupDTO>(seasonGroups.GetDataReader(), "[ax].[SeasonGroup]");
 
-                var season = AXServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "").Result.value;
-                DataAccess.DataWriter.WriteToTable<SeasonTable>(season.GetDataReader(), "[ax].[SeasonTable]");
+                //var season = AXServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "").Result.value;
+                //DataAccess.DataWriter.WriteToTable<SeasonTable>(season.GetDataReader(), "[ax].[SeasonTable]");
             }
             //var season = ReadSeasonTable(context);
             //DataAccess.DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
@@ -127,20 +127,20 @@ namespace AxConnect.Modules
         }
         private static IGenericDataReader ReadSeasonTable(Resources context)
         {
-            var seasons = context.SeasonTables.ToList();
+            //var seasons = context.SeasonTables.ToList();
             List<dynamic> list = new List<dynamic>();
-            foreach (var season in seasons)
-            {
-                list.Add(
-                    new
-                    {
-                        SEASONCODE = season.SeasonCode,
-                        STARTDATE = season.StartDate.DateTime,
-                        ENDDATE = season.EndDate.DateTime,
-                        KRFRetailSeasonGroupId = season.KRFRetailSeasonGroupId,
-                        Description = season.Description
-                    });
-            }
+            //foreach (var season in seasons)
+            //{
+            //    list.Add(
+            //        new
+            //        {
+            //            SEASONCODE = season.SeasonCode,
+            //            STARTDATE = season.StartDate.DateTime,
+            //            ENDDATE = season.EndDate.DateTime,
+            //            KRFRetailSeasonGroupId = season.KRFRetailSeasonGroupId,
+            //            Description = season.Description
+            //        });
+            //}
             return list.GetDataReader<dynamic>();
         }
 

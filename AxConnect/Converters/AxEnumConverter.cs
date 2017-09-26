@@ -102,16 +102,37 @@ namespace AxConnect.Converters
             {
                 writer.WriteValue(((EcoResProductType)value).ToString());
             }
+
+            if (value.GetType() ==typeof(AGROrderStatus))
+            {
+                writer.WriteValue(((AGROrderStatus)value).ToString());
+            }
+
+            if (value.GetType() == typeof(AGROrderType))
+            {
+                writer.WriteValue(((AGROrderType)value).ToString());
+            }
         }
 
         public override bool CanConvert(Type t)
         {
-            return t == typeof(NoYes) || t == typeof(ItemNumAlternative) || t==typeof(PdsVendorCheckItem) || t == typeof(SalesPriceModelBasic) 
+            bool result = (t == typeof(NoYes) || t == typeof(ItemNumAlternative) || t==typeof(PdsVendorCheckItem) || t == typeof(SalesPriceModelBasic) 
                 || t == typeof(InventBatchMergeDateCalculationMethod) || t == typeof(ABC) || t == typeof(ReqPOType) 
                 || t == typeof(ProdFlushingPrincipItem) || t == typeof(RetailPriceKeyingRequirement) || t == typeof(RetailQtyKeyingRequirement)
                 || t == typeof(PDSPotencyAttribRecordingEnum) || t == typeof(FITaxationOrigin_BR) || t == typeof(WHSAllowMaterialOverPick)
                 || t == typeof(SalesPriceModel) || t == typeof(PurchMatchingPolicyWithNotSetOption) || t==typeof(PmfProductType)
-                || t == typeof(EcoResVariantConfigurationTechnologyType) || t == typeof(EcoResProductType);
+                || t == typeof(EcoResVariantConfigurationTechnologyType) || t == typeof(EcoResProductType) || t== typeof(AGROrderStatus)
+                || t ==typeof(AGROrderType));
+
+            if (!result)
+            {
+                Type underLyingType = Nullable.GetUnderlyingType(t);
+                if (underLyingType != null)
+                {
+                    return CanConvert(underLyingType);
+                }
+            }
+            return result;
         }
 
         public override bool CanRead
