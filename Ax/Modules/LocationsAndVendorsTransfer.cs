@@ -8,35 +8,40 @@ namespace ErpConnector.Ax.Modules
 {
     public class LocationsAndVendorsTransfer
     {
-        public static void WriteLocationsAndVendors(Resources context, string authHeader)
+        public static void WriteLocationsAndVendors(Resources context)
         {
             //var channel = ReadRetailChannel(context);
             var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
-                "",authHeader).Result.value.GetDataReader();
+                "").Result.value.GetDataReader();
             DataWriter.WriteToTable<RetailChannel>(channel, "[ax].[RETAILCHANNELTABLE]");
 
             //var assortment = ReadRetailAssortment(context);
             var assortment = ServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
-                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'",
-                authHeader).Result.value.GetDataReader();
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'"
+                ).Result.value.GetDataReader();
             DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
             var locSetup = context.Locations.ToList().GetDataReader<Location>();
             DataWriter.WriteToTable<Location>(locSetup, "[ax].[INVENTLOCATION]");
 
-            var dir = context.DirParties.ToList().GetDataReader<DirParty>();
+            var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
             DataWriter.WriteToTable<DirParty>(dir, "[ax].[DIRPARTYTABLE]");
 
             var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
             DataWriter.WriteToTable<Vendor>(vendor, "[ax].[VENDTABLE]");
 
 
-            var channelLines = ReadRetailAssortmentChannelLines(context);
-            DataWriter.WriteToTable(channelLines, "[ax].[RETAILASSORTMENTCHANNELLINE]");
+           
+            var channelLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentChannelLine>("RetailAssortmentChannelLines",
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'")
+                .Result.value.GetDataReader<RetailAssortmentChannelLine>();
+            DataWriter.WriteToTable<RetailAssortmentChannelLine>(channelLines, "[ax].[RETAILASSORTMENTCHANNELLINE]");
 
-            var productLines = ReadRetailAssortmentProductLine(context);
-            DataWriter.WriteToTable(productLines, "[ax].[RETAILASSORTMENTPRODUCTLINE]");
+            var productLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentProductLine>("RetailAssortmentProductLines",
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'")
+                .Result.value.GetDataReader<RetailAssortmentProductLine>();
+            DataWriter.WriteToTable<RetailAssortmentProductLine>(productLines, "[ax].[RETAILASSORTMENTPRODUCTLINE]");
         }
 
         private static IGenericDataReader ReadRetailChannel(Resources context)
@@ -114,7 +119,7 @@ namespace ErpConnector.Ax.Modules
 
         private static IGenericDataReader ReadRetailAssortmentChannelLines(Resources context)
         {
-            var channelGroup = context.RetailAssortmentChannelLines.Where(x=>x.Status == RetailAssortmentStatusType.Published);
+            var channelGroup = context.RetailAssortmentChannelLines.ToList();//.Where(x=>x.Status == RetailAssortmentStatusType.Published);
             var list = new List<dynamic>();
             foreach(var cg in channelGroup)
             {
@@ -122,7 +127,7 @@ namespace ErpConnector.Ax.Modules
                 {
                     ASSORTMENTID = cg.AssortmentId,
                     PARTYNUMBER = cg.PartyNumber,
-                    STATUS = RetailAssortmentStatusType.Published
+                    STATUS = cg.Status.GetValueOrDefault()
                 });
             }
             return list.GetDataReader<dynamic>();

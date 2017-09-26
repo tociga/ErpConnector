@@ -24,7 +24,7 @@ namespace ErpConnector.Ax.Modules
             {
                 //context.AddToReleasedProductVariants(variant);
                 //context.SaveChanges();
-                var variantResult = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, adalHeader, variant).Result;
+                //var variantResult = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
             }
         }
     }

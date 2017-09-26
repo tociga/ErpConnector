@@ -109,6 +109,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\ClientConfiguration.cs" />
+    <Compile Include="Authentication\OAuthHelper.cs" />
+    <Compile Include="AXODataContext.cs" />
+    <Compile Include="AXODataContextConnector.cs" />
+    <Compile Include="DTO\AGROrderDTO.cs" />
+    <Compile Include="DTO\AGROrderLineDTO.cs" />
+    <Compile Include="DTO\GenericWriteObject.cs" />
+    <Compile Include="DTO\InventSumDTO.cs" />
+    <Compile Include="DTO\InventTransferLineDTO.cs" />
+    <Compile Include="DTO\InventTransferTableDTO.cs" />
+    <Compile Include="DTO\PriceDiscTableDTO.cs" />
+    <Compile Include="DTO\PurchLinesDTO.cs" />
+    <Compile Include="Modules\CreateOrder.cs" />
+    <Compile Include="Utils\Authenticator.cs" />
     <Compile Include="Utils\EnumConverter.cs" />
     <Compile Include="AxODataConnector.cs" />
     <Compile Include="ServiceConnector.cs" />
@@ -174,7 +188,9 @@
     <Compile Include="Utils\ScriptGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Web.config" />
     <None Include="ODataClient.ttinclude" />

@@ -9,34 +9,38 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemTransfer
     {
-        public static void WriteItems(Resources context, string authHeader)
+        public static void WriteItems(Resources context, bool includeFashion)
         {
-            var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", authHeader).Result.value;
+            var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "").Result.value;
             DataWriter.WriteToTable<ProductMasterReadDTO>(productMaster.GetDataReader(), "[ax].[ProductMaster]");
 
-            var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMasterReadDTO>("ReleasedProductMasters", "", authHeader).Result.value;
-            DataWriter.WriteToTable<ReleasedProductMasterReadDTO>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
+            var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMaster>("ReleasedProductMasters", "").Result.value;
+            DataWriter.WriteToTable<ReleasedProductMaster>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
+
             //var items = ReadProducts(context);
-            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", authHeader).Result.value;
+            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "").Result.value;
             DataWriter.WriteToTable<DistinctProductsDTO>(distinctProducts.GetDataReader(), "[ax].[DistinctProduct]");
 
-            var items = ServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "", authHeader).Result.value;
+            var items = ServiceConnector.CallOdataEndpoint<ReleasedDistinctProductsReadDTO>("ReleasedDistinctProducts", "").Result.value;
             DataWriter.WriteToTable<ReleasedDistinctProductsReadDTO>(items.GetDataReader(), "[ax].[ReleasedDistinctProducts]");
 
-            var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", authHeader).Result.value;
+            var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "").Result.value;
             DataWriter.WriteToTable(inventDim.GetDataReader(), "[ax].[INVENTDIM]");
 
-            var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "", authHeader).Result.value;
+            var invTableModule = ServiceConnector.CallOdataEndpoint<TableModule>("TableModules", "").Result.value;
+            DataWriter.WriteToTable<TableModule>(invTableModule.GetDataReader(), "[ax].[INVENTTABLEMODULE]");
+
+            var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItemsDTO>("CustVendExternalItems", "").Result.value;
             DataWriter.WriteToTable(custVendExt.GetDataReader(), "[ax].[CUSTVENDEXTERNALITEM]");
 
-            var variants = ReadVariants(context);
-            DataWriter.WriteToTable(variants, "[ax].[ReleasedProductVariants]");
+            var variants = ServiceConnector.CallOdataEndpoint<ReleasedProductVariant>("ReleasedProductVariants", "").Result.value.GetDataReader();
+            DataWriter.WriteToTable<ReleasedProductVariant>(variants, "[ax].[ReleasedProductVariants]");
 
-            var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", authHeader).Result.value;
+            var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "").Result.value;
             DataWriter.WriteToTable(combos.GetDataReader(), "[ax].[INVENTDIMCOMBINATIONS]");
 
-            WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup", authHeader);
-            WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup", authHeader);
+            WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
+            WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup");
 
             var reqItems = context.AGRReqItemTables.ToList().GetDataReader<AGRReqItemTable>();
             DataWriter.WriteToTable<AGRReqItemTable>(reqItems, "[ax].[REQITEMTABLE]");
@@ -44,71 +48,73 @@ namespace ErpConnector.Ax.Modules
             var reqKey = ReadReqSafetyKey(context);
             DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
 
-            WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines", authHeader);
+            WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines");
 
             // item_order_routes
-            var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", authHeader).Result.value;
+            var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "").Result.value;
             DataWriter.WriteToTable<ItemPurchSetup>(itemPurchSetup.GetDataReader(), "[ax].[INVENTITEMPURCHSETUP]");
 
-            var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", authHeader).Result.value;
+            var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "").Result.value;
             DataWriter.WriteToTable<ItemInventSetup>(itemInventSetup.GetDataReader(), "[ax].[INVENTITEMINVENTSETUP]");
 
-            WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure", authHeader);
-            WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion", authHeader);
-
-            var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
-            DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
+            WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure");
+            WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion");
+            if (includeFashion)
+            {
+            //var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
+            //    DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
             //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
-            var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null, authHeader);
-            DataWriter.WriteToTable(inventColorSeason.GetDataReader(), "[ax].[InventColorSeason]");
+                var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
+                DataWriter.WriteToTable(inventColorSeason.value.GetDataReader(), "[ax].[InventColorSeason]");
+            }
         }
 
         private static IGenericDataReader ReadInventSeasonTable(Resources context)
         {
-            var inventSeasons = context.InventSeasonTables.ToList();
+           // var inventSeasons = context.InventSeasonTables.ToList();
             List<dynamic> list = new List<dynamic>();
-            foreach (var i in inventSeasons)
-            {
-                list.Add(
-                    new
-                    {
-                        ItemId = i.ItemId,
-                        SeasonCode = i.SeasonCode,
-                        IsDefault = i.IsDefault
-                    });
-            }
+            //foreach (var i in inventSeasons)
+            //{
+            //    list.Add(
+            //        new
+            //        {
+            //            ItemId = i.ItemId,
+            //            SeasonCode = i.SeasonCode,
+            //            IsDefault = i.IsDefault
+            //        });
+            //}
             return list.GetDataReader<dynamic>();
         }
 
-        private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName, string adalHeader)
+        private static void WriteServiceData<T>(string schemaName, string tableName, string webMethodName)
         {
             Int64 recId = DataWriter.GetMaxRecId(schemaName, tableName);
             Int64 pageSize = 20000;
             bool foundData = true;
             while (foundData)
             {
-                foundData = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "."+tableName, adalHeader);
+                foundData = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "."+tableName);
                 recId = DataWriter.GetMaxRecId("[ax]", tableName);
             }
 
         }
 
-        private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable, string adalHeader)
+        private static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         {
             string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
-            //var result = AXServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
-            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData, adalHeader);
-            var reader = result.GetDataReader();
+            //var result = ServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
+            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData);
+            var reader = result.value.GetDataReader();
 
             DataWriter.WriteToTable<T>(reader, destTable);
 
-            return result.Any();
+            return result.value.Any();
         }
 
-        private static List<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData, string adalHeader)
+        private static GenericJsonOdata<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData)
         {
-            return ServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, adalHeader, serviceGroup).Result;
+            return ServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, serviceGroup).Result;
         }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
@@ -246,40 +252,6 @@ namespace ErpConnector.Ax.Modules
             return list.GetDataReader<dynamic>();
         }
 
-        public static ItemDTO CreateItem(ItemDTO item, string header)
-        {
-            //ProductMasterWriteDTO master = new ProductMasterWriteDTO();
-            //master.AreIdenticalConfigurationsAllowed = NoYes.No;
-            //master.HarmonizedSystemCode = "";
-            //master.IsAutomaticVariantGenerationEnabled = NoYes.Yes;
-            //master.IsCatchWeightProduct = NoYes.No;
-            //master.IsProductKit = NoYes.No;
-            //master.IsProductVariantUnitConversionEnabled = NoYes.No;
-            ////master.KPMInstructionGroupId = "";
-            ////master.KRFColorRatioCurve = "";
-            ////master.KRFSizeRatioCurve = "";
-            ////master.KRFStyleRatioCurve = "";
-            ////master.KRFUseRatioCurves = NoYes.Yes;
-            //master.NMFCCode = "";
-            //master.ProductColorGroupId = "Basic";
-            //master.ProductDescription = "";
-            ////master.ProductDimensionGroupName = "CSF";
-            //master.ProductDimensionGroupName = "SizeCol";
-            //master.ProductName = dp.ProductName;
-            //master.ProductNumber = dp.ProductNumber;
-            //master.ProductSearchName = dp.ProductSearchName;
-            //master.ProductSizeGroupId = "10-18";
-            //master.ProductStyleGroupId = "";
-            //master.VariantConfigurationTechnology = EcoResVariantConfigurationTechnologyType.PredefinedVariants;
-            //master.RetailProductCategoryName = "";
-            //master.ProductType = EcoResProductType.Item;
-            //master.STCCCode = "";
-            //master.TrackingDimensionGroupName = "None";
-            //master.StorageDimensionGroupName = "Ware";
-            
-            var r = ServiceConnector.CreateEntity<ProductMasterWriteDTO>("ProductMasters", null, header, item.productMaster, item.ErrorMessages).Result;
-            item.productMaster = r;            
-            return item;
-        }
+ 
     }
 }

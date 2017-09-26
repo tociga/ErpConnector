@@ -14,7 +14,7 @@ CREATE TABLE [log].[erp_actions](
 	[created_at] [datetime] NOT NULL,
 	[updated_at] [datetime] NOT NULL,
 	[user_id] [int] NULL,
-	[success] [bit] NULL,
+	[status] [int] NULL,
  CONSTRAINT [PK_erp_actions] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC

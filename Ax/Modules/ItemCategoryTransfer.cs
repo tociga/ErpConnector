@@ -9,18 +9,18 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemCategoryTransfer
     {
-        public static void WriteCategories(string authHeader)
+        public static void WriteCategories()
         {
-            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", authHeader).Result.value;
+            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "").Result.value;
             DataWriter.WriteToTable(roles.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHYROLE]");
 
-            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", authHeader).Result.value;
-            DataWriter.WriteToTable(hierarchy.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHY]");
+            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "").Result.value;
+            DataWriter.WriteToTable<RetailEcoResCategoryHierarchy>(hierarchy.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHY]");
 
-            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", authHeader).Result.value;
+            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "").Result.value;
             DataWriter.WriteToTable<RetailEcoResCategory>(category.GetDataReader(), "[ax].[ECORESCATEGORY]");
 
-            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", authHeader).Result.value;
+            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "").Result.value;
             DataWriter.WriteToTable< AGREcoResProductCategory>(prodCat.GetDataReader(), "[ax].[ECORESPRODUCTCATEGORY]");
         }
 

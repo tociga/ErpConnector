@@ -34,5 +34,30 @@ namespace ErpConnector.Ax.DTO
         public string TrackingDimensionGroupName { get; set; }
         public string StorageDimensionGroupName { get; set; }
 
+        public ProductMasterWriteDTO()
+        {       
+            AreIdenticalConfigurationsAllowed = NoYes.No;
+            HarmonizedSystemCode = "";
+            IsAutomaticVariantGenerationEnabled = NoYes.Yes;
+            IsCatchWeightProduct = NoYes.No;
+            IsProductKit = NoYes.No;
+            IsProductVariantUnitConversionEnabled = NoYes.No;
+            NMFCCode = "";
+            //ProductColorGroupId = "Basic";
+            ProductDescription = "";
+            ProductDimensionGroupName = "SizeCol";
+            //ProductName = dp.ProductName;
+            //ProductNumber = dp.ProductNumber;
+            //ProductSearchName = dp.ProductSearchName;
+            //ProductSizeGroupId = "10-18";
+            //ProductStyleGroupId = "";
+            VariantConfigurationTechnology = EcoResVariantConfigurationTechnologyType.PredefinedVariants;
+            RetailProductCategoryName = "";
+            ProductType = EcoResProductType.Item;
+            STCCCode = "";
+            TrackingDimensionGroupName = "None";
+            StorageDimensionGroupName = "Ware";
+        }
+
     }
 }

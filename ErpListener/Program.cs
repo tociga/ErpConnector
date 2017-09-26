@@ -21,7 +21,7 @@ namespace ErpConnector.Listener
             const string serviceName = "ErpListener";
             const string displayName = "ERP Listener";
             const string description = "Syncs up data from ERP system(s) to AGR5 system.";
-
+            log4net.Config.XmlConfigurator.Configure();
             HostFactory.Run(x =>
             {
                 x.UseCommonLogging();

@@ -30,7 +30,7 @@ namespace ErpConnector.Listener
 
             Log.Info($"{nameof(WinService)} Start command received.");
             // Set up a timer to trigger every minute.  
-            _timer.Interval = 1 * 60 * 1000; // Check every minute if db should sync
+            _timer.Interval = 1 * 10 * 1000; // Check every 10 seconds if db should sync
             _timer.Elapsed += new ElapsedEventHandler(ShouldSync);
             _timer.Start();
             //TODO: Implement your service start routine.

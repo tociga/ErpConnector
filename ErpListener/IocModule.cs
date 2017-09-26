@@ -8,7 +8,7 @@ namespace ErpConnector.Listener
     {
         public override void Load()
         {
-
+            
             Bind<ILog>().ToMethod(ctx =>
             {
                 Type type = ctx.Request.ParentContext.Request.Service;

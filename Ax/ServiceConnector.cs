@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using ErpConnector.Ax.DTO;
 using System.Configuration;
 using ErpConnector.Ax.Utils;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax
 {
     public class ServiceConnector
     {
-        public static async Task<T> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject)
+        public static async Task<GenericWriteObject<T>> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, T postDataObject)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = Authenticator.GetAdalToken();
             //request.Headers["Accept"] = "application/json;odata.metadata=none";
             //request.Headers["Content-Type"] = "application/json";
 
@@ -25,8 +26,8 @@ namespace ErpConnector.Ax
             var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
             request.ContentLength = postData != null ? postData.Length : 0;
             request.ContentType = "application/json";
-           
 
+            GenericWriteObject<T> result = new GenericWriteObject<T>();
             using (var requestStream = request.GetRequestStream())
             {
                 using (var writer = new StreamWriter(requestStream))
@@ -47,7 +48,8 @@ namespace ErpConnector.Ax
                             var responseString = streamReader.ReadToEnd();
                             //string sanitized = SanitizeJsonString(responseString);
 
-                            return JsonConvert.DeserializeObject<T>(responseString);
+                            result.WriteObject = JsonConvert.DeserializeObject<T>(responseString);
+                            return result;
                             //return responseString;
                         }
                     }
@@ -59,10 +61,9 @@ namespace ErpConnector.Ax
                 {
                     using (var reader = new StreamReader(rStream))
                     {
-                        var r = reader.ReadToEnd();
-
+                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
                         // TODO: Need to log error;
-                        return default(T);
+                        return result;
                     }
                 }
             }
@@ -70,69 +71,69 @@ namespace ErpConnector.Ax
 
         
 
-        public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, string adalHeader, T postDataObject, List<string> errorMessage)
-        {
-            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+        //public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
+        //{
+        //    string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+        //    string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
-            var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
-            //request.Headers["Content-Type"] = "application/json";
+        //    var request = HttpWebRequest.Create(endpoint);
+        //    request.Headers["Authorization"] = Authenticator.GetAdalToken();
+        //    //request.Headers["Content-Type"] = "application/json";
 
-            request.Method = "POST";
-            var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
-            request.ContentLength = postData != null ? postData.Length : 0;
-            request.ContentType = "application/json";
+        //    request.Method = "POST";
+        //    var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
+        //    request.ContentLength = postData != null ? postData.Length : 0;
+        //    request.ContentType = "application/json";
 
-            using (var requestStream = request.GetRequestStream())
-            {
-                using (var writer = new StreamWriter(requestStream))
-                {
-                    writer.Write(postData);
-                    writer.Flush();
-                }
-            }
+        //    using (var requestStream = request.GetRequestStream())
+        //    {
+        //        using (var writer = new StreamWriter(requestStream))
+        //        {
+        //            writer.Write(postData);
+        //            writer.Flush();
+        //        }
+        //    }
 
-            try
-            {
-                using (var response = (HttpWebResponse)request.GetResponse())
-                {
-                    using (var responseStream = response.GetResponseStream())
-                    {
-                        using (var streamReader = new StreamReader(responseStream))
-                        {
-                            var responseString = streamReader.ReadToEnd();
-                            //string sanitized = SanitizeJsonString(responseString);
+        //    try
+        //    {
+        //        using (var response = (HttpWebResponse)request.GetResponse())
+        //        {
+        //            using (var responseStream = response.GetResponseStream())
+        //            {
+        //                using (var streamReader = new StreamReader(responseStream))
+        //                {
+        //                    var responseString = streamReader.ReadToEnd();
+        //                    //string sanitized = SanitizeJsonString(responseString);
 
-                            return JsonConvert.DeserializeObject<T>(responseString);
-                            //return responseString;
-                        }
-                    }
-                }
-            }
-            catch (WebException e)
-            {
-                using (var rStream = e.Response.GetResponseStream())
-                {
-                    using (var reader = new StreamReader(rStream))
-                    {
-                        var r = reader.ReadToEnd();
+        //                    return JsonConvert.DeserializeObject<T>(responseString);
+        //                    //return responseString;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (WebException e)
+        //    {
+        //        using (var rStream = e.Response.GetResponseStream())
+        //        {
+        //            using (var reader = new StreamReader(rStream))
+        //            {
+        //                var r = reader.ReadToEnd();
 
-                        // TODO: Need to log error;
-                        errorMessage.Add(r);
-                        return default(T);
-                    }
-                }
-            }
-        }
-        public static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string adalHeader)
+        //                // TODO: Need to log error;
+        //                errorMessage.Add(r);
+        //                return default(T);
+        //            }
+        //        }
+        //    }
+        //}
+        public static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters)
         {
             var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
             var endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
 
             var request =(HttpWebRequest)HttpWebRequest.Create(endpoint);
             request.Accept = "application/json;odata.metadata=none";
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = Authenticator.GetAdalToken();
             request.Method = "GET";
             request.Timeout = 1000 * 60 * 3;
             //request.ContentLength = postData != null ? postData.Length : 0;
@@ -160,14 +161,15 @@ namespace ErpConnector.Ax
                 }
             }
         }
-        public static async Task<List<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string adalHeader, string serviceGroup = null)
+
+        public static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         {
             var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
             var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = adalHeader;
+            request.Headers["Authorization"] = Authenticator.GetAdalToken();
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData != null ? postData.Length : 0;
@@ -183,19 +185,40 @@ namespace ErpConnector.Ax
                     }
                 }
             }
-            using (var response = (HttpWebResponse)request.GetResponse())
-            {
-                using (var responseStream = response.GetResponseStream())
-                {
-                    using (var streamReader = new StreamReader(responseStream))
-                    {
-                        var responseString = streamReader.ReadToEnd();
-                        //string sanitized = SanitizeJsonString(responseString);
-                        return JsonConvert.DeserializeObject<List<T>>(responseString);
 
+            var result = new GenericJsonOdata<T>();
+            try
+            {
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        using (var streamReader = new StreamReader(responseStream))
+                        {
+                            var responseString = streamReader.ReadToEnd();
+                            result.value = JsonConvert.DeserializeObject<List<T>>(responseString);
+
+                            return result;
+
+                        }
                     }
                 }
             }
+            catch (WebException e)
+            {
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+                        //var r = reader.ReadToEnd();
+
+                        // TODO: Need to log error;
+                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+                        return result;
+                    }
+                }
+            }
+
         }
 
         public static async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData, string adalHeader)
