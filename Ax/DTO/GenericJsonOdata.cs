@@ -12,7 +12,7 @@ namespace ErpConnector.Ax.DTO
         }
         public List<T> value { get; set;}
 
-        [JsonProperty("odata.nextLink")]
+        [JsonProperty("@odata.nextLink")]
         public string NextLink { get; set; }
 
         public AxBaseException Exception { get; set; }

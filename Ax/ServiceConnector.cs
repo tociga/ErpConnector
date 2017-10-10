@@ -7,6 +7,7 @@ using ErpConnector.Ax.DTO;
 using System.Configuration;
 using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
+using System;
 
 namespace ErpConnector.Ax
 {
@@ -69,7 +70,7 @@ namespace ErpConnector.Ax
             }
         }
 
-        
+
 
         //public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
         //{
@@ -129,13 +130,28 @@ namespace ErpConnector.Ax
         public static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters)
         {
             var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-            var endpoint = baseUrl + "/data/" + oDataEndpoint + filters??"";
+            var endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
-            var request =(HttpWebRequest)HttpWebRequest.Create(endpoint);
+            GenericJsonOdata<T> returnObject = new GenericJsonOdata<T>();
+            var returnODataObject = CallOdataEndpoint<T>(endpoint).Result;
+            returnObject.value.AddRange(returnODataObject.value);
+
+            while(!string.IsNullOrEmpty(returnODataObject.NextLink))
+            {
+                returnODataObject = await CallOdataEndpoint<T>(returnODataObject.NextLink);
+                returnObject.value.AddRange(returnODataObject.value);
+            }
+            return returnObject;
+
+        }
+        private static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string requestUri)
+        {            
+            var request =(HttpWebRequest)HttpWebRequest.Create(requestUri);
             request.Accept = "application/json;odata.metadata=none";
-            request.Headers["Authorization"] = Authenticator.GetAdalToken();
+            string token = Authenticator.GetAdalToken();
+            request.Headers["Authorization"] = token;
             request.Method = "GET";
-            request.Timeout = 1000 * 60 * 3;
+            //request.Timeout = 1000 * 60 * 3;
             //request.ContentLength = postData != null ? postData.Length : 0;
 
             //using (var requestStream = request.GetRequestStream())
@@ -146,19 +162,25 @@ namespace ErpConnector.Ax
             //        writer.Flush();
             //    }
             //}
-
-            using (var response = (HttpWebResponse)request.GetResponse())
+            try
             {
-                using (var responseStream = response.GetResponseStream())
+                using (var response = (HttpWebResponse)request.GetResponse())
                 {
-                    using (var streamReader = new StreamReader(responseStream))
+                    using (var responseStream = response.GetResponseStream())
                     {
-                        var responseString = streamReader.ReadToEnd();
-                        //string sanitized = SanitizeJsonString(responseString);
-                        return JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+                        using (var streamReader = new StreamReader(responseStream))
+                        {
+                            var responseString = streamReader.ReadToEnd();
+                            //string sanitized = SanitizeJsonString(responseString);
+                            return JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
 
+                        }
                     }
                 }
+            }
+            catch(Exception e)
+            {
+                throw e;
             }
         }
 
