@@ -629,9 +629,9 @@ namespace ErpConnector.Ax
         {
             DataWriter.TruncateTables(true, false, false, true, true, true, false);
             ItemCategoryTransfer.WriteCategories();
-            LocationsAndVendorsTransfer.WriteLocationsAndVendors(_context);
-            ItemTransfer.WriteItems(_context, includesFashion);
-            ItemAttributeLookup.ReadItemAttributes(_context, includesFashion);
+            LocationsAndVendorsTransfer.WriteLocationsAndVendors();
+            ItemTransfer.WriteItems(includesFashion);
+            ItemAttributeLookup.ReadItemAttributes(includesFashion);
             GetBom();
             return null;
         }

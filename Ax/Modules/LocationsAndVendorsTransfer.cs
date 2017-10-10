@@ -8,7 +8,7 @@ namespace ErpConnector.Ax.Modules
 {
     public class LocationsAndVendorsTransfer
     {
-        public static void WriteLocationsAndVendors(Resources context)
+        public static void WriteLocationsAndVendors()
         {
             //var channel = ReadRetailChannel(context);
             var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
@@ -22,13 +22,16 @@ namespace ErpConnector.Ax.Modules
                 ).Result.value.GetDataReader();
             DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");
 
-            var locSetup = context.Locations.ToList().GetDataReader<Location>();
+            //var locSetup = context.Locations.ToList().GetDataReader<Location>();
+            var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "").Result.value.GetDataReader();
             DataWriter.WriteToTable<Location>(locSetup, "[ax].[INVENTLOCATION]");
 
-            var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
+            //var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
+            var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "").Result.value.GetDataReader();
             DataWriter.WriteToTable<DirParty>(dir, "[ax].[DIRPARTYTABLE]");
 
-            var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
+            //var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
+            var vendor = ServiceConnector.CallOdataEndpoint<Vendor>("Vendors", "").Result.value.GetDataReader();
             DataWriter.WriteToTable<Vendor>(vendor, "[ax].[VENDTABLE]");
 
 

@@ -9,7 +9,7 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemTransfer
     {
-        public static void WriteItems(Resources context, bool includeFashion)
+        public static void WriteItems(bool includeFashion)
         {
             var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "").Result.value;
             DataWriter.WriteToTable<ProductMasterReadDTO>(productMaster.GetDataReader(), "[ax].[ProductMaster]");
@@ -17,7 +17,8 @@ namespace ErpConnector.Ax.Modules
             var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMaster>("ReleasedProductMasters", "").Result.value;
             DataWriter.WriteToTable<ReleasedProductMaster>(releasedMasters.GetDataReader(), "[ax].[ReleasedProductMaster]");
 
-            //var items = ReadProducts(context);
+            //var items = ReadProducts(context);            
+            
             var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "").Result.value;
             DataWriter.WriteToTable<DistinctProductsDTO>(distinctProducts.GetDataReader(), "[ax].[DistinctProduct]");
 
@@ -42,10 +43,10 @@ namespace ErpConnector.Ax.Modules
             WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
             WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup");
 
-            var reqItems = context.AGRReqItemTables.ToList().GetDataReader<AGRReqItemTable>();
+            var reqItems = ServiceConnector.CallOdataEndpoint<AGRReqItemTable>("AGRReqItemTables", "").Result.value.GetDataReader<AGRReqItemTable>();
             DataWriter.WriteToTable<AGRReqItemTable>(reqItems, "[ax].[REQITEMTABLE]");
 
-            var reqKey = ReadReqSafetyKey(context);
+            var reqKey = ServiceConnector.CallOdataEndpoint<AGRReqSafetyKey>("AGRReqSafetyKeys", "").Result.value.GetDataReader<AGRReqSafetyKey>();
             DataWriter.WriteToTable(reqKey, "[ax].[REQSAFETYKEY]");
 
             WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines");

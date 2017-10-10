@@ -8,7 +8,7 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemAttributeLookup
     {
-        public static void ReadItemAttributes(Resources context, bool includesFashion)
+        public static void ReadItemAttributes(bool includesFashion)
         {
             var colorGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "").Result.value;
             DataWriter.WriteToTable<VariantGroupDTO>(colorGroups.GetDataReader(), "[ax].[ProductColorGroup]");
