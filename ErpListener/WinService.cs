@@ -3,6 +3,7 @@ using System;
 using Topshelf;
 using System.Timers;
 using System.Configuration;
+using System.Net;
 
 namespace ErpConnector.Listener
 {
@@ -33,6 +34,11 @@ namespace ErpConnector.Listener
             _timer.Interval = 1 * 10 * 1000; // Check every 10 seconds if db should sync
             _timer.Elapsed += new ElapsedEventHandler(ShouldSync);
             _timer.Start();
+            var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
+            if (useTsl == "true")
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            }
             //TODO: Implement your service start routine.
             return true;
         }
