@@ -9,5 +9,7 @@ namespace ErpConnector.Common.Exceptions
     public class AxBaseException
     {
         public AxWebExceptions error { get; set; }
+
+        public Exception ApplicationException { get; set; }
     }
 }

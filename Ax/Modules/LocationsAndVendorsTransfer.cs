@@ -3,48 +3,67 @@ using System.Data;
 using System.Linq;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.Utils;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
     public class LocationsAndVendorsTransfer
     {
-        public static void WriteLocationsAndVendors()
+        public static AxBaseException WriteLocationsAndVendors()
         {
             //var channel = ReadRetailChannel(context);
             var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
-                "").Result.value.GetDataReader();
-            DataWriter.WriteToTable<RetailChannel>(channel, "[ax].[RETAILCHANNELTABLE]");
+                "", "[ax].[RETAILCHANNELTABLE]").Result;
+            if (channel != null)
+            {
+                return channel;
+            }
 
             //var assortment = ReadRetailAssortment(context);
             var assortment = ServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'"
-                ).Result.value.GetDataReader();
-            DataWriter.WriteToTable<RetailAssortment>(assortment, "[ax].[RETAILASSORTMENTTABLE]");
+                , "[ax].[RETAILASSORTMENTTABLE]").Result;
 
+            if (assortment != null)
+            {
+                return assortment;
+            }
             //var locSetup = context.Locations.ToList().GetDataReader<Location>();
-            var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "").Result.value.GetDataReader();
-            DataWriter.WriteToTable<Location>(locSetup, "[ax].[INVENTLOCATION]");
-
+            var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "", "[ax].[INVENTLOCATION]").Result;
+            if (locSetup != null)
+            {
+                return locSetup;
+            }
             //var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
-            var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "").Result.value.GetDataReader();
-            DataWriter.WriteToTable<DirParty>(dir, "[ax].[DIRPARTYTABLE]");
-
+            var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "", "[ax].[DIRPARTYTABLE]").Result;
+            if (dir != null)
+            {
+                return dir;
+            }
             //var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
-            var vendor = ServiceConnector.CallOdataEndpoint<Vendor>("Vendors", "").Result.value.GetDataReader();
-            DataWriter.WriteToTable<Vendor>(vendor, "[ax].[VENDTABLE]");
+            var vendor = ServiceConnector.CallOdataEndpoint<Vendor>("Vendors", "", "[ax].[VENDTABLE]").Result;
+            if (vendor != null)
+            {
+                return vendor;
+            }
 
-
-           
             var channelLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentChannelLine>("RetailAssortmentChannelLines",
-                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'")
-                .Result.value.GetDataReader<RetailAssortmentChannelLine>();
-            DataWriter.WriteToTable<RetailAssortmentChannelLine>(channelLines, "[ax].[RETAILASSORTMENTCHANNELLINE]");
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", "[ax].[RETAILASSORTMENTCHANNELLINE]")
+                .Result;
+            if (channelLines != null)
+            {
+                return channelLines;
+            }
 
             var productLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentProductLine>("RetailAssortmentProductLines",
-                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'")
-                .Result.value.GetDataReader<RetailAssortmentProductLine>();
-            DataWriter.WriteToTable<RetailAssortmentProductLine>(productLines, "[ax].[RETAILASSORTMENTPRODUCTLINE]");
+                "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", "[ax].[RETAILASSORTMENTPRODUCTLINE]")
+                .Result;
+            if (productLines != null)
+            {
+                return productLines;
+            }
+            return null;
         }
 
         private static IGenericDataReader ReadRetailChannel(Resources context)

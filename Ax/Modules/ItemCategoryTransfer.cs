@@ -4,95 +4,39 @@ using System.Linq;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.Utils;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
     public class ItemCategoryTransfer
     {
-        public static void WriteCategories()
+        public static AxBaseException WriteCategories()
         {
-            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "").Result.value;
-            DataWriter.WriteToTable(roles.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHYROLE]");
-
-            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "").Result.value;
-            DataWriter.WriteToTable<RetailEcoResCategoryHierarchy>(hierarchy.GetDataReader(), "[ax].[ECORESCATEGORYHIERARCHY]");
-
-            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "").Result.value;
-            DataWriter.WriteToTable<RetailEcoResCategory>(category.GetDataReader(), "[ax].[ECORESCATEGORY]");
-
-            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "").Result.value;
-            DataWriter.WriteToTable< AGREcoResProductCategory>(prodCat.GetDataReader(), "[ax].[ECORESPRODUCTCATEGORY]");
-        }
-
-        private static IGenericDataReader ReadHierarchy(Resources context)
-        {
-            var cat = from c in context.RetailEcoResCategoryHierarchy select c;            
-            List<dynamic> list = new List<dynamic>();
-            foreach (var category in cat)
+            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]").Result;
+            if (roles != null)
             {
-                list.Add(new
-                {
-                    RecVersion = category.AxRecId,
-                    Name = category.Name,
-                    HierarchyModifier = (int)category.HierarchyModifier.GetValueOrDefault()
-                });
+                return roles;
             }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadCategoryRole(Resources context)
-        {
-            var catRoles = from cr in context.RetailEcoResCategoryHierarchyRole select cr;
-            List<dynamic> list = new List<dynamic>();
-            foreach (var role in catRoles)
+            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]").Result;
+            if (hierarchy != null)
             {
-                list.Add(new
-                {
-                    CategryHierarchy = role.CategoryHierarchy,
-                    NamedCategoryHierarchyRole = role.NamedCategoryHierarchyRoleAsInt
-                });
-            }
-            return list.GetDataReader<dynamic>();
-        }
-        private static IGenericDataReader ReadCategory(Resources context)
-        {
-            var categories = from c in context.RetailEcoResCategory select c;
-            List<dynamic> list = new List<dynamic>();            
-            foreach (var category in categories)
-            {
-                list.Add(new
-                {
-                    CATEGORYHIERARCHY = category.CategoryHierarchy,
-                    PARENTCATEGORY = category.ParentCategory,
-                    NAME = category.Name,
-                    CODE = category.Code,
-                    ISACTIVE = category.IsActive.GetValueOrDefault() == NoYes.Yes ? 1 : 0,
-                    CHANGESTATUS = (int)category.ChangeStatus.GetValueOrDefault(),
-                    LEVEL_ = category.Level,
-                    RECVERSION = category.AxRecId,
-                    RELATIONTYPE = category.InstanceRelationType,
-                });
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadProductCategory(Resources context)
-        {
-            var prodCat = context.AGREcoResProductCategories;
-            var list = new List<dynamic>();
-            foreach (var pc in prodCat)
-            {
-                list.Add(new
-                {
-                    CATEGORYHIERARCHY = pc.CategoryHierarchy,
-                    CATEGROY = pc.Category,
-                    PRODUCT = pc.Product,
-                    MODIFIEDDATETIME = pc.ModifiedDateAndTime.DateTime
-                });
+                return hierarchy;
             }
 
-            return list.GetDataReader<dynamic>();
+            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]").Result;
+            if (category != null)
+            {
+                return category;
+            }
+
+            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]").Result;
+            if (prodCat != null)
+            {
+                return prodCat;
+            }
+            return null;
         }
+
 
     }
 }

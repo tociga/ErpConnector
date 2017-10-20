@@ -133,14 +133,14 @@ namespace ErpConnector.Ax.DTO
 
 
         public int ShippingAndReceivingSortOrderCode { get; set; }
-        public int ProductionConsumptionWidthConversionFactor { get; set; }
+        public decimal ProductionConsumptionWidthConversionFactor { get; set; }
         public string AlternativeProductSizeId { get; set; }
         public object RawMaterialPickingPrinciple
         {
             get { return (int)_rawMaterialPick; }
             set { _rawMaterialPick = DTOUtil.GetEnumFromObj<WHSAllowMaterialOverPick>(value, WHSAllowMaterialOverPick.Staging); }
         }
-        public int ProductionConsumptionDepthConversionFactor { get; set; }
+        public decimal ProductionConsumptionDepthConversionFactor { get; set; }
         public string ItemModelGroupId { get; set; }
         public object IsSalesWithholdingTaxCalculated
         {
@@ -198,7 +198,7 @@ namespace ErpConnector.Ax.DTO
             get { return (int)_carryingCostABCCode; }
             set { _carryingCostABCCode = DTOUtil.GetEnumFromObj<ABC>(value, ABC.None); }
         }
-        public int TransferOrderOverdeliveryPercentage { get; set; }
+        public decimal TransferOrderOverdeliveryPercentage { get; set; }
         public string UnitConversionSequenceGroupId { get; set; }
         public object WillPickingWorkbenchApplyBoxingLogic
         {
@@ -246,14 +246,14 @@ namespace ErpConnector.Ax.DTO
             set { _isShipAloneEnabled = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No); }
         }
 
-        public int ProductionConsumptionDensityConversionFactor { get; set; }
+        public decimal ProductionConsumptionDensityConversionFactor { get; set; }
         public DateTime PurchasePriceDate { get; set; }
         public int SalesPricingPrecision { get; set; }
-        public int PurchaseChargesQuantity { get; set; }
+        public decimal PurchaseChargesQuantity { get; set; }
         public string ProductSearchName { get; set; }
         public DateTime UnitCostDate { get; set; }
-        public int VariableScrapPercentage { get; set; }
-        public int MaximumPickQuantity { get; set; }
+        public decimal VariableScrapPercentage { get; set; }
+        public decimal MaximumPickQuantity { get; set; }
         public string AlternativeProductStyleId { get; set; }
         public string BarcodeSetupId { get; set; }
         public object IsSalesPriceIncludingCharges
@@ -261,14 +261,14 @@ namespace ErpConnector.Ax.DTO
             get { return (int)_isSalesPriceIncludingCharges; }
             set { _isSalesPriceIncludingCharges = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No); }
         }
-        public int PurchasePriceQuantity { get; set; }
+        public decimal PurchasePriceQuantity { get; set; }
         public string PurchaseChargeProductGroupId { get; set; }
         public string ContinuityScheduleId { get; set; }
         public int FixedCostCharges { get; set; }
         public string CostGroupId { get; set; }
         public string SalesLineDiscountProductGroupCode { get; set; }
         public DateTime POSRegistrationActivationDate { get; set; }
-        public int MaximumCatchWeightQuantity { get; set; }
+        public decimal MaximumCatchWeightQuantity { get; set; }
         public string ServiceFiscalInformationCode { get; set; }
         public DateTime ProductLifeCycleValidToDate { get; set; }
         public string PurchaseSupplementaryProductProductGroupId { get; set; }
@@ -280,7 +280,7 @@ namespace ErpConnector.Ax.DTO
         }
 
         public string PackSizeCategoryId { get; set; }
-        public int SalesChargesQuantity { get; set; }
+        public decimal SalesChargesQuantity { get; set; }
         public object BatchMergeDateCalculationMethod
         {
             get { return (int)_batchMergeDateCalculationMethod; }
@@ -296,7 +296,7 @@ namespace ErpConnector.Ax.DTO
         }
 
         public string AlternativeProductConfigurationId { get; set; }
-        public int SalesOverdeliveryPercentage { get; set; }
+        public decimal SalesOverdeliveryPercentage { get; set; }
         public object IsDiscountPOSRegistrationProhibited
         {
             get { return (int)_isDiscountPOSRegistrationProhibited; }
@@ -304,9 +304,9 @@ namespace ErpConnector.Ax.DTO
         }
 
         public int BestBeforePeriodDays { get; set; }
-        public int PurchaseOverdeliveryPercentage { get; set; }
+        public decimal PurchaseOverdeliveryPercentage { get; set; }
         public string PurchaseUnitSymbol { get; set; }
-        public int SalesUnderdeliveryPercentage { get; set; }
+        public decimal SalesUnderdeliveryPercentage { get; set; }
         public string NecessaryProductionWorkingTimeSchedulingPropertyId { get; set; }
         public string InventoryGSTReliefCategoryCode { get; set; }
         public object ApprovedVendorCheckMethod
@@ -327,11 +327,11 @@ namespace ErpConnector.Ax.DTO
                 _flushingPrinciple = DTOUtil.GetEnumFromObj<ProdFlushingPrincipItem>(value, ProdFlushingPrincipItem.Start);
             }
         }
-        public int SalesPriceQuantity { get; set; }
-        public int YieldPercentage { get; set; }
-        public int TareProductWeight { get; set; }
-        public int ApproximateSalesTaxPercentage { get; set; }
-        public int PackingDutyQuantity { get; set; }
+        public decimal SalesPriceQuantity { get; set; }
+        public decimal YieldPercentage { get; set; }
+        public decimal TareProductWeight { get; set; }
+        public decimal ApproximateSalesTaxPercentage { get; set; }
+        public decimal PackingDutyQuantity { get; set; }
         public string PurchaseLineDiscountProductGroupCode { get; set; }
         public object WillInventoryIssueAutomaticallyReportAsFinished
         {
@@ -345,8 +345,8 @@ namespace ErpConnector.Ax.DTO
         public int PackageHandlingTime { get; set; }
         public Guid DynamicsConnectorIntegrationKey { get; set; }
         public int ShelfLifePeriodDays { get; set; }
-        public int TransferOrderUnderdeliveryPercentage { get; set; }
-        public int DefaultReceivingQuantity { get; set; }
+        public decimal TransferOrderUnderdeliveryPercentage { get; set; }
+        public decimal DefaultReceivingQuantity { get; set; }
         public DateTime POSRegistrationBlockedDate { get; set; }
         public object MustKeyInCommentAtPOSRegister
         {
@@ -356,7 +356,7 @@ namespace ErpConnector.Ax.DTO
                 _mustKeyInCommentAtPOSRegister = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No);
             }
         }
-        public int ConstantScrapQuantity { get; set; }
+        public decimal ConstantScrapQuantity { get; set; }
         public object PotencyBaseAttributeValueEntryEvent
         {
             get { return (int)_potencyBaseAttributeValueEntryEvent; }
@@ -373,7 +373,7 @@ namespace ErpConnector.Ax.DTO
                 _keyInPriceRequirementsAtPOSRegister = DTOUtil.GetEnumFromObj<RetailPriceKeyingRequirement>(value, RetailPriceKeyingRequirement.NotMandatory);
             }
         }
-        public int IntrastatChargePercentage { get; set; }
+        public decimal IntrastatChargePercentage { get; set; }
         public string ProductCoverageGroupId { get; set; }
         public int PotencyBaseAttibuteTargetValue { get; set; }
         public object IsIntercompanySalesUsageBlocked
@@ -398,7 +398,7 @@ namespace ErpConnector.Ax.DTO
                 _isZeroPricePOSRegistrationAllowed = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No);
             }
         }
-        public int CostChargesQuantity { get; set; }
+        public decimal CostChargesQuantity { get; set; }
         public object IsUnitCostAutomaticallyUpdated
         {
             get { return (int)_isUnitCostAutomaticallyUpdated; }
@@ -478,7 +478,7 @@ namespace ErpConnector.Ax.DTO
             get { return (int)_defaultOrderType; }
             set { _defaultOrderType = DTOUtil.GetEnumFromObj<ReqPOType>(value, ReqPOType.Purch); }
         }
-        public int ProductionConsumptionHeightConversionFactor { get; set; }
+        public decimal ProductionConsumptionHeightConversionFactor { get; set; }
         public int ContinuityEventDuration { get; set; }
         public object IsPOSRegistrationBlocked
         {
@@ -490,10 +490,10 @@ namespace ErpConnector.Ax.DTO
         }
         public string BatchNumberGroupCode { get; set; }
         public string PotencyBaseAttributeId { get; set; }
-        public int PurchaseUnderdeliveryPercentage { get; set; }
+        public decimal PurchaseUnderdeliveryPercentage { get; set; }
         public string PackageClassId { get; set; }
         public string PurchaseGSTReliefCategoryCode { get; set; }
-        public int SalesPriceCalculationChargesPercentage { get; set; }
+        public decimal SalesPriceCalculationChargesPercentage { get; set; }
         public string PurchaseMultilineDiscountProductGroupCode { get; set; }
         public object WillWorkCenterPickingAllowNegativeInventory
         {
@@ -527,7 +527,7 @@ namespace ErpConnector.Ax.DTO
                 _isPurchasePriceAutomaticallyUpdated = DTOUtil.GetEnumFromObj<NoYes>(value, NoYes.No);
             }
         }
-        public int MinimumCatchWeightQuantity { get; set; }
+        public decimal MinimumCatchWeightQuantity { get; set; }
         public object WillInventoryReceiptIgnoreFlushingPrinciple
         {
             get { return (int)_willInventoryReceiptIgnoreFlushingPrinciple; }
@@ -538,7 +538,7 @@ namespace ErpConnector.Ax.DTO
         }
 
         public string ProductNumber { get; set; }
-        public int UnitCostQuantity { get; set; }
+        public decimal UnitCostQuantity { get; set; }
         public string FreightAllocationGroupId { get; set; }
         public string ComparisonPriceBaseUnitSymbol { get; set; }
         public string CostCalculationGroupId { get; set; }

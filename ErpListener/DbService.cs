@@ -15,8 +15,10 @@ namespace ErpConnector.Listener
         public bool? Sync()
         {
             try
-            { 
-            var actions = GetPendingActions();
+            {
+                bool includeBAndM = false;
+                Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeBAndM);
+                var actions = GetPendingActions(includeBAndM);
                 foreach (var action in actions)
                 {
                     if (action.status == 0)
@@ -61,14 +63,17 @@ namespace ErpConnector.Listener
                                 UpdateOrderStatus(action.reference_id);
                                 break;
                             case "create_item":
-                                UpdateActionStatus(action.id, 1, null);
-                                var itemsToCreate = GetItemsToCreate(action.reference_id);
-                                connectorTask = connector.CreateItem(itemsToCreate);
-                                connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
-                                var options = itemsToCreate.Select(x => x.option_id).Distinct();
-                                foreach (int option in options)
+                                if (includeBAndM)
                                 {
-                                    UpdateCreatedProductStatus(action.reference_id, option, connectorTask.Result);
+                                    UpdateActionStatus(action.id, 1, null);
+                                    var itemsToCreate = GetItemsToCreate(action.reference_id);
+                                    connectorTask = connector.CreateItem(itemsToCreate);
+                                    connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                    var options = itemsToCreate.Select(x => x.option_id).Distinct();
+                                    foreach (int option in options)
+                                    {
+                                        UpdateCreatedProductStatus(action.reference_id, option, connectorTask.Result);
+                                    }
                                 }
                                 break;
                             default:
@@ -192,13 +197,20 @@ namespace ErpConnector.Listener
                         errorStackTrace = a.Exception.GetBaseException().StackTrace;
                     }
                 }
-
+            }
+            else if (a != null && a.Result != null && a.Result.ApplicationException != null)
+            {
+                status = 3;
+                errorMessage = a.Result.ApplicationException.Message;
+                errorStackTrace = a.Result.ApplicationException.StackTrace;
             }
             else if (a != null && a.Result != null && a.Result.error != null && a.Result.error.innererror != null)
             {
+                status = 3;
                 errorMessage = "Error occured in Communication between AGR and AX.";
                 errorStackTrace = a.Result.error.innererror.stacktrace;
             }
+           
             var connectionString = ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))
             {
@@ -216,13 +228,16 @@ namespace ErpConnector.Listener
             }
 
         }
-        private List<ErpActions> GetPendingActions()
+        private List<ErpActions> GetPendingActions(bool includeBAndM)
         {
-            var pendingItems = GetItemsToCreate(null);
-            foreach(var item in pendingItems)
+            if (includeBAndM)
             {
-                InsertAction("create_item", item.temp_id);
-            }           
+                var pendingItems = GetItemsToCreate(null);
+                foreach (var item in pendingItems)
+                {
+                    InsertAction("create_item", item.temp_id);
+                }
+            }          
 
             var connectionString = ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))

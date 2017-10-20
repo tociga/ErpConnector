@@ -41,10 +41,10 @@ namespace ErpConnector.Ax
             return ScriptGeneratorModule.GenerateScript(entity);
         }
        
-        public void GetBom()
+        public AxBaseException GetBom()
         {
             DataWriter.TruncateTables(false, false, false, false, false, true, false);
-            BomTransfer.GetBom();
+            return BomTransfer.GetBom();
         }
 
         public void GetPoTo()
@@ -620,7 +620,11 @@ namespace ErpConnector.Ax
 
         public AxBaseException FullTransfer()
         {
-            PimFull();
+            var pim = PimFull();
+            if (pim != null)
+            {
+                return pim;
+            }
             TransactionFull();
             return null;
         }
@@ -628,11 +632,35 @@ namespace ErpConnector.Ax
         public AxBaseException PimFull()
         {
             DataWriter.TruncateTables(true, false, false, true, true, true, false);
-            ItemCategoryTransfer.WriteCategories();
-            LocationsAndVendorsTransfer.WriteLocationsAndVendors();
-            ItemTransfer.WriteItems(includesFashion);
-            ItemAttributeLookup.ReadItemAttributes(includesFashion);
-            GetBom();
+            var cat = ItemCategoryTransfer.WriteCategories();
+            if (cat != null)
+            {
+                return cat;
+            }
+
+            var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors();
+            if (loc != null)
+            {
+                return loc;
+            }
+
+            var items = ItemTransfer.WriteItems(includesFashion);
+            if (items != null)
+            {
+                return items;
+            }
+
+            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion);
+            if (attr != null)
+            {
+                return attr;
+            }
+
+            var bom = GetBom();
+            if (bom != null)
+            {
+                return bom;
+            }
             return null;
         }
 

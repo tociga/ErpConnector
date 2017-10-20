@@ -127,21 +127,64 @@ namespace ErpConnector.Ax
         //        }
         //    }
         //}
-        public static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string oDataEndpoint, string filters)
+        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string dbTable)
         {
-            var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-            var endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
-
-            GenericJsonOdata<T> returnObject = new GenericJsonOdata<T>();
-            var returnODataObject = CallOdataEndpoint<T>(endpoint).Result;
-            returnObject.value.AddRange(returnODataObject.value);
-
-            while(!string.IsNullOrEmpty(returnODataObject.NextLink))
+            try
             {
-                returnODataObject = await CallOdataEndpoint<T>(returnODataObject.NextLink);
-                returnObject.value.AddRange(returnODataObject.value);
+
+
+                var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                var endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+
+                var returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+
+                while (!string.IsNullOrEmpty(returnODataObject.NextLink))
+                {
+                    returnODataObject = await CallOdataEndpoint<T>(returnODataObject.NextLink);
+                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                    if (returnODataObject.Exception != null)
+                    {
+                        break;
+                    }
+                }
+                return returnODataObject.Exception;
             }
-            return returnObject;
+            catch(Exception e)
+            {
+                return new AxBaseException { ApplicationException = e };
+            }
+
+        }
+
+        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, int maxNumber, string dbTable)
+        {
+            try
+            {
+
+                var filter = "?$top=" + maxNumber;// 1000 &$top = 1000
+                var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                var endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
+
+                var returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                for(int i = 1; returnODataObject.value.Count > 0; i++)
+                {
+                    filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
+                    endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
+                    returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                    if (returnODataObject.Exception != null)
+                    {
+                        break;
+                    }
+                }
+                return returnODataObject.Exception;
+            }
+            catch (Exception e)
+            {
+                return new AxBaseException { ApplicationException = e };
+            }
 
         }
         private static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string requestUri)
@@ -151,17 +194,7 @@ namespace ErpConnector.Ax
             string token = Authenticator.GetAdalToken();
             request.Headers["Authorization"] = token;
             request.Method = "GET";
-            //request.Timeout = 1000 * 60 * 3;
-            //request.ContentLength = postData != null ? postData.Length : 0;
-
-            //using (var requestStream = request.GetRequestStream())
-            //{
-            //    using (StreamWriter writer = new StreamWriter(requestStream))
-            //    {
-            //        writer.Write(postData);
-            //        writer.Flush();
-            //    }
-            //}
+            var result = new GenericJsonOdata<T>();
             try
             {
                 using (var response = (HttpWebResponse)request.GetResponse())
@@ -172,15 +205,23 @@ namespace ErpConnector.Ax
                         {
                             var responseString = streamReader.ReadToEnd();
                             //string sanitized = SanitizeJsonString(responseString);
-                            return JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
-
+                            result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+                            return result;
                         }
                     }
                 }
             }
-            catch(Exception e)
+            catch(WebException e)
             {
-                throw e;
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+                        // TODO: Need to log error;
+                        return result;
+                    }
+                }
             }
         }
 
@@ -232,10 +273,10 @@ namespace ErpConnector.Ax
                 {
                     using (var reader = new StreamReader(rStream))
                     {
-                        //var r = reader.ReadToEnd();
+                        var r = reader.ReadToEnd();
 
                         // TODO: Need to log error;
-                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(r);
                         return result;
                     }
                 }
