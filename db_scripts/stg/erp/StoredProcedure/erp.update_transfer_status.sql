@@ -3,8 +3,7 @@
 -- Create date: 15.08.2017
 -- Description:	Updates the status of an erp action
 -- =============================================
-
-ALTER PROCEDURE [erp].[update_transfer_status]
+CREATE PROCEDURE [erp].[update_transfer_status]
 	@action_id int,
 	@status int,
 	@error_message nvarchar(MAX) = null,
@@ -19,4 +18,6 @@ BEGIN
 	WHERE id = @action_id													
 
 END
+
 GO
+

@@ -5,7 +5,7 @@
 --              daily_refresh, full_refresh, pim_full, transaction_full, transaction_refresh, create_po_to, create_item
 -- =============================================
 
-ALTER PROCEDURE [erp].[pending_transfers]
+CREATE PROCEDURE [erp].[pending_transfers]
 
 AS
 BEGIN
@@ -16,5 +16,6 @@ BEGIN
 	FROM log.erp_actions 
 	WHERE status = 0
 END
+
 
 GO

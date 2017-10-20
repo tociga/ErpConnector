@@ -1,9 +1,3 @@
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
 CREATE TABLE [log].[erp_actions](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[action_type] [nvarchar](50) NOT NULL,

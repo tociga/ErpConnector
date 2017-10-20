@@ -1,5 +1,6 @@
 ﻿using ErpConnector.Ax;
 using ErpConnector.Ax.DTO;
+using ErpConnector.Ax.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,18 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
+            Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.CustVendExternalItem);
 
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str =  sg.CreateScript("[ax].[INVENTDIM]");
+                Console.WriteLine(str);
+            }
 
-            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "").Result.value;
-
-            Console.WriteLine("number of Distinct Products= " + distinctProducts.Count);
+           
+           
         }
     }
 }

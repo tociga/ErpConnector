@@ -1,4 +1,3 @@
-
 -- =============================================
 -- Author:		Dadi Arnason
 -- Create date: 10.10.2017
@@ -19,6 +18,7 @@ BEGIN
 
 	exec (@sql)
 END
+
 
 
 GO
