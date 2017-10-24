@@ -678,6 +678,7 @@ namespace ErpConnector.Ax
             ProductHistory ph = new ProductHistory();
             ph.WriteInventSumRefresh(date);
             ph.WriteInventTransRefresh(date);
+            ph.WriteInventTransOrigin();
             POTransfer.RefreshPurchLines(date);
             return null;
         }
