@@ -48,6 +48,7 @@ BEGIN
 		--truncate table ax.RetailTransactionSalesLineTable
 		truncate table ax.INVENTTRANS
 		truncate table ax.INVENTTRANSORIGIN
+		truncate table ax.INVENTSUM
 	END
 
 	if @truncate_locations_and_vendors = 1
@@ -68,6 +69,7 @@ BEGIN
 		truncate table ax.INVENTSUM_Increment
 		truncate table ax.INVENTTRANS_Increment
 		truncate table ax.PurchLine_Increment
+		truncate table ax.INVENTTRANSORIGIN
 	END
 
 
