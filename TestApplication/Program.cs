@@ -28,8 +28,8 @@ namespace TestApplication
             AxODataConnector connector = new AxODataConnector();
 
             List<POTOCreate> list = new List<POTOCreate>();
-            list.Add(new POTOCreate { order_id = 12, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "GMOOR", order_from_location_no = "SUP00000030", est_delivery_date = new DateTime(2017, 11, 15),
-                vendor_location_type = "vendor", style="-" });
+            list.Add(new POTOCreate { order_id = 16, item_no = "0140", size = "Large", color = "Black", unit_qty_chg = 10m, location_no = "DC-WEST", order_from_location_no = "1004", est_delivery_date = new DateTime(2017, 11, 15),
+                vendor_location_type = "vendor"});
 
             connector.CreatePoTo(list);
                         
