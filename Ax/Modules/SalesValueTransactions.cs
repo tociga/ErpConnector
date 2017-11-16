@@ -11,14 +11,13 @@ namespace ErpConnector.Ax.Modules
         public static void WriteSalesValueTrans(Resources context)
         {
             //DataWriter.TruncateTables(false, true, true);
-           // ReadTransActionHeaders(context);
+            ReadTransActionHeaders(context);
                 //DateTime.Now.Date.AddDays(-30)
                 
             //DataWriter.WriteToTable<RetailTransaction>(salesTransOld, "[ax].[RetailTransactionTable]");
 
             //var salesTransNew = ReadTransActionHeaders(context, DateTime.Now.Date.AddDays(-30), DateTime.Now.Date);
             //DataWriter.WriteToTable(salesTransNew, "[ax].[RetailTransactionTable_increment]");
-            //var variants = ReadVariants(context);
 
             //WriteSalesValueLines(context);
             

@@ -36,20 +36,13 @@ namespace ErpConnector.Ax.Modules
                     return seasonGroups;
                 }
 
-                //var season = ServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "").Result.value;
-                //DataWriter.WriteToTable<SeasonTable>(season.GetDataReader(), "[ax].[SeasonTable]");
+                var season = ServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "", "[ax].[SeasonTable]").Result;
+                if (season != null)
+                {
+                    return season;
+                }
+                
             }
-            //var season = ReadSeasonTable(context);
-            //DataWriter.WriteToTable(season, "[ax].[SeasonTable]");
-
-            //var colorGroupLines = ReadColorGroupLines(context);
-            //DataWriter.WriteToTable(colorGroupLines, "[ax].[ProductColorGroupLine]");
-
-            //var sizeGroupLines = ReadSizeGroupLines(context);
-            //DataWriter.WriteToTable(sizeGroupLines, "[ax].[ProductSizeGroupLine]");
-
-            //var styleGroupLines = ReadStyleGroupLines(context);
-            //DataWriter.WriteToTable(styleGroupLines, "[ax].[ProductStyleGroupLine]");
             var colorGroupLines = ServiceConnector.CallOdataEndpoint<ProductColorGroupLine>("ProductColorGroupLines", "", "[ax].[ProductColorGroupLine]").Result;
             if (colorGroupLines != null)
             {
@@ -67,6 +60,24 @@ namespace ErpConnector.Ax.Modules
             {
                 return styleGroupLines;
             }
+
+            var color = ServiceConnector.CallOdataEndpoint<ProductColor>("ProductColors", "", "[ax].[ProductColor]").Result;
+            if (color != null)
+            {
+                return color;
+            }
+
+            var size = ServiceConnector.CallOdataEndpoint<ProductSize>("ProductSizes", "", "[ax].[ProductSize]").Result;
+            if (size != null)
+            {
+                return size;
+            }
+
+            var style = ServiceConnector.CallOdataEndpoint<ProductStyleGroupLine>("ProductStyles", "", "[ax].[ProductStyle]").Result;
+            if (style != null)
+            {
+                return style;
+            }
             var prodAttribute = ServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", "", "[ax].[ProductAttributes]").Result;
             if (prodAttribute != null)
             {
@@ -78,6 +89,7 @@ namespace ErpConnector.Ax.Modules
             {
                 return attrValue;
             }
+
             return null;
         }
 

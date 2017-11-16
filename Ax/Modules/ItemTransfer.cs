@@ -83,6 +83,8 @@ namespace ErpConnector.Ax.Modules
                 return reqItems;
             }
 
+            
+
             var reqKey = ServiceConnector.CallOdataEndpoint<AGRReqSafetyKey>("AGRReqSafetyKeys", "", "[ax].[REQSAFETYKEY]").Result;
             if (reqKey != null)
             {
@@ -121,16 +123,17 @@ namespace ErpConnector.Ax.Modules
 
             if (includeFashion)
             {
-            //var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
-            //    DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
+            ////var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
+            ////    DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
-            //WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
-                var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
-                if (inventColorSeason.Exception != null)
-                {
-                    return inventColorSeason.Exception;
-                }
-                DataWriter.WriteToTable(inventColorSeason.value.GetDataReader(), "[ax].[InventColorSeason]");
+            ////WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
+            //    var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
+            //    if (inventColorSeason.Exception != null)
+            //    {
+            //        return inventColorSeason.Exception;
+            //    }
+            //    DataWriter.WriteToTable(inventColorSeason.value.GetDataReader(), "[ax].[InventColorSeason]");
+            
             }
             return null;
         }

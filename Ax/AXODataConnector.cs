@@ -543,62 +543,69 @@ namespace ErpConnector.Ax
 
         public AxBaseException CreatePoTo(List<POTOCreate> po_to_create)
         {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                       ConfigurationManager.AppSettings["ax_client_secret"],
-                                                       axBaseUrl,
-                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                       ConfigurationManager.AppSettings["ax_client_key"]);
-            var oAuthHelper = new OAuthHelper(clientconfig);
-
-            ArrayList a = new ArrayList();
-
-            string dataarea = "USRT";
-
-            AXODataContextConnector axConnector = new CreateOrder(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
-            if (po_to_create.Any())
+            try
             {
-                var o = po_to_create.First();
+                string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                           ConfigurationManager.AppSettings["ax_client_secret"],
+                                                           axBaseUrl,
+                                                           ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                           ConfigurationManager.AppSettings["ax_client_key"]);
+                var oAuthHelper = new OAuthHelper(clientconfig);
 
-                AGROrderDTO order = new AGROrderDTO();
-                order.ARGId = o.order_id.ToString();
-                order.OrderFrom = o.order_from_location_no; //"1004"; //vendor number;
-                order.OrderTo = o.location_no; //"DC"; //warehouse;
-                order.OrderType =  o.vendor_location_type.ToLower() == "vendor" ? AGROrderType.PO : AGROrderType.TO;
-                order.ReceiveDate = o.est_delivery_date;
-                order.OrderStatus = AGROrderStatus.Created;
+                ArrayList a = new ArrayList();
 
-                ArrayList orderline = new ArrayList();
+                string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
 
-                for (int i=0; i< po_to_create.Count;i++)
+                AXODataContextConnector axConnector = new CreateOrder(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+                if (po_to_create.Any())
                 {
-                    AGROrderLineDTO line = new AGROrderLineDTO();
-                    line.ARGId = order.ARGId;
-                    line.Color = po_to_create[i].color;
-                    line.Config = "";
-                    line.ItemId = po_to_create[i].item_no;
-                    line.LineNum = i+1;
-                    line.Qty = po_to_create[i].unit_qty_chg;
-                    line.Size = po_to_create[i].size;
-                    line.Style = po_to_create[i].style;
-                    orderline.Add(line);
+                    var o = po_to_create.First();
+
+                    AGROrderDTO order = new AGROrderDTO();
+                    order.ARGId = o.order_id.ToString();
+                    order.OrderFrom = o.order_from_location_no; //"1004"; //vendor number;
+                    order.OrderTo = o.location_no; //"DC"; //warehouse;
+                    order.OrderType = o.vendor_location_type.ToLower() == "vendor" ? AGROrderType.PO : AGROrderType.TO;
+                    order.ReceiveDate = o.est_delivery_date;
+                    order.OrderStatus = AGROrderStatus.Created;
+
+                    ArrayList orderline = new ArrayList();
+
+                    for (int i = 0; i < po_to_create.Count; i++)
+                    {
+                        AGROrderLineDTO line = new AGROrderLineDTO();
+                        line.ARGId = order.ARGId;
+                        line.Color = po_to_create[i].color;
+                        line.Config = "";
+                        line.ItemId = po_to_create[i].item_no;
+                        line.LineNum = i + 1;
+                        line.Qty = po_to_create[i].unit_qty_chg;
+                        line.Size = po_to_create[i].size;
+                        line.Style = po_to_create[i].style;
+                        orderline.Add(line);
+                    }
+
+                    order.ArgOrderLine = orderline;
+
+                    a.Add(order);
+
+                    // Send the data file to the connector object:
+                    axConnector.CreateRecordInAX(dataarea, a);
+
+                    order.OrderStatus = AGROrderStatus.Ready;
+                    order.ArgOrderLine.Clear();
+                    a = new System.Collections.ArrayList();
+                    a.Add(order);
+
+                    // Send the data file to the connector object:
+                    axConnector.CreateRecordInAX(dataarea, a);
                 }
-               
-                order.ArgOrderLine = orderline;
-
-                a.Add(order);
-
-                // Send the data file to the connector object:
-                axConnector.CreateRecordInAX(dataarea, a);
-
-                order.OrderStatus = AGROrderStatus.Ready;
-                order.ArgOrderLine.Clear();
-                a = new System.Collections.ArrayList();
-                a.Add(order);
-
-                // Send the data file to the connector object:
-                axConnector.CreateRecordInAX(dataarea, a);
             }
+            catch (Exception e)
+            {
+                return new AxBaseException { ApplicationException = e };
+            }            
             return null;
         }
 
@@ -613,7 +620,11 @@ namespace ErpConnector.Ax
 
         public AxBaseException DailyRefresh(DateTime date)
         {
-            PimFull();
+            var pim = PimFull();
+            if (pim != null)
+            {
+                return pim;
+            }
             TransactionRefresh(date);
             return null;
         }
