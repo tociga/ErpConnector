@@ -591,7 +591,11 @@ namespace ErpConnector.Ax
                     a.Add(order);
 
                     // Send the data file to the connector object:
-                    axConnector.CreateRecordInAX(dataarea, a);
+                    var createOrder = axConnector.CreateRecordInAX(dataarea, a);
+                    if(createOrder != null)
+                    {
+                        return createOrder;
+                    }
 
                     order.OrderStatus = AGROrderStatus.Ready;
                     order.ArgOrderLine.Clear();
@@ -599,7 +603,7 @@ namespace ErpConnector.Ax
                     a.Add(order);
 
                     // Send the data file to the connector object:
-                    axConnector.CreateRecordInAX(dataarea, a);
+                    return axConnector.CreateRecordInAX(dataarea, a);
                 }
             }
             catch (Exception e)
