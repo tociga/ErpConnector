@@ -13,7 +13,7 @@ namespace ErpConnector.Listener
     public class DbService
     {
         public bool? Sync()
-        {
+        {            
             try
             {
                 bool includeBAndM = false;
@@ -85,7 +85,7 @@ namespace ErpConnector.Listener
             }
             catch(Exception e)
             {
-
+                LogCommError(e.Message + " " + e.StackTrace, -99);
             }
             return true;
         }
