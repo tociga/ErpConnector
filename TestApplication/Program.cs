@@ -25,11 +25,12 @@ namespace TestApplication
             //    string str =  sg.CreateScript("[ax].[INVENTDIM]");
             //    Console.WriteLine(str);
             //}
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             AxODataConnector connector = new AxODataConnector();
 
             List<POTOCreate> list = new List<POTOCreate>();
-            list.Add(new POTOCreate { order_id = 19, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "GMOOR", order_from_location_no = "SUP00000030", est_delivery_date = new DateTime(2017, 11, 15),
-                vendor_location_type = "vendor", style="-" });
+            list.Add(new POTOCreate { order_id = 1, item_no = "2000003", unit_qty_chg = 10m, location_no = "Picc", order_from_location_no = "OI010", est_delivery_date = new DateTime(2017, 11, 2),
+                vendor_location_type = "vendor"});
 
             var result = connector.CreatePoTo(list);
                         
