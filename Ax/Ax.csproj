@@ -121,6 +121,8 @@
     <Compile Include="DTO\InventTransferTableDTO.cs" />
     <Compile Include="DTO\PriceDiscTableDTO.cs" />
     <Compile Include="DTO\PurchLinesDTO.cs" />
+    <Compile Include="DTO\RetailTransactionSalesLinesDTO.cs" />
+    <Compile Include="DTO\RetailTransactionTableDTO.cs" />
     <Compile Include="Modules\CreateOrder.cs" />
     <Compile Include="Utils\Authenticator.cs" />
     <Compile Include="Utils\EnumConverter.cs" />

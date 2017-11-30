@@ -33,5 +33,8 @@ namespace ErpConnector.Common.AGREntities
         public decimal? pack_size { get; set; }
         public decimal? display_stock { get; set; }
         public int option_id { get; set; }
+        public string primar_vendor_no { get; set; }
+        public decimal? sale_price { get; set; }
+        public decimal? cost_price { get; set; }
     }
 }

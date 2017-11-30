@@ -10,26 +10,26 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemCategoryTransfer
     {
-        public static AxBaseException WriteCategories()
+        public static AxBaseException WriteCategories(int actionId)
         {
-            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]").Result;
+            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]", actionId).Result;
             if (roles != null)
             {
                 return roles;
             }
-            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]").Result;
+            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]", actionId).Result;
             if (hierarchy != null)
             {
                 return hierarchy;
             }
 
-            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]").Result;
+            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]", actionId).Result;
             if (category != null)
             {
                 return category;
             }
 
-            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]").Result;
+            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]", actionId).Result;
             if (prodCat != null)
             {
                 return prodCat;

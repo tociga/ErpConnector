@@ -6,20 +6,20 @@ namespace ErpConnector.Ax.Modules
 {
     public class BomTransfer
     {
-        public static AxBaseException GetBom()
+        public static AxBaseException GetBom(int actionId)
         {
-            var bomHeaders = ServiceConnector.CallOdataEndpoint<BillOfMaterialsHeader>("BillOfMaterialsHeaders", null, "[ax].[BillOfMaterialsHeaders]").Result;
+            var bomHeaders = ServiceConnector.CallOdataEndpoint<BillOfMaterialsHeader>("BillOfMaterialsHeaders", null, "[ax].[BillOfMaterialsHeaders]", actionId).Result;
             if (bomHeaders != null)
             {
                 return bomHeaders;
             }
-            var bomLines = ServiceConnector.CallOdataEndpoint<BillOfMaterialsLine>("BillOfMaterialsLines", null, "[ax].[BillOfMaterialsLines]").Result;
+            var bomLines = ServiceConnector.CallOdataEndpoint<BillOfMaterialsLine>("BillOfMaterialsLines", null, "[ax].[BillOfMaterialsLines]", actionId).Result;
             if (bomLines != null)
             {
                 return bomLines;
             }
 
-            var bomVersion = ServiceConnector.CallOdataEndpoint<BillOfMaterialsVersion>("BillOfMaterialsVersions", null, "[ax].[BillOfMaterialsVersions]").Result;
+            var bomVersion = ServiceConnector.CallOdataEndpoint<BillOfMaterialsVersion>("BillOfMaterialsVersions", null, "[ax].[BillOfMaterialsVersions]", actionId).Result;
             if (bomVersion != null)
             {
                 return bomVersion;

@@ -1,9 +1,11 @@
 ﻿using ErpConnector.Ax.Authentication;
 using Microsoft.OData.Client;
 using System;
+using Newtonsoft.Json;
 using System.Linq;
 using System.Xml;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax
 {
@@ -25,42 +27,40 @@ namespace ErpConnector.Ax
             this.context = new AXODataContext(oAuthHelper, enableCrossCompany);
         }
 
-        public bool CreateRecordInAX(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
+        public AxBaseException CreateRecordInAX(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
         {
             if (dataFile.Count > 0)
             {
                 bool recordCreated = this.CreateRcords(targetAXLegalEntity, dataFile);
 
                 // Save everything as a single transaction (can be otherwise if required):
-                if (recordCreated && !SaveChanges()) return false;
+                if (recordCreated)
+                {
+                    return SaveChanges();
+                }
             }
 
-
-            return true;
+            return null;
         }
 
         protected abstract bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile);
 
-        private bool SaveChanges()
+        private AxBaseException SaveChanges()
         {
             try
             {
                 context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
 
-                return true;
+                return null;
             }
             catch (DataServiceRequestException ex)
             {
-                logMessageHandler(
-                    string.Format("Error occured while saving: {0}", ex.InnerException.Message),
-                    ConsoleColor.Red);
+                return JsonConvert.DeserializeObject<AxBaseException>(ex.InnerException.Message);
             }
             catch (Exception ex)
             {
-                logException(ex);
+                return new AxBaseException { ApplicationException = ex };
             }
-
-            return false;
         }
 
         private void logException(Exception ex)
