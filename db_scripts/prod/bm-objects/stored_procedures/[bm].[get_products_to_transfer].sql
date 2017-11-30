@@ -46,6 +46,9 @@
  	  ,pack_size
  	  ,display_stock
  	  , option_id
+	  ,primary_vendor_no
+	  ,sale_price
+	  ,cost_price
  	FROM bm.v_items_to_create WHERE temp_id = @temp_id
  	end
  END

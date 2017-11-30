@@ -8,6 +8,8 @@ using System.Configuration;
 using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
 using System;
+using System.Text;
+using System.Linq;
 
 namespace ErpConnector.Ax
 {
@@ -127,12 +129,11 @@ namespace ErpConnector.Ax
         //        }
         //    }
         //}
-        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string dbTable)
+        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, string filters, string dbTable, int actionId)
         {
+            DateTime startTime = DateTime.Now;
             try
             {
-
-
                 var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
@@ -148,20 +149,22 @@ namespace ErpConnector.Ax
                         break;
                     }
                 }
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, true);
                 return returnODataObject.Exception;
             }
             catch(Exception e)
             {
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false);
                 return new AxBaseException { ApplicationException = e };
             }
 
         }
 
-        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, int maxNumber, string dbTable)
+        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, int maxNumber, string dbTable, int actionId)
         {
+            DateTime startTime = DateTime.Now;
             try
             {
-
                 var filter = "?$top=" + maxNumber;// 1000 &$top = 1000
                 var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
@@ -179,10 +182,12 @@ namespace ErpConnector.Ax
                         break;
                     }
                 }
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, true);
                 return returnODataObject.Exception;
             }
             catch (Exception e)
             {
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false);
                 return new AxBaseException { ApplicationException = e };
             }
 
@@ -197,7 +202,7 @@ namespace ErpConnector.Ax
             var result = new GenericJsonOdata<T>();
             try
             {
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
                 {
                     using (var responseStream = response.GetResponseStream())
                     {
@@ -317,7 +322,29 @@ namespace ErpConnector.Ax
                     }
                 }
             }
-        }        
+        }
+
+        public static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, DateTime minDate, bool useDate = false)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (useDate)
+            {
+                sb.Append("{\"firstDate\" : \"" + minDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
+                sb.Append(", \"lastDate\" : \"" + minDate.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss") + "\"}");
+            }
+            else
+            {
+                sb.Append("{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + " }");
+            }
+            var result = ServiceConnector.CallAGRServiceArray<T>(serviceName, webMethod, sb.ToString(), null);
+
+            var reader = result.Result.value.GetDataReader();
+
+            DataWriter.WriteToTable<T>(reader, "[ax]." + destTable);
+
+            return result.Result.value.Any();
+        }
+
 
     }
 }
