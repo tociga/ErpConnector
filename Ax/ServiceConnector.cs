@@ -27,21 +27,21 @@ namespace ErpConnector.Ax
 
             request.Method = "POST";
             var postData = JsonConvert.SerializeObject(postDataObject, new EnumConverter());
-            request.ContentLength = postData != null ? postData.Length : 0;
+            //request.ContentLength = postData != null ? postData.Length : 0;
             request.ContentType = "application/json";
 
             GenericWriteObject<T> result = new GenericWriteObject<T>();
-            using (var requestStream = request.GetRequestStream())
-            {
-                using (var writer = new StreamWriter(requestStream))
-                {
-                    writer.Write(postData);
-                    writer.Flush();
-                }
-            }
-
+ 
             try
             {
+                using (var requestStream = request.GetRequestStream())
+                {
+                    using (var writer = new StreamWriter(requestStream))
+                    {
+                        writer.Write(postData);
+                        writer.Flush();
+                    }
+                }
                 using (var response = (HttpWebResponse)request.GetResponse())
                 {
                     using (var responseStream = response.GetResponseStream())
@@ -68,6 +68,17 @@ namespace ErpConnector.Ax
                         // TODO: Need to log error;
                         return result;
                     }
+                }
+            }
+            catch(Exception e)
+            {
+                if (e is AggregateException)
+                {
+                    return new GenericWriteObject<T> { Exception = new AxBaseException { ApplicationException = e.InnerException } };
+                }
+                else
+                {
+                    return new GenericWriteObject<T> { Exception = new AxBaseException { ApplicationException = e } };
                 }
             }
         }
