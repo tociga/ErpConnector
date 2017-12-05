@@ -71,7 +71,7 @@ namespace ErpConnector.Ax.Modules
             //    return assortLookup;
             //}
 
-            var retailChannelLookup = WriteServiceData<RetailAssortmentLookupChannelGroupDTO>("[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", "GetRetailAssortmentLookupChannelGroup", actionId);
+            var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", "[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000);
             if (retailChannelLookup != null)
             {
                 return retailChannelLookup;
@@ -91,7 +91,7 @@ namespace ErpConnector.Ax.Modules
                 return reqKey;
             }
 
-            var saftyLines =  WriteServiceData<ReqSafetyLineDTO>("[ax]", "[REQSAFETYLINE]", "GetSafetyLines", actionId);
+            var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax]", "[REQSAFETYLINE]", 5000);
             if (saftyLines != null)
             {
                 return saftyLines;
@@ -110,12 +110,12 @@ namespace ErpConnector.Ax.Modules
                 return itemInventSetup;
             }
 
-            var unitOfMeasure = WriteServiceData<UnitOfMeasureDTO>("[ax]", "[UNITOFMEASURE]", "GetUnitOfMeasure",actionId);
+            var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax]", "[UNITOFMEASURE]", 5000);
             if (unitOfMeasure != null)
             {
                 return unitOfMeasure;
             }
-            var unitConv = WriteServiceData<UnitOfMeasureConversionDTO>("[ax]", "[UNITOFMEASURECONVERSION]", "GetUnitOfMeasureConversion",actionId);
+            var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax]", "[UNITOFMEASURECONVERSION]", 5000);
             if (unitConv != null)
             {
                 return unitConv;
@@ -155,51 +155,18 @@ namespace ErpConnector.Ax.Modules
             return list.GetDataReader<dynamic>();
         }
 
-        private static AxBaseException WriteServiceData<T>(string schemaName, string tableName, string webMethodName, int actionId)
-        {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                Int64 recId = DataWriter.GetMaxRecId(schemaName, tableName);
-                Int64 pageSize = 20000;
-                GenericJsonOdata<T> result = null;
-                bool firstRound = true;
-                while (firstRound || result.value.Any())
-                {
-                    firstRound = false;
-                    result = WriteFromService<T>(recId, pageSize, webMethodName, schemaName + "." + tableName);
-                    if (result.Exception != null)
-                    {
-                        return result.Exception;
-                    }
-                    recId = DataWriter.GetMaxRecId("[ax]", tableName);
-                }
-                DataWriter.LogErpActionStep(actionId, tableName, startTime, true);
-            }
-            catch(Exception)
-            {
-                DataWriter.LogErpActionStep(actionId, tableName, startTime, true);
-                throw;
-            }
-            return null;
-        }
+        //private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
+        //{
+        //    string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
+        //    //var result = ServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
+        //    var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData);
+        //    var reader = result.value.GetDataReader();
 
-        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
-        {
-            string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";
-            //var result = ServiceConnector.CallAGRServiceArray<T>("AGRItemCustomService", webMethod, postData);
-            var result = GetFromService<T>(null, "AGRItemCustomService", webMethod, postData);
-            var reader = result.value.GetDataReader();
+        //    DataWriter.WriteToTable<T>(reader, destTable);
 
-            DataWriter.WriteToTable<T>(reader, destTable);
+        //    return result;
+        //}
 
-            return result;
-        }
-
-        private static GenericJsonOdata<T> GetFromService<T>(string serviceGroup, string service, string serviceMethod, string postData)
-        {
-            return ServiceConnector.CallAGRServiceArray<T>(service, serviceMethod, postData, serviceGroup).Result;
-        }
         //private static IGenericDataReader ReadInventDimCombo(Resources context)
         //{
         //    var combos = context.AGRInventDimCombinations.ToList();

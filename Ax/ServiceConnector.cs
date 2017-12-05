@@ -230,7 +230,7 @@ namespace ErpConnector.Ax
             }
         }
 
-        public static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
+        private static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         {
             var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
@@ -241,6 +241,8 @@ namespace ErpConnector.Ax
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData != null ? postData.Length : 0;
+            System.Diagnostics.Debug.Write("Endpoint :" + endpoint+ " ");
+            System.Diagnostics.Debug.WriteLine("postData: " + postData);
 
             if (request.ContentLength > 0)
             {
@@ -324,13 +326,13 @@ namespace ErpConnector.Ax
             }
         }
 
-        public static bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, DateTime minDate, bool useDate = false)
+        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string dbSchema, string destTable, DateTime minDate, DateTime maxDate, bool useDate = false)
         {
             StringBuilder sb = new StringBuilder();
             if (useDate)
             {
                 sb.Append("{\"firstDate\" : \"" + minDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                sb.Append(", \"lastDate\" : \"" + minDate.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss") + "\"}");
+                sb.Append(", \"lastDate\" : \"" + maxDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"}");
             }
             else
             {
@@ -340,9 +342,78 @@ namespace ErpConnector.Ax
 
             var reader = result.Result.value.GetDataReader();
 
-            DataWriter.WriteToTable<T>(reader, "[ax]." + destTable);
+            DataWriter.WriteToTable<T>(reader, dbSchema+ "." + destTable);
 
-            return result.Result.value.Any();
+            return result.Result;
+        }
+
+        public static AxBaseException CallService<T>(int actionId, string webMethod, string serviceName, string dbSchema, string dbTable, int pageSize)
+        {
+            DateTime startTime = DateTime.Now;
+            try
+            {
+                long recId = DataWriter.GetMaxRecId(dbSchema, dbTable);
+                GenericJsonOdata<T> result = new GenericJsonOdata<T>();
+                bool firstRound = true;
+                while (firstRound || (result.value.Any() && result.Exception == null))
+                {
+                    result = ServiceConnector.WriteFromService<T>(recId, pageSize, webMethod, serviceName, dbSchema, dbTable, DateTime.MinValue, DateTime.MinValue, false);
+                    recId = DataWriter.GetMaxRecId(dbSchema, dbTable);
+                    firstRound = false;
+                }
+
+                if (result.Exception == null)
+                {
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false);
+                }
+                return result.Exception;
+            }
+            catch (Exception e)
+            {
+                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false);
+                return new AxBaseException { ApplicationException = e };
+            }
+        }
+
+        public static AxBaseException CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName, string dbSchema, string dbTable, Func<DateTime, DateTime> nextPeriod = null )
+        {
+            if (nextPeriod == null)
+            {
+                nextPeriod = AddDay;
+            }
+            DateTime startTime = DateTime.Now;
+            try
+            {
+                GenericJsonOdata<T> result = new GenericJsonOdata<T>();
+                for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
+                {
+                    result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName, dbSchema, dbTable, d, nextPeriod(d), true);
+                }
+                if (result.Exception == null)
+                {
+                    DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, true);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, false);
+                }
+                return result.Exception;
+            }
+            catch (Exception e)
+            {
+                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, false);
+                return new AxBaseException { ApplicationException = e };
+            }
+
+        }
+
+        public static DateTime AddDay(DateTime d)
+        {
+            return d.AddDays(1);
         }
 
 

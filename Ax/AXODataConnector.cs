@@ -700,7 +700,7 @@ namespace ErpConnector.Ax
                 return items;
             }
 
-            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, actionId);
+            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
             if (attr != null)
             {
                 return attr;
@@ -731,7 +731,7 @@ namespace ErpConnector.Ax
             ph.WriteInventTransOrigin();
             POTransfer.RefreshPurchLines(date, actionId);
 
-            if(includeB_M)
+            if (includeB_M)
             {
                 SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
                 SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
