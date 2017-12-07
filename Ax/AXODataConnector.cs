@@ -602,7 +602,7 @@ namespace ErpConnector.Ax
                     order.OrderFrom = o.order_from_location_no; //"1004"; //vendor number;
                     order.OrderTo = o.location_no; //"DC"; //warehouse;
                     order.OrderType = o.vendor_location_type.ToLower() == "vendor" ? AGROrderType.PO : AGROrderType.TO;
-                    order.ReceiveDate = o.est_delivery_date;
+                    order.ReceiveDate = o.est_delivery_date < DateTime.Now.Date ? DateTime.Now.Date : o.est_delivery_date;
                     order.OrderStatus = AGROrderStatus.Created;
 
                     ArrayList orderline = new ArrayList();
