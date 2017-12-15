@@ -24,7 +24,7 @@ namespace ErpConnector.Ax.DTO
         public long Channel { get; set; }
         public string ChannelReferenceId { get; set; }
         public string Comment { get; set; }
-        public long CostAmount { get; set; }
+        public decimal CostAmount { get; set; }
         public int Counter { get; set; }
         public int CreatedOffline { get; set; }
         public string CreatedOnPosTerminal { get; set; }
@@ -59,7 +59,7 @@ namespace ErpConnector.Ax.DTO
         public int NumberOfPaymentLines { get; set; }
         public int OpenDrawer { get; set; }
         public string Origin { get; set; }
-        public decimal PaymentAmoun { get; set; }
+        public decimal PaymentAmount { get; set; }
         public int PostAsShipment { get; set; }
         public DateTime ReceiptDateRequested { get; set; }
         public string ReceiptEmail { get; set; }

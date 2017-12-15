@@ -113,6 +113,13 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
+    <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
+    <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
+    <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />
+    <Compile Include="DTO\AGREcoResCategoryAttributeDTO.cs" />
+    <Compile Include="DTO\AGREcoResEnumerationAttributeValueDTO.cs" />
+    <Compile Include="DTO\AGREcoResProductInstanceDTO.cs" />
+    <Compile Include="DTO\AGREcoResValueDTO.cs" />
     <Compile Include="DTO\AGROrderDTO.cs" />
     <Compile Include="DTO\AGROrderLineDTO.cs" />
     <Compile Include="DTO\GenericWriteObject.cs" />

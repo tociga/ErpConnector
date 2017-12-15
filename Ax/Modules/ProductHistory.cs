@@ -3,6 +3,7 @@ using System.Linq;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Utils;
 using System.Text;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -14,107 +15,29 @@ namespace ErpConnector.Ax.Modules
             ActionId = actionId;
         }
 
-        public void WriteInventTrans()
+        public AxBaseException WriteInventTrans()
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");
-                bool foundData = true;
-                while (foundData)
-                {
-                    foundData = ServiceConnector.WriteFromService<InventTransDTO>(recId, 5000, "GetInventTrans", "AGRInventTransService", "[INVENTTRANS]", DateTime.MinValue);
-                    recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");
-                }
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANS]", startTime, true);
-            }
-            catch(Exception)
-            {
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANS]", startTime, false);
-                throw;
-            }
+            return ServiceConnector.CallService<InventTransDTO>(ActionId, "GetInventTrans", "AGRInventTransService", "[ax]", "[INVENTTRANS]", 5000);
         }
 
-        public void WriteInventTransOrigin()
+        public AxBaseException WriteInventTransOrigin()
         {
-            DateTime startTime = DateTime.Now;
-            try
-            { 
-                Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-                bool foundData = true;
-                while(foundData)
-                {
-                    foundData = ServiceConnector.WriteFromService<InventTransOriginDTO>(recId, 5000, "GetInventTransOrigin", "AGRInventTransService", "[INVENTTRANSORIGIN]", DateTime.MinValue);
-                    recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-                }
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANSORIGIN]", startTime, true);
-            }
-            catch (Exception)
-            {
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANSORIGIN]", startTime, false);
-                throw;
-            }
+            return ServiceConnector.CallService<InventTransOriginDTO>(ActionId, "GetInventTransOrigin", "AGRInventTransService", "[ax]", "[INVENTTRANSORIGIN]", 5000);
         }
 
-
-        public void WriteInventSumFull()
+        public AxBaseException WriteInventSumFull()
         {
-            DateTime startTime = DateTime.Now;
-            try
-            { 
-                Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTSUM]");
-                bool foundData = true;
-                while (foundData)
-                {
-                    foundData = ServiceConnector.WriteFromService<InventSumDTO>(recId, 5000, "GetInventSum", "AGRItemCustomService", "[INVENTSUM]", DateTime.MinValue, false);
-                    recId = DataWriter.GetMaxRecId("[ax]", "[INVENTSUM]");
-                }
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTSUM]", startTime, true);
-            }
-            catch (Exception)
-            {
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTSUM]", startTime, false);
-                throw;
-            }
-
+            return ServiceConnector.CallService<InventSumDTO>(ActionId, "GetInventSum", "AGRItemCustomService", "[ax]", "[INVENTSUM]", 5000);
         }
 
-        public void WriteInventSumRefresh(DateTime minDate)
+        public AxBaseException WriteInventSumRefresh(DateTime minDate)
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                for (DateTime d = minDate.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-                {
-                    ServiceConnector.WriteFromService<InventSumDTO>(0, 5000, "GetInventSumByDate", "AGRItemCustomService", "[INVENTSUM_Increment]", d, true);
-                }
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTSUM_Increment]", startTime, true);
-            }
-            catch (Exception)
-            {
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTSUM_Increment]", startTime, false);
-                throw;
-            }
-
+            return ServiceConnector.CallServiceByDate<InventSumDTO>(minDate, ActionId, "GetInventSumByDate", "AGRItemCustomService", "[ax]", "[INVENTSUM_Increment]");
         }
 
-        public void WriteInventTransRefresh(DateTime minDate)
+        public AxBaseException WriteInventTransRefresh(DateTime minDate)
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                for (DateTime d = minDate.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-                {
-                    ServiceConnector.WriteFromService<InventTransDTO>(0, 5000, "GetInventTransByDate", "AGRInventTransService", "[INVENTTRANS_Increment]", d, true);
-                }
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANS_Increment]", startTime, true);
-            }
-            catch (Exception)
-            {
-                DataWriter.LogErpActionStep(ActionId, "[ax].[INVENTTRANS_Increment]", startTime, false);
-                throw;
-            }
-
+            return ServiceConnector.CallServiceByDate<InventTransDTO>(minDate, ActionId, "GetInventTransByDate", "AGRInventTransService", "[ax]", "[INVENTTRANS_Increment]");
         }
     }
 }

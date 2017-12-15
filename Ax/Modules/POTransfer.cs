@@ -4,12 +4,13 @@ using ErpConnector.Ax.Utils;
 using ErpConnector.Ax.DTO;
 using System;
 using System.Text;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
     public class POTransfer
     {
-        public static void GetPosAndTos( Resources context, int actionId)
+        public static AxBaseException GetPosAndTos( Resources context, int actionId)
         {
             //var pol = AXServiceConnector.CallOdataEndpoint<PurchaseOrderHeader>("PurchaseOrderHeaders", null, header).Result;
             //var poh = context.PurchaseOrderHeaders.ToList();
@@ -17,108 +18,40 @@ namespace ErpConnector.Ax.Modules
             //PullPoHeaders(context, 5000);
 
             //PullPoLines(context, 5000);
-            PullPurchLines(DateTime.MinValue, false, actionId);
-            PullTOTable(actionId);
-            PullTOLines(actionId);
+            var poLines = PullPurchLines(actionId);
+            if (poLines != null)
+            {
+                return poLines;
+            }
+            var toTable = PullTOTable(actionId);
+            if (toTable != null)
+            {
+                return toTable;
+            }
+            var toLines = PullTOLines(actionId);
+            if (toLines != null)
+            {
+                return toLines;
+            }
+            return null;
         }
 
-        private static void PullPurchLines(DateTime date, bool useDate, int actionId)
+        private static AxBaseException PullPurchLines(int actionId)
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                long nextRecId = DataWriter.GetMaxRecId("[ax]", "[PurchLine]");
-                bool hasData = true;
-                while (hasData)
-                {
-                    hasData = WriteData<PurchLinesDTO>(nextRecId, 10000, "GetPurchLine", "AGRInventTransService", "[PurchLine]", date, useDate);
-                    nextRecId = DataWriter.GetMaxRecId("[ax]", "[PurchLine]");
-                }
-                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine]", startTime, true);
-            }
-            catch(Exception)
-            {
-                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine]", startTime, false);
-                throw;
-            }
+            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax]", "[PurchLine]", 10000);
         }
-        public static void RefreshPurchLines(DateTime date, int actionId)
-        {            
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                for (DateTime d = date.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-                {
-                    WriteData<PurchLinesDTO>(0, 10000, "GetPurchLineByDate", "AGRInventTransService", "[PurchLine_Increment]", d, true);
-                }
-                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, true);
-            }
-            catch (Exception)
-            {
-                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, false);
-                throw;
-            }
-
-        }
-        private static void PullTOLines(int actionId)
+        public static AxBaseException RefreshPurchLines(DateTime date, int actionId)
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                long nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERLINE]");
-                bool hasData = WriteData<InventTransferLineDTO>(nextRecId, 10000, "GetInventTransferLines", "AGRItemCustomService", "[INVENTTRANSFERLINE]", DateTime.MinValue, false);
-                while (hasData)
-                {
-                    nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERLINE]");
-                    hasData = WriteData<InventTransferLineDTO>(nextRecId, 10000, "GetInventTransferLines", "AGRItemCustomService", "[INVENTTRANSFERLINE]", DateTime.MinValue, false);
-                }
-                DataWriter.LogErpActionStep(actionId, "[ax].[INVENTTRANSFERLINE]", startTime, true);
-            }
-            catch(Exception)
-            {
-                DataWriter.LogErpActionStep(actionId, "[ax].[INVENTTRANSFERLINE]", startTime, false);
-            }
+            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax]", "[PurchLine_Increment]");
+
         }
-        private static void PullTOTable(int actionId)
+        private static AxBaseException PullTOLines(int actionId)
         {
-            DateTime startTime = DateTime.Now;
-            try
-            {
-                long nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERTABLE]");
-                bool hasData = WriteData<InventTransferTableDTO>(nextRecId, 10000, "GetInventTransferTable", "AGRItemCustomService", "[INVENTTRANSFERTABLE]", DateTime.MinValue, false);
-                while (hasData)
-                {
-                    nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERTABLE]");
-                    hasData = WriteData<InventTransferTableDTO>(nextRecId, 10000, "GetInventTransferTable", "AGRItemCustomService", "[INVENTTRANSFERTABLE]", DateTime.MinValue, false);
-                }
-            }
-            catch(Exception)
-            {
-                DataWriter.LogErpActionStep(actionId, "[ax].[INVENTTRANSFERTALBE]", startTime, true);
-                throw;
-            }
+            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERLINE]", 5000);
         }
-        public static bool WriteData<T>(long recId, long pageSize, string webMethod, string service, string destTable, DateTime minDate, bool useDate = false)
+        private static AxBaseException PullTOTable(int actionId)
         {
-
-            StringBuilder sb = new StringBuilder();
-            if (useDate)
-            {
-                sb.Append("{\"firstDate\" : \"" + minDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                sb.Append(", \"lastDate\" : \"" + minDate.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss") + "\"}");
-            }
-            else
-            {
-                sb.Append("{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + " }");
-            }
-            var result = ServiceConnector.CallAGRServiceArray<T>(service, webMethod, sb.ToString(), null);
-
-            var reader = result.Result.value.GetDataReader();
-
-            DataWriter.WriteToTable<T>(reader, "[ax]." + destTable);
-
-            return result.Result.value.Any();
+            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERTABLE]", 10000);
         }
-
     }
 }
