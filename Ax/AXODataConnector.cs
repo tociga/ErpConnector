@@ -497,7 +497,7 @@ namespace ErpConnector.Ax
                 if (masterData.master_status < 2)
                 {
                     var master = new ProductMasterWriteDTO();
-                    master.ProductDimensionGroupName = "CS";
+                    //master.ProductDimensionGroupName = "CS";
                     master.ProductNumber = masterData.product_no;
                     master.ProductName = masterData.product_name;
                     master.ProductSearchName = masterData.product_name.Trim();
