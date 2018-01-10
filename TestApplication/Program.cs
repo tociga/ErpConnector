@@ -26,22 +26,43 @@ namespace TestApplication
             //    Console.WriteLine(str);
             //}
             AxODataConnector connector = new AxODataConnector();
-            connector.PimFull(1);
+            //connector.PimFull(1);
 
-            //List<POTOCreate> list = new List<POTOCreate>();
+            List<POTOCreate> list = new List<POTOCreate>();
 
-            //list.Add(new POTOCreate { order_id = 16, item_no = "0140", size = "Large", color = "Black", unit_qty_chg = 10m, location_no = "DC-WEST", order_from_location_no = "1004", est_delivery_date = new DateTime(2017, 11, 15),
-            //    vendor_location_type = "vendor"});
+            //list.Add(new POTOCreate
+            //{
+            //    order_id = 16,
+            //    item_no = "0140",
+            //    size = "Large",
+            //    color = "Black",
+            //    unit_qty_chg = 10m,
+            //    location_no = "DC-WEST",
+            //    order_from_location_no = "1004",
+            //    est_delivery_date = DateTime.Now.Date.AddDays(10),
+            //    vendor_location_type = "vendor"
+            //});
 
-            ////PO
-            ////list.Add(new POTOCreate { order_id = 21, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "GMOOR", order_from_location_no = "SUP00000030", est_delivery_date = new DateTime(2017, 11, 30),
-            ////    vendor_location_type = "vendor", style="-" });
+            //PO
+            list.Add(new POTOCreate
+            {
+                order_id = 1,
+                item_no = "010611",
+                size = "010",
+                color = "53",
+                unit_qty_chg = 10m,
+                location_no = "GMOOR",
+                order_from_location_no = "SUP00000030",
+                est_delivery_date = DateTime.Now.Date.AddDays(10),
+                vendor_location_type = "vendor",
+                style = "-"
+            });
 
             ////TO
             ////list.Add(new POTOCreate { order_id = 23, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "W0041-LIVE", order_from_location_no = "GMOOR", est_delivery_date = new DateTime(2017, 11, 30),
             ////    vendor_location_type = "warehose", style="-" });
 
-            ////var result = connector.CreatePoTo(list, -1);
+            var result = connector.CreatePoTo(list, -1);
 
 
             //// W0041 - LIVE
