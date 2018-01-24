@@ -34,7 +34,7 @@ namespace ErpConnector.Ax
  
             try
             {
-                using (var requestStream = request.GetRequestStream())
+                using (var requestStream = await request.GetRequestStreamAsync())
                 {
                     using (var writer = new StreamWriter(requestStream))
                     {
@@ -42,7 +42,7 @@ namespace ErpConnector.Ax
                         writer.Flush();
                     }
                 }
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
                 {
                     using (var responseStream = response.GetResponseStream())
                     {
@@ -270,7 +270,7 @@ namespace ErpConnector.Ax
             var result = new GenericJsonOdata<T>();
             try
             {
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
                 {
                     using (var responseStream = response.GetResponseStream())
                     {
@@ -322,7 +322,7 @@ namespace ErpConnector.Ax
                 }
             }
 
-            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
             {
                 using (var responseStream = response.GetResponseStream())
                 {

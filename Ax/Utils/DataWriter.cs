@@ -60,7 +60,7 @@ namespace ErpConnector.Ax.Utils
         }
 
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -75,6 +75,7 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
                     cmd.Parameters.AddWithValue("@truncate_po_to", clearPOTO);
                     cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
+                    cmd.Parameters.AddWithValue("@truncate_price", clearPrice);
 
                     cmd.ExecuteNonQuery();
                 }

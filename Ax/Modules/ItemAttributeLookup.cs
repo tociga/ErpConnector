@@ -37,7 +37,7 @@ namespace ErpConnector.Ax.Modules
                     return seasonGroups;
                 }
 
-                var season = ServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "", "[ax].[SeasonTable]", actionId).Result;
+                var season = ServiceConnector.CallOdataEndpoint<SeasonTableDTO>("SeasonTables", "", "[ax].[SeasonTable]", actionId).Result;
                 if (season != null)
                 {
                     return season;

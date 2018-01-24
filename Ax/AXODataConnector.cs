@@ -45,13 +45,13 @@ namespace ErpConnector.Ax
        
         public AxBaseException GetBom(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, true, false);
+            DataWriter.TruncateTables(false, false, false, false, false, true, false, false);
             return BomTransfer.GetBom(actionId);
         }
 
         public void GetPoTo(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, false, true);
+            DataWriter.TruncateTables(false, false, false, false, false, false, true, false);
             POTransfer.GetPosAndTos(_context, actionId);
         }
         
@@ -488,6 +488,26 @@ namespace ErpConnector.Ax
             //var rv = ServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
         }
 
+        public GenericWriteObject<ProductMasterWriteDTO> CreateMaster(ProductMasterWriteDTO master)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+
+            ArrayList a = new ArrayList();
+
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+
+            AXODataContextConnector axConnector = new CreateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+
+            a.Add(master);
+            axConnector.CreateRecordInAX(dataarea, a);
+            return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
+        }
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
@@ -497,7 +517,7 @@ namespace ErpConnector.Ax
                 if (masterData.master_status < 2)
                 {
                     var master = new ProductMasterWriteDTO();
-                    //master.ProductDimensionGroupName = "CS";
+                    master.ProductDimensionGroupName = "CS";
                     master.ProductNumber = masterData.product_no;
                     master.ProductName = masterData.product_name;
                     master.ProductSearchName = masterData.product_name.Trim();
@@ -506,8 +526,8 @@ namespace ErpConnector.Ax
                     master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
-                    
-                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+                    var erpMaster = CreateMaster(master);
+                    //var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
                     
                     if (erpMaster.Exception != null)
                     {
@@ -681,42 +701,48 @@ namespace ErpConnector.Ax
 
         public AxBaseException PimFull(int actionId)
         {
-            DataWriter.TruncateTables(true, false, false, true, true, true, false);
-            var cat = ItemCategoryTransfer.WriteCategories(actionId);
-            if (cat != null)
-            {
-                return cat;
-            }
+            //DataWriter.TruncateTables(true, false, false, true, true, true, false, true);
+            //var cat = ItemCategoryTransfer.WriteCategories(actionId);
+            //if (cat != null)
+            //{
+            //    return cat;
+            //}
 
-            var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
-            if (loc != null)
-            {
-                return loc;
-            }
+            //var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
+            //if (loc != null)
+            //{
+            //    return loc;
+            //}
 
-            var items = ItemTransfer.WriteItems(includesFashion, actionId);
-            if (items != null)
-            {
-                return items;
-            }
+            //var items = ItemTransfer.WriteItems(includesFashion, actionId);
+            //if (items != null)
+            //{
+            //    return items;
+            //}
 
-            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
-            if (attr != null)
-            {
-                return attr;
-            }
+            //var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
+            //if (attr != null)
+            //{
+            //    return attr;
+            //}
 
-            var bom = GetBom(actionId);
-            if (bom != null)
+            //var bom = GetBom(actionId);
+            //if (bom != null)
+            //{
+            //    return bom;
+            //}
+            DataWriter.TruncateTables(false, false, false, false, false, false, false, true);
+            var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
+            if (price != null)
             {
-                return bom;
+                return price;
             }
             return null;
         }
 
         public AxBaseException TransactionFull(int actionId)
         {
-            DataWriter.TruncateTables(false, true, true, false, false, false, true);
+            DataWriter.TruncateTables(false, true, true, false, false, false, true, true);
             GetFullIoTrans(actionId);
             GetPoTo(actionId);
             return null;
@@ -724,7 +750,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionRefresh(DateTime date, int actionId)
         {
-            DataWriter.TruncateTables(false, false, true, false, false, false, false);
+            DataWriter.TruncateTables(false, false, true, false, false, false, false, false);
             ProductHistory ph = new ProductHistory(actionId);
             ph.WriteInventSumRefresh(date);
             ph.WriteInventTransRefresh(date);

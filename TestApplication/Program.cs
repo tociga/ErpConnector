@@ -16,19 +16,31 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            //Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.CustVendExternalItem);
+            ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
+            Type entityObject = typeof(BONSalesPriceDTO);
 
-            //if (entityObject != null)
-            //{
-            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str =  sg.CreateScript("[ax].[INVENTDIM]");
-            //    Console.WriteLine(str);
-            //}
-            AxODataConnector connector = new AxODataConnector();
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[SalesPrices]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
+            //AxODataConnector connector = new AxODataConnector();
+            //ProductMasterWriteDTO mw = new ProductMasterWriteDTO();
+
+            //mw.ProductNumber = "Dadi 6";
+            //mw.ProductDimensionGroupName = "CS";
+            //mw.ProductName = "DadiCreateTest";
+            //mw.ProductSearchName = "DadiCreateTest";
+            //mw.ProductSizeGroupId = "ONE SIZE";
+            //mw.ProductColorGroupId = "AW17 WK 17";
+            //mw.RetailProductCategoryName = "TOPS";
+            //mw.ProductDescription = "Just For testing, can delete";
+
+            //connector.CreateMaster(mw);
             //connector.PimFull(1);
 
-            List<POTOCreate> list = new List<POTOCreate>();
+            //List<POTOCreate> list = new List<POTOCreate>();
 
             //list.Add(new POTOCreate
             //{
@@ -44,25 +56,25 @@ namespace TestApplication
             //});
 
             //PO
-            list.Add(new POTOCreate
-            {
-                order_id = 1,
-                item_no = "010611",
-                size = "010",
-                color = "53",
-                unit_qty_chg = 10m,
-                location_no = "GMOOR",
-                order_from_location_no = "SUP00000030",
-                est_delivery_date = DateTime.Now.Date.AddDays(10),
-                vendor_location_type = "vendor",
-                style = "-"
-            });
+            //list.Add(new POTOCreate
+            //{
+            //    order_id = 1,
+            //    item_no = "010611",
+            //    size = "010",
+            //    color = "53",
+            //    unit_qty_chg = 10m,
+            //    location_no = "GMOOR",
+            //    order_from_location_no = "SUP00000030",
+            //    est_delivery_date = DateTime.Now.Date.AddDays(10),
+            //    vendor_location_type = "vendor",
+            //    style = "-"
+            //});
 
-            ////TO
-            ////list.Add(new POTOCreate { order_id = 23, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "W0041-LIVE", order_from_location_no = "GMOOR", est_delivery_date = new DateTime(2017, 11, 30),
-            ////    vendor_location_type = "warehose", style="-" });
+            //////TO
+            //////list.Add(new POTOCreate { order_id = 23, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "W0041-LIVE", order_from_location_no = "GMOOR", est_delivery_date = new DateTime(2017, 11, 30),
+            //////    vendor_location_type = "warehose", style="-" });
 
-            var result = connector.CreatePoTo(list, -1);
+            //var result = connector.CreatePoTo(list, -1);
 
 
             //// W0041 - LIVE
