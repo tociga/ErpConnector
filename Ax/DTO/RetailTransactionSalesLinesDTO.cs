@@ -1,0 +1,145 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ErpConnector.Ax.DTO
+{
+    public class RetailTransactionSalesLinesDTO
+    {
+        public int OriginalOfLinkedItemList { get; set; }
+        public int KeyboardItemEntry { get; set; }
+        public long RecId { get; set; }
+        public string DataAreaId { get; set; }
+        public long Partition { get; set; }
+        public DateTime ModifiedDateTime { get; set; }
+        public int RecVersion { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime CreatedDateTime { get; set; }
+        public string ModifiedBy { get; set; }
+        public long ModifiedTransactionId { get; set; }
+        public long CreatedTransactionId { get; set; }
+        public string TaxGroup { get; set; }
+        public string TaxItemGroup { get; set; }
+        public string TerminalId { get; set; }
+        public string TransactionId { get; set; }
+        public string Store { get; set; }
+        public string Barcode { get; set; }
+        public decimal BlockQty { get; set; }
+        public DateTime BusinessDate { get; set; }
+        public long Catalog { get; set; }
+        public long CategoryId { get; set; }
+        public long Channel { get; set; }
+        public string Comment { get; set; }
+        public decimal CostAmount { get; set; }
+        public int Counter { get; set; }
+        public string Currency { get; set; }
+        public string CustAccount { get; set; }
+        public decimal CustDiscAmount { get; set; }
+        public decimal CustInvoiceDiscAmount { get; set; }
+        public long DefaultDimension { get; set; }
+        public decimal DiscAmount { get; set; }
+        public decimal DiscAmountFromStdPrice { get; set; }
+        public string DiscGroupId { get; set; }
+        public string DiscOfferId { get; set; }
+        public decimal DiscountAmountForPrinting { get; set; }
+        public string DlvMode { get; set; }
+        public string ElectronicDeliveryEmail { get; set; }
+        public string ElectronicDeliveryEmailContent { get; set; }
+        public int GiftCard { get; set; }
+        public decimal InfocodeDiscAmount { get; set; }
+        public string InventBatchId { get; set; }
+        public string InventDimId { get; set; }
+        public string InventLocationId { get; set; }
+        public string InventSerialId { get; set; }
+        public string InventSiteId { get; set; }
+        public int InventStatusSales { get; set; }
+        public string InventTransId { get; set; }
+        public int ItemCorrectedLine { get; set; }
+        public string ItemId { get; set; }
+        public int ItemIdScanned { get; set; }
+        public string ItemPostingGroup { get; set; }
+        public decimal LineDscAmount { get; set; }
+        public decimal LineManualDiscountAmount { get; set; }
+        public decimal LineManualDiscountPercentage { get; set; }
+        public decimal LineNum { get; set; }
+        public int LineWasDiscounted { get; set; }
+        public int LinkedItemNotOriginal { get; set; }
+        public string ListingId { get; set; }
+        public long LogisticsPostalAddress { get; set; }
+        public decimal LoyaltyDiscAmount_RU { get; set; }
+        public decimal LoyaltyDiscPct_RU { get; set; }
+        public decimal NetAmount { get; set; }
+        public decimal NetAmountInclTax { get; set; }
+        public decimal NetPrice { get; set; }
+        public string Origin { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public string OriginalTaxGroup { get; set; }
+        public string OriginalTaxItemGroup { get; set; }
+        public decimal PeriodicDiscAmount { get; set; }
+        public string PeriodicDiscGroup { get; set; }
+        public int PeriodicDiscType { get; set; }
+        public decimal PeriodicPercentageDiscount { get; set; }
+        public string PresriptionId { get; set; }
+        public decimal Price { get; set; }
+        public int PriceChange { get; set; }
+        public int PriceInBarCode { get; set; }
+        public int PumpId { get; set; }
+        public string PurchId { get; set; }
+        public decimal Qty { get; set; }
+        public DateTime ReceiptDateRequested { get; set; }
+        public string ReceiptId { get; set; }
+        public int Replicated { get; set; }
+        public int ReplicationCounterFromOrigin { get; set; }
+        public decimal ReturnLineNum { get; set; }
+        public int ReturnNoSale { get; set; }
+        public decimal ReturnQty { get; set; }
+        public string ReturnStore { get; set; }
+        public string ReturnTerminalId { get; set; }
+        public string ReturnTransactionId { get; set; }
+        public string RFIDTagId { get; set; }
+        public int ScaleItem { get; set; }
+        public string Section { get; set; }
+        public string Shelf { get; set; }
+        public string Shift { get; set; }
+        public DateTime ShiftDate { get; set; }
+        public DateTime ShippingDateRequested { get; set; }
+        public int SkipSalesLine_RU { get; set; }
+        public string StaffId { get; set; }
+        public string StatementCode { get; set; }
+        public string StatementId { get; set; }
+        public decimal StdNetPrice { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal TotalDiscAmount { get; set; }
+        public decimal TotalDiscInfoCodeLineNum { get; set; }
+        public decimal TotalDiscPct { get; set; }
+        public decimal TotalRoundedAmount { get; set; }
+        public int TransactionCode { get; set; }
+        public int TransactionStatus { get; set; }
+        public DateTime TransDate { get; set; }
+        public int TransTime { get; set; }
+        public string Unit { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal UnitQty { get; set; }
+        public string VariantId { get; set; }
+        public int WeightItem { get; set; }
+        public int WeigthManuallyEntered { get; set; }
+        public string CustAccountAsync { get; set; }
+        public string FullFillmentStoreId { get; set; }
+        public string GiftCardNumber { get; set; }
+        public string SourceId { get; set; }
+        public string ContinuityScheduleId { get; set; }
+        public long CustInviceTransRecId { get; set; }
+        public int InstallmentEligible { get; set; }
+        public int LineType { get; set; }
+        public int UpSellOrigin { get; set; }
+        public string UpSellOriginOfferId { get; set; }
+        public string ParentInventTransId { get; set; }
+        public string WarehouseLocation { get; set; }
+        public string LicensePlate { get; set; }
+        public string InventStatus { get; set; }
+        public string SalesGroup { get; set; }
+
+    }
+}

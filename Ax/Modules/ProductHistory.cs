@@ -3,84 +3,43 @@ using System.Linq;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Utils;
 using System.Text;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
     public class ProductHistory
     {
-
-        public void WriteInventTrans()
+        private int ActionId { get; set; }
+        public ProductHistory(int actionId)
         {
-            Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");            
-            bool foundData = true;
-            while(foundData)
-            {
-                foundData =  WriteFromService<InventTransDTO>(recId, 5000, "GetInventTrans", "AGRInventTransService", "[INVENTTRANS]", DateTime.MinValue);
-                recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANS]");                
-            }
+            ActionId = actionId;
         }
 
-        public void WriteInventTransOrigin()
+        public AxBaseException WriteInventTrans()
         {
-            Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-            bool foundData = true;
-            while(foundData)
-            {
-                foundData = WriteFromService<InventTransOriginDTO>(recId, 5000, "GetInventTransOrigin", "AGRInventTransService", "[INVENTTRANSORIGIN]", DateTime.MinValue);
-                recId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSORIGIN]");
-    }
+            return ServiceConnector.CallService<InventTransDTO>(ActionId, "GetInventTrans", "AGRInventTransService", "[ax]", "[INVENTTRANS]", 5000);
         }
 
-        private bool WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, DateTime minDate, bool useDate = false)
+        public AxBaseException WriteInventTransOrigin()
         {
-            StringBuilder sb = new StringBuilder();
-            if (useDate)
-            {
-                sb.Append("{\"firstDate\" : \"" + minDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                sb.Append(", \"lastDate\" : \"" + minDate.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss") +"\"}");
-            }
-            else
-            {
-                sb.Append("{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + " }");
-            }
-            var result = ServiceConnector.CallAGRServiceArray<T>(serviceName, webMethod , sb.ToString(), null);
-
-            var reader = result.Result.value.GetDataReader();
-
-            DataWriter.WriteToTable<T>(reader, "[ax]." + destTable);
-
-            return result.Result.value.Any();
+            return ServiceConnector.CallService<InventTransOriginDTO>(ActionId, "GetInventTransOrigin", "AGRInventTransService", "[ax]", "[INVENTTRANSORIGIN]", 5000);
         }
 
-
-
-        public void WriteInventSumFull()
+        public AxBaseException WriteInventSumFull()
         {
-            Int64 recId = DataWriter.GetMaxRecId("[ax]", "[INVENTSUM]");
-            bool foundData = true;
-            while (foundData)
-            {
-                foundData = WriteFromService<InventSumDTO>(recId, 5000, "GetInventSum", "AGRItemCustomService", "[INVENTSUM]", DateTime.MinValue, false);
-                recId = DataWriter.GetMaxRecId("[ax]", "[INVENTSUM]");
-            }
+            return ServiceConnector.CallService<InventSumDTO>(ActionId, "GetInventSum", "AGRItemCustomService", "[ax]", "[INVENTSUM]", 5000);
 
         }
 
-        public void WriteInventSumRefresh(DateTime minDate)
+        public AxBaseException WriteInventSumRefresh(DateTime minDate)
         {
-            for (DateTime d = minDate.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-            {
-                WriteFromService<InventSumDTO>(0, 5000, "GetInventSumByDate", "AGRItemCustomService", "[INVENTSUM_Increment]", d, true);
-            }
+            return ServiceConnector.CallServiceByDate<InventSumDTO>(minDate, ActionId, "GetInventSumByDate", "AGRItemCustomService", "[ax]", "[INVENTSUM_Increment]");
 
         }
 
-        public void WriteInventTransRefresh(DateTime minDate)
+        public AxBaseException WriteInventTransRefresh(DateTime minDate)
         {
-            for (DateTime d = minDate.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-            {
-                WriteFromService<InventTransDTO>(0, 5000, "GetInventTransByDate", "AGRInventTransService", "[INVENTTRANS_Increment]", d, true);
-            }
+            return ServiceConnector.CallServiceByDate<InventTransDTO>(minDate, ActionId, "GetInventTransByDate", "AGRInventTransService", "[ax]", "[INVENTTRANS_Increment]");
         }
     }
 }

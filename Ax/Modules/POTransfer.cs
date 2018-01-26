@@ -4,12 +4,13 @@ using ErpConnector.Ax.Utils;
 using ErpConnector.Ax.DTO;
 using System;
 using System.Text;
+using ErpConnector.Common.Exceptions;
 
 namespace ErpConnector.Ax.Modules
 {
     public class POTransfer
     {
-        public static void GetPosAndTos( Resources context)
+        public static AxBaseException GetPosAndTos( Resources context, int actionId)
         {
             //var pol = AXServiceConnector.CallOdataEndpoint<PurchaseOrderHeader>("PurchaseOrderHeaders", null, header).Result;
             //var poh = context.PurchaseOrderHeaders.ToList();
@@ -17,107 +18,40 @@ namespace ErpConnector.Ax.Modules
             //PullPoHeaders(context, 5000);
 
             //PullPoLines(context, 5000);
-            PullPurchLines(DateTime.MinValue, false);
-            PullTOTable();
-            PullTOLines();
+            var poLines = PullPurchLines(actionId);
+            if (poLines != null)
+            {
+                return poLines;
+            }
+            var toTable = PullTOTable(actionId);
+            if (toTable != null)
+            {
+                return toTable;
+            }
+            var toLines = PullTOLines(actionId);
+            if (toLines != null)
+            {
+                return toLines;
+            }
+            return null;
         }
 
-        public static void RefershPosAndTos(Resources context, DateTime date)
+        private static AxBaseException PullPurchLines(int actionId)
         {
-            PullPoHeaders(context, 5000);
-            PullPoLines(context, 5000);
-
-            PullTOLines();
-            PullTOTable();
-
-            PullPurchLines(date, true);
+            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax]", "[PurchLine]", 10000);
         }
-
-        private static void PullPurchLines(DateTime date, bool useDate)
+        public static AxBaseException RefreshPurchLines(DateTime date, int actionId)
         {
-            long nextRecId = DataWriter.GetMaxRecId("[ax]", "[PurchLine]");
-            bool hasData = true;
-            while (hasData)
-            {
-                hasData = WriteData<PurchLinesDTO>(nextRecId, 10000, "GetPurchLine", "AGRInventTransService", "[PurchLine]", date, useDate);
-                nextRecId = DataWriter.GetMaxRecId("[ax]", "[PurchLine]");
-            }
+            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax]", "[PurchLine_Increment]");
+
         }
-        public static void RefreshPurchLines(DateTime date)
-        {            
-            for (DateTime d = date.Date; d <= DateTime.Now.Date; d = d.AddDays(1))
-            {
-                WriteData<PurchLinesDTO>(0, 10000, "GetPurchLineByDate", "AGRInventTransService", "[PurchLine_Increment]", d, true);
-            }
-        }
-        private static void PullPoLines(Resources context, int pageSize)
+        private static AxBaseException PullTOLines(int actionId)
         {
-            var pol = context.PurchaseOrderLines.Take(pageSize).ToList();
-            bool foundData = pol.Any();
-            for(int i = 1; foundData; i++)
-            {
-                DataWriter.WriteToTable<PurchaseOrderLine>(pol.GetDataReader(), "[ax].[PurchaseOrderLines]");
-                pol.Clear();
-                pol = context.PurchaseOrderLines.Skip(i * pageSize).Take(pageSize).ToList();
-                foundData = pol.Any();
-                System.GC.Collect();
-                // Allow GC to work magic
-            }
+            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERLINE]", 5000);
         }
-
-        private static void PullPoHeaders(Resources context, int pageSize)
+        private static AxBaseException PullTOTable(int actionId)
         {
-            var poh = context.PurchaseOrderHeaders.Take(pageSize).ToList();
-            bool foundData = poh.Any();
-            for (int i = 1; foundData; i++)
-            {
-                DataWriter.WriteToTable<PurchaseOrderHeader>(poh.GetDataReader(), "[ax].[PurchaseOrderHeaders]");
-                poh.Clear();
-                poh = context.PurchaseOrderHeaders.Skip(i * pageSize).Take(pageSize).ToList();
-                foundData = poh.Any();
-            }
+            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERTABLE]", 10000);
         }
-        private static void PullTOLines()
-        {
-            long nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERLINE]");
-            bool hasData = WriteData<InventTransferLineDTO>(nextRecId, 10000, "GetInventTransferLines", "AGRItemCustomService", "[INVENTTRANSFERLINE]", DateTime.MinValue, false);
-            while(hasData)
-            {
-                nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERLINE]");
-                hasData = WriteData<InventTransferLineDTO>(nextRecId, 10000, "GetInventTransferLines", "AGRItemCustomService", "[INVENTTRANSFERLINE]", DateTime.MinValue, false);
-            }
-        }
-        private static void PullTOTable()
-        {
-            long nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERTABLE]");
-            bool hasData = WriteData<InventTransferTableDTO>(nextRecId, 10000, "GetInventTransferTable", "AGRItemCustomService", "[INVENTTRANSFERTABLE]", DateTime.MinValue, false);
-            while (hasData)
-            {
-                nextRecId = DataWriter.GetMaxRecId("[ax]", "[INVENTTRANSFERTABLE]");
-                hasData = WriteData<InventTransferTableDTO>(nextRecId, 10000, "GetInventTransferTable", "AGRItemCustomService", "[INVENTTRANSFERTABLE]", DateTime.MinValue, false);
-            }
-        }
-        public static bool WriteData<T>(long recId, long pageSize, string webMethod, string service, string destTable, DateTime minDate, bool useDate = false)
-        {
-
-            StringBuilder sb = new StringBuilder();
-            if (useDate)
-            {
-                sb.Append("{\"firstDate\" : \"" + minDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                sb.Append(", \"lastDate\" : \"" + minDate.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss") + "\"}");
-            }
-            else
-            {
-                sb.Append("{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + " }");
-            }
-            var result = ServiceConnector.CallAGRServiceArray<T>(service, webMethod, sb.ToString(), null);
-
-            var reader = result.Result.value.GetDataReader();
-
-            DataWriter.WriteToTable<T>(reader, "[ax]." + destTable);
-
-            return result.Result.value.Any();
-        }
-
     }
 }

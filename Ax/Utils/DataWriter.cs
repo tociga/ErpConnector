@@ -40,25 +40,26 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public static void WriteToTable(IGenericDataReader reader, string tableName)
+        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success)
         {
-            if (reader.HasRows())
-            {
                 using (var con = new SqlConnection(ConnectionString))
                 {
-                    using (var copy = new SqlBulkCopy(con))
+                using (var cmd = new SqlCommand("erp.insert_erp_action_step", con))
                     {
-                        con.Open();
-                        copy.DestinationTableName = tableName;                        
-                        copy.BulkCopyTimeout = 3600;
-                        copy.WriteToServer(reader);
-                 
-                    }
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection.Open();
+
+                    cmd.Parameters.AddWithValue("@action_id", actionId);
+                    cmd.Parameters.AddWithValue("@step", step);
+                    cmd.Parameters.AddWithValue("@success", success);
+                    cmd.Parameters.AddWithValue("@start_time", startTime);
+
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -73,6 +74,7 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
                     cmd.Parameters.AddWithValue("@truncate_po_to", clearPOTO);
                     cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
+                    cmd.Parameters.AddWithValue("@truncate_price", clearPrice);
 
                     cmd.ExecuteNonQuery();
                 }

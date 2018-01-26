@@ -10,10 +10,15 @@ namespace ErpConnector.Ax.DTO
 
         }
 
-        public ReleasedProductMasterWriteDTO(string itemNumber, string searchName)
+        public ReleasedProductMasterWriteDTO(string itemNumber, string searchName, string primarVendorNo, decimal? salePrice, decimal? costPrice)
         {
+            PrimaryVendorAccountNumber = primarVendorNo;
+            SalesPrice = salePrice.HasValue ? salePrice.Value : 0.0m;
+            UnitCost = costPrice.HasValue ? costPrice.Value : 0.0m;
+            ItemNumber = itemNumber;
+            ProductNumber = itemNumber;
             TransferOrderOverdeliveryPercentage = 0;
-            SalesUnitSymbol = "Ea";
+            SalesUnitSymbol = "UNIT";
             ProductionConsumptionWidthConversionFactor = 0;
             IsPurchasePriceAutomaticallyUpdated = NoYes.No;
             IsPurchaseWithholdingTaxCalculated = NoYes.No;
@@ -40,7 +45,6 @@ namespace ErpConnector.Ax.DTO
             WillInventoryIssueAutomaticallyReportAsFinished = NoYes.No;
             ProductVolume = 0;
             TareProductWeight = 0;
-            ItemNumber = itemNumber;
             IsPhantom = NoYes.No;
             DefaultProductConfigurationId = "";
             FlushingPrinciple = ProdFlushingPrincipItem.Start;
@@ -60,7 +64,7 @@ namespace ErpConnector.Ax.DTO
             IsScaleProduct = NoYes.No;
             PlanningFormulaItemNumber = "";
             ProductFiscalInformationType = "";
-            StorageDimensionGroupName = "Ware";
+            StorageDimensionGroupName = "SiteWhsCha";
             ShelfAdvicePeriodDays = 0;
             ContinuityScheduleId = "";
             VendorInvoiceLineMatchingPolicy = PurchMatchingPolicyWithNotSetOption.NotSet;
@@ -83,13 +87,12 @@ namespace ErpConnector.Ax.DTO
             CostCalculationGroupId = "";
             PackingDutyQuantity = 0;
             AlternativeProductConfigurationId = "";
-            SalesPrice = 19.99m;
             DefaultProductColorId = "";
             IsSalesPriceIncludingCharges = NoYes.No;
             ProductionType = PmfProductType.None;
             WillTotalSalesDiscountCalculationIncludeProduct = NoYes.Yes;
             PotencyBaseAttributeValueEntryEvent = PDSPotencyAttribRecordingEnum.PurchProdReceipt;
-            ItemModelGroupId = "MOV_AVG";
+            ItemModelGroupId = "DEFAULT";
             PurchaseMultilineDiscountProductGroupCode = "";
             SalesChargesQuantity = 0;
             SalesPriceCalculationContributionRatio = 0;
@@ -120,14 +123,13 @@ namespace ErpConnector.Ax.DTO
             ProductTaxationOrigin = FITaxationOrigin_BR.National;
             ProductionPoolId = "";
             ValueABCCode = ABC.None;
-            PurchaseUnitSymbol = "Ea";
+            PurchaseUnitSymbol = "UNIT";
             PurchaseSupplementaryProductProductGroupId = "";
             AlternativeItemNumber = "";
             ProductCoverageGroupId = "";
             CostGroupId = "";
             IsPurchasePriceIncludingCharges = NoYes.No;
             IsShipAloneEnabled = NoYes.No;
-            ProductNumber = itemNumber;
             RawMaterialPickingPrinciple = WHSAllowMaterialOverPick.Staging;
             FixedPurchasePriceCharges = 0;
             FreightAllocationGroupId = "";
@@ -154,7 +156,6 @@ namespace ErpConnector.Ax.DTO
             PackSizeCategoryId = "";
             PackageClassId = "";
             FixedCostCharges = 0;
-            UnitCost = 11.994m;
             SerialNumberGroupCode = "";
             CarryingCostABCCode = ABC.None;
             SalesLineDiscountProductGroupCode = "";
@@ -165,7 +166,7 @@ namespace ErpConnector.Ax.DTO
             AreTransportationManagementProcessesEnabled = NoYes.Yes;
             IsExemptFromAutomaticNotificationAndCancellation = NoYes.No;
             PackingMaterialGroupId = "";
-            InventoryUnitSymbol = "Ea";
+            InventoryUnitSymbol = "UNIT";
             ComparisonPriceBaseUnitSymbol = "";
             WillWorkCenterPickingAllowNegativeInventory = NoYes.No;
             IsICMSTaxAppliedOnService = NoYes.No;
@@ -179,7 +180,7 @@ namespace ErpConnector.Ax.DTO
             SalesPriceCalculationModel = SalesPriceModel.None;
             PurchaseChargeProductGroupId = "";
             SalesOverdeliveryPercentage = 0;
-            DefaultLedgerDimensionDisplayValue = "006--";
+            DefaultLedgerDimensionDisplayValue = "";
             SalesPricingPrecision = 0;
             MarginABCCode = ABC.None;
             CatchWeightUnitSymbol = "";

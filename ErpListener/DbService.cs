@@ -32,33 +32,33 @@ namespace ErpConnector.Listener
                         {
                             case "daily_refresh":
                                 UpdateActionStatus(action.id, 1, null);
-                                var connectorTask = connector.DailyRefresh(GetDateById(action.reference_id));
+                                var connectorTask = connector.DailyRefresh(GetDateById(action.reference_id), action.id);
                                 connectorTask.ContinueWith((m) => UpdateActionStatus(action.id, 2, m));
                                 break;
                             case "full_refresh":
                                 UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.FullTransfer();
+                                connectorTask = connector.FullTransfer(action.id);
                                 connectorTask.ContinueWith((m) => UpdateActionStatus(action.id, 2, m));
                                 break;
                             case "transaction_full":
                                 UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.TransactionFull();
+                                connectorTask = connector.TransactionFull(action.id);
                                 connectorTask.ContinueWith((m) => UpdateActionStatus(action.id, 2, m));
                                 break;
                             case "transaction_refresh":
                                 UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.TransfactionRefresh(GetDateById(action.reference_id));
+                                connectorTask = connector.TransfactionRefresh(GetDateById(action.reference_id), action.id);
                                 connectorTask.ContinueWith((m) => UpdateActionStatus(action.id, 2, m));
                                 break;
                             case "pim_full":
                                 UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.PimFull();
+                                connectorTask = connector.PimFull(action.id);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 break;
                             case "create_po_to":
                                 UpdateActionStatus(action.id, 1, null);
                                 var orders = GetPoToToCreate(action.reference_id);
-                                connectorTask = connector.CreatePoTo(orders);
+                                connectorTask = connector.CreatePoTo(orders, action.id);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 UpdateOrderStatus(action.reference_id);
                                 break;
@@ -67,7 +67,7 @@ namespace ErpConnector.Listener
                                 {
                                     UpdateActionStatus(action.id, 1, null);
                                     var itemsToCreate = GetItemsToCreate(action.reference_id);
-                                    connectorTask = connector.CreateItem(itemsToCreate);
+                                    connectorTask = connector.CreateItem(itemsToCreate, action.id);
                                     connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                     var options = itemsToCreate.Select(x => x.option_id).Distinct();
                                     foreach (int option in options)
@@ -207,7 +207,7 @@ namespace ErpConnector.Listener
             else if (a != null && a.Result != null && a.Result.error != null && a.Result.error.innererror != null)
             {
                 status = 3;
-                errorMessage = "Error occured in Communication between AGR and AX.";
+                errorMessage = a.Result.error.innererror.message; 
                 errorStackTrace = a.Result.error.innererror.stacktrace;
             }
            
@@ -282,6 +282,7 @@ namespace ErpConnector.Listener
 
                     cmd.Parameters.AddWithValue("@action_type", action_type);
                     cmd.Parameters.AddWithValue("@reference_id", reference_id);
+                    cmd.Parameters.Add(new SqlParameter { ParameterName = "@action_id", Direction = ParameterDirection.Output, DbType = DbType.Int32 });
                     cmd.ExecuteNonQuery();
 
                 }
@@ -370,14 +371,17 @@ namespace ErpConnector.Listener
                                     color = ReadString(reader, 14),
                                     color_group_no = ReadString(reader, 15),
                                     color_group = ReadString(reader, 16),
-                                    size_group = ReadString(reader, 17),
-                                    size_group_no = ReadString(reader, 18),
+                                    size_group_no = ReadString(reader, 17),
+                                    size_group = ReadString(reader, 18),
                                     temp_id = ReadInt(reader, 19).Value,
                                     master_status = ReadInt(reader, 20).Value,
                                     min_order_qty = ReadDecimal(reader, 21),
                                     pack_size = ReadDecimal(reader, 22),
                                     display_stock = ReadDecimal(reader, 23),
-                                    option_id = ReadInt(reader, 24).Value
+                                    option_id = ReadInt(reader, 24).Value,
+                                    primar_vendor_no = ReadString(reader, 25),
+                                    sale_price = ReadDecimal(reader, 26),
+                                    cost_price = ReadDecimal(reader, 27)
                                 };
                                 items.Add(item);
                             }

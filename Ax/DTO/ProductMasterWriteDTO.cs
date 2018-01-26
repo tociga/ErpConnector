@@ -4,6 +4,8 @@ namespace ErpConnector.Ax.DTO
 {
     public class ProductMasterWriteDTO
     {
+ 
+
         public NoYes AreIdenticalConfigurationsAllowed{ get; set; }
         public string HarmonizedSystemCode { get; set; }
         public NoYes IsAutomaticVariantGenerationEnabled{ get; set; }
@@ -44,19 +46,19 @@ namespace ErpConnector.Ax.DTO
             IsProductVariantUnitConversionEnabled = NoYes.No;
             NMFCCode = "";
             //ProductColorGroupId = "Basic";
-            ProductDescription = "";
-            ProductDimensionGroupName = "SizeCol";
+            //ProductDescription = "";
+            //ProductDimensionGroupName = "SizeCol";
             //ProductName = dp.ProductName;
             //ProductNumber = dp.ProductNumber;
             //ProductSearchName = dp.ProductSearchName;
             //ProductSizeGroupId = "10-18";
             //ProductStyleGroupId = "";
             VariantConfigurationTechnology = EcoResVariantConfigurationTechnologyType.PredefinedVariants;
-            RetailProductCategoryName = "";
+            //RetailProductCategoryName = "";
             ProductType = EcoResProductType.Item;
             STCCCode = "";
             TrackingDimensionGroupName = "None";
-            StorageDimensionGroupName = "Ware";
+            StorageDimensionGroupName = "SiteWhsCha";
         }
 
     }
