@@ -10,6 +10,59 @@ namespace ErpConnector.Ax.Modules
 {
     public class ItemAttributeLookup
     {
+        public static AxBaseException UpdateProductAttributes(int actionId)
+        {
+            var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId, "GetValue", "AGRAttributeService", "[ax]", "[ECORESVALUE]", 10000);
+            if (ecoResValue != null)
+            {
+                return ecoResValue;
+            }
+
+            var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTE]", 10000);
+            if (ecoResAttribute != null)
+            {
+                return ecoResAttribute;
+            }
+
+            var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEVALUE]", 10000);
+            if (ecoResAttributeValue != null)
+            {
+                return ecoResAttributeValue;
+            }
+
+            var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEType]", 10000);
+            if (ecoResAttributeType != null)
+            {
+                return ecoResAttributeType;
+            }
+
+            var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId,
+                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax]", "[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
+
+            if (ecoResEnum != null)
+            {
+                return ecoResEnum;
+            }
+
+            var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
+                 "GetCategoryAttribute", "AGRAttributeService", "[ax]", "[ECORESCATEGORYATTRIBUTE]", 10000);
+
+            if (ecoResCatAttr != null)
+            {
+                return ecoResCatAttr;
+            }
+
+            var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
+                 "GetProductInstanceValue", "AGRAttributeService", "[ax]", "[ECORESPRODUCTINSTANCEVALUE]", 10000);
+
+            if (ecoResProdInstance != null)
+            {
+                return ecoResProdInstance;
+            }
+
+            return null;
+
+        }
         public static AxBaseException ReadItemAttributes(bool includesFashion, bool includeBandM, int actionId)
         {
             var colorGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", "[ax].[ProductColorGroup]", actionId).Result;
@@ -99,48 +152,11 @@ namespace ErpConnector.Ax.Modules
                     return ecoResValue;
                 }
 
-                var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId,  "GetAttribute", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTE]", 10000);
-                if (ecoResAttribute != null)
+                var attrViaService = UpdateProductAttributes(actionId);
+                if (attrViaService != null)
                 {
-                    return ecoResAttribute;
+                    return null;
                 }
-
-                var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId,  "GetAttributeValue", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEVALUE]", 10000);
-                if (ecoResAttributeValue != null)
-                {
-                    return ecoResAttributeValue;
-                }
-
-                var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEType]", 10000);
-                if (ecoResAttributeType != null)
-                {
-                    return ecoResAttributeType;
-                }
-
-                var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId, 
-                    "GetEnumerationAttributeValue", "AGRAttributeService", "[ax]", "[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
-
-                if (ecoResEnum != null)
-                {
-                    return ecoResEnum;
-                }
-
-                var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
-                     "GetCategoryAttribute", "AGRAttributeService", "[ax]", "[ECORESCATEGORYATTRIBUTE]", 10000);
-
-                if (ecoResCatAttr != null)
-                {
-                    return ecoResCatAttr;
-                }
-
-                var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
-                     "GetProductInstanceValue", "AGRAttributeService", "[ax]", "[ECORESPRODUCTINSTANCEVALUE]", 10000);
-
-                if (ecoResProdInstance != null)
-                {
-                    return ecoResProdInstance;
-                }
-
             }
 
             return null;

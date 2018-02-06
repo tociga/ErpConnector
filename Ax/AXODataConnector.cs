@@ -45,13 +45,13 @@ namespace ErpConnector.Ax
        
         public AxBaseException GetBom(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, true, false, false);
+            DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
             return BomTransfer.GetBom(actionId);
         }
 
         public void GetPoTo(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, false, true, false);
+            DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
             POTransfer.GetPosAndTos(_context, actionId);
         }
         
@@ -701,37 +701,37 @@ namespace ErpConnector.Ax
 
         public AxBaseException PimFull(int actionId)
         {
-            //DataWriter.TruncateTables(true, false, false, true, true, true, false, true);
-            //var cat = ItemCategoryTransfer.WriteCategories(actionId);
-            //if (cat != null)
-            //{
-            //    return cat;
-            //}
+            DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
+            var cat = ItemCategoryTransfer.WriteCategories(actionId);
+            if (cat != null)
+            {
+                return cat;
+            }
 
-            //var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
-            //if (loc != null)
-            //{
-            //    return loc;
-            //}
+            var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
+            if (loc != null)
+            {
+                return loc;
+            }
 
-            //var items = ItemTransfer.WriteItems(includesFashion, actionId);
-            //if (items != null)
-            //{
-            //    return items;
-            //}
+            var items = ItemTransfer.WriteItems(includesFashion, actionId);
+            if (items != null)
+            {
+                return items;
+            }
 
-            //var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
-            //if (attr != null)
-            //{
-            //    return attr;
-            //}
+            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
+            if (attr != null)
+            {
+                return attr;
+            }
 
-            //var bom = GetBom(actionId);
-            //if (bom != null)
-            //{
-            //    return bom;
-            //}
-            DataWriter.TruncateTables(false, false, false, false, false, false, false, true);
+            var bom = GetBom(actionId);
+            if (bom != null)
+            {
+                return bom;
+            }
+
             var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
             if (price != null)
             {
@@ -742,7 +742,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionFull(int actionId)
         {
-            DataWriter.TruncateTables(false, true, true, false, false, false, true, true);
+            DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
             GetFullIoTrans(actionId);
             GetPoTo(actionId);
             return null;
@@ -750,7 +750,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionRefresh(DateTime date, int actionId)
         {
-            DataWriter.TruncateTables(false, false, true, false, false, false, false, false);
+            DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
             ProductHistory ph = new ProductHistory(actionId);
             ph.WriteInventSumRefresh(date);
             ph.WriteInventTransRefresh(date);
@@ -761,6 +761,17 @@ namespace ErpConnector.Ax
             {
                 SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
                 SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
+            }
+            return null;
+        }
+
+        public AxBaseException UpdateProduct(int actionId)
+        {
+            DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
+            var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);
+            if (attributes != null)
+            {
+                return attributes;
             }
             return null;
         }

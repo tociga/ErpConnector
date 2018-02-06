@@ -88,6 +88,13 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
+
+        public Task<AxBaseException> UpdateProductAttributes(int actionId)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProduct(actionId));
+            connectorTasks.Add(task);
+            return task;
+        }
         //public string GetDBScript(string entity)
         //{
         //    return factory.GetDBScript(entity);
