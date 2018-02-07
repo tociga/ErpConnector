@@ -40,58 +40,58 @@ namespace ErpConnector.Listener
             }
         }
 
-        public Task<AxBaseException> DailyRefresh(DateTime date, int actionId)
+        public Task<ErpConnectorException> DailyRefresh(DateTime date, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.DailyRefresh(date, actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(()=>factory.DailyRefresh(date, actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        public Task<ErpConnectorException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreatePoTo(po_to_create, actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.CreatePoTo(po_to_create, actionId));
             connectorTasks.Add(task);
             return task;            
         }
 
-        public Task<AxBaseException> PimFull(int actionId)
+        public Task<ErpConnectorException> PimFull(int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.PimFull(actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(()=>factory.PimFull(actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> FullTransfer(int actionId)
+        public Task<ErpConnectorException> FullTransfer(int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.FullTransfer(actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.FullTransfer(actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> TransactionFull(int actionId)
+        public Task<ErpConnectorException> TransactionFull(int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionFull(actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.TransactionFull(actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> TransfactionRefresh(DateTime date, int actionId)
+        public Task<ErpConnectorException> TransfactionRefresh(DateTime date, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionRefresh(date, actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.TransactionRefresh(date, actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> CreateItem(List<ItemToCreate> itemsToCreate, int actionId)
+        public Task<ErpConnectorException> CreateItem(List<ItemToCreate> itemsToCreate, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemsToCreate, actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.CreateItems(itemsToCreate, actionId));
             connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> UpdateProductAttributes(int actionId)
+        public Task<ErpConnectorException> UpdateProductAttributes(int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProduct(actionId));
+            Task<ErpConnectorException> task = new Task<ErpConnectorException>(() => factory.UpdateProduct(actionId));
             connectorTasks.Add(task);
             return task;
         }

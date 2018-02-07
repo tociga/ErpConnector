@@ -16,12 +16,12 @@ namespace ErpConnector.Common
         //void GetPoTo();
         //string GetDBScript(string entity);
         //void GetBom();
-        AxBaseException DailyRefresh(DateTime date, int actionId);
-        AxBaseException PimFull(int actionId);
-        AxBaseException TransactionRefresh(DateTime date, int actionId);
-        AxBaseException TransactionFull(int actionId);
-        AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId);
-        AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
-        AxBaseException UpdateProduct(int actionId);
+        ErpConnectorException DailyRefresh(DateTime date, int actionId);
+        ErpConnectorException PimFull(int actionId);
+        ErpConnectorException TransactionRefresh(DateTime date, int actionId);
+        ErpConnectorException TransactionFull(int actionId);
+        ErpConnectorException CreatePoTo(List<POTOCreate> po_to_create, int actionId);
+        ErpConnectorException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
+        ErpConnectorException UpdateProduct(int actionId);
     }
 }

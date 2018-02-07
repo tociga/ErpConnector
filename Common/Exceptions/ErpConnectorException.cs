@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Common.Exceptions
 {
-    public class AxBaseException : ErpConnectorException
+    public class ErpConnectorException
     {
-        public AxWebExceptions error { get; set; }
-
         public Exception ApplicationException { get; set; }
     }
 }

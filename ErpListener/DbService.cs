@@ -1,4 +1,5 @@
-﻿using ErpConnector.Common.AGREntities;
+﻿using ErpConnector.Common;
+using ErpConnector.Common.AGREntities;
 using ErpConnector.Common.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -98,7 +99,7 @@ namespace ErpConnector.Listener
             return true;
         }
 
-        public DateTime GetDateById(int dateId)
+        private DateTime GetDateById(int dateId)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var con = new SqlConnection(connectionString))
@@ -123,7 +124,7 @@ namespace ErpConnector.Listener
             }        
         
         }
-        public void LogCommError(string errorMessage, int temp_id)
+        private void LogCommError(string errorMessage, int temp_id)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var con = new SqlConnection(connectionString))
@@ -143,7 +144,7 @@ namespace ErpConnector.Listener
             }
         }
 
-        public void UpdateOrderStatus(int order_id)
+        private void UpdateOrderStatus(int order_id)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))
@@ -159,15 +160,18 @@ namespace ErpConnector.Listener
                 }
             }
         }
-        public void UpdateCreatedProductStatus(int temp_id, int option_id, AxBaseException ex)
+        private void UpdateCreatedProductStatus(int temp_id, int option_id, ErpConnectorException ex)
         {
             int status = 2;
-            if (ex != null && ex.error != null && ex.error.innererror != null)
+            if (ex is AxBaseException)
             {
-                status = -1;
-                LogCommError(ex.error.innererror.stacktrace, temp_id);
+                var axEx = ex as AxBaseException;                
+                if (axEx != null && axEx.error != null && axEx.error.innererror != null)
+                {
+                    status = -1;
+                    LogCommError(axEx.error.innererror.stacktrace, temp_id);
+                }
             }
-
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))
             {
@@ -185,10 +189,12 @@ namespace ErpConnector.Listener
             }                    
         }
 
-        public void UpdateActionStatus(int id, int status, Task<AxBaseException> a)
+        private void UpdateActionStatus(int id, int status, Task<ErpConnectorException> a)
         {
             string errorMessage = null;
             string errorStackTrace = null;
+
+            var axEx = a.Result as AxBaseException;
             if ( a != null && a.IsFaulted)
             {
                 status = 3;
@@ -212,11 +218,11 @@ namespace ErpConnector.Listener
                 errorMessage = a.Result.ApplicationException.Message;
                 errorStackTrace = a.Result.ApplicationException.StackTrace;
             }
-            else if (a != null && a.Result != null && a.Result.error != null && a.Result.error.innererror != null)
+            else if (a != null && a.Result != null && axEx.error != null && axEx.error.innererror != null)
             {
                 status = 3;
-                errorMessage = a.Result.error.innererror.message; 
-                errorStackTrace = a.Result.error.innererror.stacktrace;
+                errorMessage = axEx.error.innererror.message; 
+                errorStackTrace = axEx.error.innererror.stacktrace;
             }
            
             var connectionString = ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
@@ -298,7 +304,7 @@ namespace ErpConnector.Listener
             }
 
         }
-        public static List<POTOCreate> GetPoToToCreate(int order_id)
+        private static List<POTOCreate> GetPoToToCreate(int order_id)
         {
             List<POTOCreate> orders = new List<POTOCreate>();
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
@@ -339,7 +345,7 @@ namespace ErpConnector.Listener
             }
             return orders;
         }
-        public static List<ItemToCreate> GetItemsToCreate(int? temp_id)
+        private static List<ItemToCreate> GetItemsToCreate(int? temp_id)
         {
             List<ItemToCreate> items = new List<ItemToCreate>();
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;

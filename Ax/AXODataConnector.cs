@@ -508,7 +508,7 @@ namespace ErpConnector.Ax
             axConnector.CreateRecordInAX(dataarea, a);
             return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
         }
-        public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
+        public ErpConnectorException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
             if (itemsToCreate.Any())
@@ -596,7 +596,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        public ErpConnectorException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             try
             {
@@ -677,7 +677,7 @@ namespace ErpConnector.Ax
         }
 
 
-        public AxBaseException DailyRefresh(DateTime date, int actionId)
+        public ErpConnectorException DailyRefresh(DateTime date, int actionId)
         {
             var pim = PimFull(actionId);
             if (pim != null)
@@ -688,7 +688,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException FullTransfer(int actionId)
+        public ErpConnectorException FullTransfer(int actionId)
         {
             var pim = PimFull(actionId);
             if (pim != null)
@@ -699,7 +699,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException PimFull(int actionId)
+        public ErpConnectorException PimFull(int actionId)
         {
             DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
             var cat = ItemCategoryTransfer.WriteCategories(actionId);
@@ -740,7 +740,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException TransactionFull(int actionId)
+        public ErpConnectorException TransactionFull(int actionId)
         {
             DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
             GetFullIoTrans(actionId);
@@ -748,7 +748,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException TransactionRefresh(DateTime date, int actionId)
+        public ErpConnectorException TransactionRefresh(DateTime date, int actionId)
         {
             DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
             ProductHistory ph = new ProductHistory(actionId);
@@ -765,7 +765,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException UpdateProduct(int actionId)
+        public ErpConnectorException UpdateProduct(int actionId)
         {
             DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
             var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);

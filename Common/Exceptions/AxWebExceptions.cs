@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Common.Exceptions
 {
-    public class AxWebExceptions
+    public class AxWebExceptions : ErpConnectorException
     {
         public string code { get; set; }
         public string message { get; set; }
