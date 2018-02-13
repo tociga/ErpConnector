@@ -523,7 +523,9 @@ namespace ErpConnector.Ax
                     master.ProductSearchName = masterData.product_name.Trim();
                     master.ProductSizeGroupId = masterData.size_group_no;
                     master.ProductColorGroupId = masterData.color_group_no; // possible to use color_group_no                
-                    master.RetailProductCategoryName = masterData.sup_department;
+
+                    // there is a defect in Ax|is fashion which means that we can not supply the RetailProductCategoryName
+                    //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
                     var erpMaster = CreateMaster(master);

@@ -84,6 +84,12 @@ namespace ErpConnector.Listener
                                     connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 }
                                 break;
+                            case "confirm_items":
+                                if (includeBAndM)
+                                {
+                                    var itemsToCreate = GetItemsToCreate(action.reference_id);
+                                }
+                                break;
                             default:
                                 break;
                         }
