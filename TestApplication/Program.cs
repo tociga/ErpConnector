@@ -16,28 +16,33 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            Type entityObject = typeof(BONSalesPriceDTO);
+            //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
+            //Type entityObject = typeof(BONSalesPriceDTO);
 
-            if (entityObject != null)
-            {
-                ScriptGenerator sg = new ScriptGenerator(entityObject);
-                string str = sg.CreateScript("[ax].[SalesPrices]");
-                System.Diagnostics.Trace.WriteLine(str);
-            }
-            //AxODataConnector connector = new AxODataConnector();
-            //ProductMasterWriteDTO mw = new ProductMasterWriteDTO();
+            //if (entityObject != null)
+            //{
+            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
+            //    string str = sg.CreateScript("[ax].[SalesPrices]");
+            //    System.Diagnostics.Trace.WriteLine(str);
+            //}
+            AxODataConnector connector = new AxODataConnector();
+            ProductMasterWriteDTO mw = new ProductMasterWriteDTO();
 
-            //mw.ProductNumber = "Dadi 6";
-            //mw.ProductDimensionGroupName = "CS";
-            //mw.ProductName = "DadiCreateTest";
-            //mw.ProductSearchName = "DadiCreateTest";
-            //mw.ProductSizeGroupId = "ONE SIZE";
-            //mw.ProductColorGroupId = "AW17 WK 17";
+            mw.ProductNumber = "Dadi 8";
+            mw.ProductDimensionGroupName = "CS";
+            mw.ProductName = "DadiCreateTest8";
+            mw.ProductSearchName = "DadiCreateTest8";
+            mw.ProductSizeGroupId = "ONE SIZE";
+            mw.ProductColorGroupId = "AW17 WK 17";
             //mw.RetailProductCategoryName = "TOPS";
-            //mw.ProductDescription = "Just For testing, can delete";
+            mw.ProductDescription = "Just For testing, can delete";
 
-            //connector.CreateMaster(mw);
+            connector.CreateMaster(mw);
+
+            mw.RetailProductCategoryName = "TOPS";
+
+            connector.CreateMaster(mw);
+
             //connector.PimFull(1);
 
             //List<POTOCreate> list = new List<POTOCreate>();
