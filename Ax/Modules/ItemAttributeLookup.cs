@@ -37,11 +37,11 @@ namespace ErpConnector.Ax.Modules
                     return seasonGroups;
                 }
 
-                var season = ServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "", "[ax].[SeasonTable]", actionId).Result;
-                if (season != null)
-                {
-                    return season;
-                }
+                //var season = ServiceConnector.CallOdataEndpoint<SeasonTable>("SeasonTables", "", "[ax].[SeasonTable]", actionId).Result;
+                //if (season != null)
+                //{
+                //    return season;
+                //}
                 
             }
             var colorGroupLines = ServiceConnector.CallOdataEndpoint<ProductColorGroupLine>("ProductColorGroupLines", "", "[ax].[ProductColorGroupLine]", actionId).Result;

@@ -618,6 +618,7 @@ namespace ErpConnector.Ax
                         line.Qty = po_to_create[i].unit_qty_chg;
                         line.Size = po_to_create[i].size;
                         line.Style = po_to_create[i].style;
+                        line.OrderTo = po_to_create[i].location_no;
                         orderline.Add(line);
                     }
 
