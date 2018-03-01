@@ -40,12 +40,12 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success)
+        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success, string errorMessage, string errorStackTrace)
         {
-                using (var con = new SqlConnection(ConnectionString))
-                {
+            using (var con = new SqlConnection(ConnectionString))
+            {
                 using (var cmd = new SqlCommand("erp.insert_erp_action_step", con))
-                    {
+                {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Connection.Open();
 
@@ -53,6 +53,8 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@step", step);
                     cmd.Parameters.AddWithValue("@success", success);
                     cmd.Parameters.AddWithValue("@start_time", startTime);
+                    cmd.Parameters.AddWithValue("@error_message", errorMessage);
+                    cmd.Parameters.AddWithValue("@error_stack_trace", errorStackTrace);
 
                     cmd.ExecuteNonQuery();
                 }

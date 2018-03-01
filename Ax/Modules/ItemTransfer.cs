@@ -13,57 +13,57 @@ namespace ErpConnector.Ax.Modules
         public static AxBaseException WriteItems(bool includeFashion, int actionId)
         {
             var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", "[ax].[ProductMaster]", actionId).Result;
-            if (productMaster != null)
-            {
-                return productMaster;
-            }
+            //if (productMaster != null)
+            //{
+            //    return productMaster;
+            //}
 
             var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMaster>("ReleasedProductMasters", 2000, "[ax].[ReleasedProductMaster]", actionId).Result;
-            if (releasedMasters != null)
-            {
-                return releasedMasters;
-            }
+            //if (releasedMasters != null)
+            //{
+            //    return releasedMasters;
+            //}
 
             var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", "[ax].[DistinctProduct]", actionId).Result;
-            if (distinctProducts != null)
-            {
-                return distinctProducts;
-            }
+            //if (distinctProducts != null)
+            //{
+            //    return distinctProducts;
+            //}
             var items = ServiceConnector.CallOdataEndpoint<ReleasedDistinctProduct>("ReleasedDistinctProducts", 2000, "[ax].[ReleasedDistinctProducts]", actionId).Result;
-            if (items != null)
-            {
-                return items;
-            }
+            //if (items != null)
+            //{
+            //    return items;
+            //}
 
             var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", "[ax].[INVENTDIM]", actionId).Result;
-            if (inventDim != null)
-            {
-                return inventDim;
-            }
+            //if (inventDim != null)
+            //{
+            //    return inventDim;
+            //}
 
             var invTableModule = ServiceConnector.CallOdataEndpoint<TableModule>("TableModules", "", "[ax].[INVENTTABLEMODULE]",actionId).Result;
-            if (invTableModule != null)
-            {
-                return invTableModule;
-            }
+            //if (invTableModule != null)
+            //{
+            //    return invTableModule;
+            //}
 
             var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItem>("CustVendExternalItems", "", "[ax].[CUSTVENDEXTERNALITEM]", actionId).Result;
-            if (custVendExt != null)
-            {
-                return custVendExt;
-            }
+            //if (custVendExt != null)
+            //{
+            //    return custVendExt;
+            //}
 
             var variants = ServiceConnector.CallOdataEndpoint<ReleasedProductVariant>("ReleasedProductVariants", "", "[ax].[ReleasedProductVariants]", actionId).Result;
-            if (variants != null)
-            {
-                return variants;
-            }
+            //if (variants != null)
+            //{
+            //    return variants;
+            //}
 
             var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", "[ax].[INVENTDIMCOMBINATIONS]", actionId).Result;
-            if (combos != null)
-            {
-                return combos;
-            }
+            //if (combos != null)
+            //{
+            //    return combos;
+            //}
 
             //var assortLookup = WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
             //if (assortLookup != null)
@@ -72,54 +72,54 @@ namespace ErpConnector.Ax.Modules
             //}
 
             var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", "[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000);
-            if (retailChannelLookup != null)
-            {
-                return retailChannelLookup;
-            }
+            //if (retailChannelLookup != null)
+            //{
+            //    return retailChannelLookup;
+            //}
 
             var reqItems = ServiceConnector.CallOdataEndpoint<AGRReqItemTable>("AGRReqItemTables", "", "[ax].[REQITEMTABLE]", actionId).Result;
-            if (reqItems != null)
-            {
-                return reqItems;
-            }
+            //if (reqItems != null)
+            //{
+            //    return reqItems;
+            //}
 
             
 
             var reqKey = ServiceConnector.CallOdataEndpoint<AGRReqSafetyKey>("AGRReqSafetyKeys", "", "[ax].[REQSAFETYKEY]", actionId).Result;
-            if (reqKey != null)
-            {
-                return reqKey;
-            }
+            //if (reqKey != null)
+            //{
+            //    return reqKey;
+            //}
 
             var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax]", "[REQSAFETYLINE]", 5000);
-            if (saftyLines != null)
-            {
-                return saftyLines;
-            }
+            //if (saftyLines != null)
+            //{
+            //    return saftyLines;
+            //}
 
             // item_order_routes
             var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", "[ax].[INVENTITEMPURCHSETUP]", actionId).Result;
-            if (itemPurchSetup != null)
-            {
-                return itemPurchSetup;
-            }
+            //if (itemPurchSetup != null)
+            //{
+            //    return itemPurchSetup;
+            //}
 
             var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", "[ax].[INVENTITEMINVENTSETUP]",actionId).Result;
-            if (itemInventSetup != null)
-            {
-                return itemInventSetup;
-            }
+            //if (itemInventSetup != null)
+            //{
+            //    return itemInventSetup;
+            //}
 
             var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax]", "[UNITOFMEASURE]", 5000);
-            if (unitOfMeasure != null)
-            {
-                return unitOfMeasure;
-            }
+            //if (unitOfMeasure != null)
+            //{
+            //    return unitOfMeasure;
+            //}
             var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax]", "[UNITOFMEASURECONVERSION]", 5000);
-            if (unitConv != null)
-            {
-                return unitConv;
-            }
+            //if (unitConv != null)
+            //{
+            //    return unitConv;
+            //}
 
             if (includeFashion)
             {

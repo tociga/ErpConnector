@@ -33,7 +33,7 @@ namespace ErpConnector.Ax
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalToken());
+            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalHeader());
         }
         #endregion
 
@@ -527,12 +527,12 @@ namespace ErpConnector.Ax
 
                     if (erpMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
                         return erpMaster.Exception;
                     }
                     else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != masterData.product_no.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
                         return new AxBaseException
                         {
                             ApplicationException = new ApplicationException(
@@ -540,7 +540,7 @@ namespace ErpConnector.Ax
                         };
                     }
 
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
                     startTime = DateTime.Now;
                     var releasedMaster = new ReleasedProductMasterWriteDTO(master.ProductNumber, master.ProductSearchName,
                         masterData.primar_vendor_no, masterData.sale_price, masterData.cost_price);
@@ -548,19 +548,19 @@ namespace ErpConnector.Ax
 
                     if (erpReleasedMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, erpReleasedMaster.Exception.ErrorMessage, erpReleasedMaster.Exception.StackTrace);
                         return erpReleasedMaster.Exception;
                     }
                     else if (erpReleasedMaster.WriteObject.ItemNumber.ToLower().Trim() != master.ProductNumber.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, null, null);
                         return new AxBaseException
                         {
                             ApplicationException = new ApplicationException(
                             "The item number for Released Product Master does not match the returned number, AX value = " + erpReleasedMaster.WriteObject.ItemNumber + " AGR number = " + masterData.product_no)
                         };
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true, null, null);
                 }
                 foreach (var item in itemsToCreate)
                 {
@@ -582,10 +582,10 @@ namespace ErpConnector.Ax
                     
                     if (erpVariants.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
                         return erpVariants.Exception;
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
                 }
             }
             return null;
