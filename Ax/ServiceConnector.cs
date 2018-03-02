@@ -10,6 +10,8 @@ using ErpConnector.Common.Exceptions;
 using System;
 using System.Text;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace ErpConnector.Ax
 {
@@ -21,7 +23,7 @@ namespace ErpConnector.Ax
             string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = Authenticator.GetAdalToken();
+            request.Headers["Authorization"] = Authenticator.GetAdalHeader();
             //request.Headers["Accept"] = "application/json;odata.metadata=none";
             //request.Headers["Content-Type"] = "application/json";
 
@@ -160,12 +162,19 @@ namespace ErpConnector.Ax
                         break;
                     }
                 }
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, true);
+                if (returnODataObject.Exception != null)
+                {
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+                }
                 return returnODataObject.Exception;
             }
             catch(Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false);
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
 
@@ -180,36 +189,80 @@ namespace ErpConnector.Ax
                 var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
 
-                var returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                var returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
                 DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
                     filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
                     endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
-                    returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                    returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
                     DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                     if (returnODataObject.Exception != null)
                     {
                         break;
                     }
                 }
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, true);
+                if (returnODataObject.Exception != null)
+                {
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+                }
                 return returnODataObject.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false);
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
 
+        }
+        private static async Task<GenericJsonOdata<T>> CallOdataEndpointAsync<T>(string requestUri)
+        {
+            HttpClient client = new HttpClient();
+            string token = Authenticator.GetAdalToken();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = new TimeSpan(0, 3, 0);
+            var result = new GenericJsonOdata<T>();
+            try
+            {
+                using (var response = await client.GetAsync(requestUri))
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+                    return result;
+                }
+            }
+            catch (WebException e)
+            {
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+                        return result;
+                    }
+                }
+            }
+            catch(TaskCanceledException te)
+            {
+                return new GenericJsonOdata<T>
+                {
+                    Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) }
+                };
+            }
         }
         private static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string requestUri)
         {            
             var request =(HttpWebRequest)HttpWebRequest.Create(requestUri);
             request.Accept = "application/json;odata.metadata=none";
-            string token = Authenticator.GetAdalToken();
+            string token = Authenticator.GetAdalHeader();
             request.Headers["Authorization"] = token;
             request.Method = "GET";
+            request.Timeout = 1000 * 60 * 2; // we set it to 2 minutes.
             var result = new GenericJsonOdata<T>();
             try
             {
@@ -248,7 +301,7 @@ namespace ErpConnector.Ax
             var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = Authenticator.GetAdalToken();
+            request.Headers["Authorization"] = Authenticator.GetAdalHeader();
             //request.Headers["Content-Type"] = "application/json";
             request.Method = "POST";
             request.ContentLength = postData != null ? postData.Length : 0;
@@ -375,17 +428,17 @@ namespace ErpConnector.Ax
 
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true);
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true, null, null);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false);
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false);
+                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
         }
@@ -406,17 +459,17 @@ namespace ErpConnector.Ax
                 }
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true, null, null);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, false);
+                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, "[ax].[PurchLine_Increment]", startTime, false);
+                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
 

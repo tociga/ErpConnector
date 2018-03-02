@@ -10,7 +10,15 @@ namespace ErpConnector.Ax.Utils
 {
     public class Authenticator
     {
+        public static string GetAdalHeader()
+        {
+            return Authenticate().CreateAuthorizationHeader();
+        }
         public static string GetAdalToken()
+        {
+            return Authenticate().AccessToken;
+        }
+        private static AuthenticationResult Authenticate()
         {
             var axOAuthTokenUrl = ConfigurationManager.AppSettings["ax_oauth_token_url"];
             var axRedirectUrl = ConfigurationManager.AppSettings["ax_redirect_url"];
@@ -24,7 +32,7 @@ namespace ErpConnector.Ax.Utils
 
             var authResult = authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["ax_base_url"], credentials).Result;
 
-            return authResult.CreateAuthorizationHeader();
+            return authResult;
         }
 
     }
