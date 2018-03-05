@@ -33,7 +33,7 @@ namespace ErpConnector.Ax
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalToken());
+            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalHeader());
         }
         #endregion
 
@@ -45,13 +45,13 @@ namespace ErpConnector.Ax
        
         public AxBaseException GetBom(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, true, false);
+            DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
             return BomTransfer.GetBom(actionId);
         }
 
         public void GetPoTo(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, false, true);
+            DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
             POTransfer.GetPosAndTos(_context, actionId);
         }
         
@@ -488,6 +488,22 @@ namespace ErpConnector.Ax
             //var rv = ServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
         }
 
+        public GenericWriteObject<ProductMasterWriteDTO> CreateMaster(ProductMasterWriteDTO master)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+            ArrayList a = new ArrayList();
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector axConnector = new CreateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            a.Add(master);
+            axConnector.CreateRecordInAX(dataarea, a);
+            return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
+        }
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
@@ -503,20 +519,20 @@ namespace ErpConnector.Ax
                     master.ProductSearchName = masterData.product_name.Trim();
                     master.ProductSizeGroupId = masterData.size_group_no;
                     master.ProductColorGroupId = masterData.color_group_no; // possible to use color_group_no                
-                    master.RetailProductCategoryName = masterData.sup_department;
+                    //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
-                    
-                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+                    var erpMaster = CreateMaster(master);
+                    //var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
                     
                     if (erpMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
                         return erpMaster.Exception;
                     }
                     else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != masterData.product_no.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
                         return new AxBaseException
                         {
                             ApplicationException = new ApplicationException(
@@ -524,7 +540,7 @@ namespace ErpConnector.Ax
                         };
                     }
 
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
                     startTime = DateTime.Now;
                     var releasedMaster = new ReleasedProductMasterWriteDTO(master.ProductNumber, master.ProductSearchName,
                         masterData.primar_vendor_no, masterData.sale_price, masterData.cost_price);
@@ -532,19 +548,19 @@ namespace ErpConnector.Ax
 
                     if (erpReleasedMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, erpReleasedMaster.Exception.ErrorMessage, erpReleasedMaster.Exception.StackTrace);
                         return erpReleasedMaster.Exception;
                     }
                     else if (erpReleasedMaster.WriteObject.ItemNumber.ToLower().Trim() != master.ProductNumber.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, null, null);
                         return new AxBaseException
                         {
                             ApplicationException = new ApplicationException(
                             "The item number for Released Product Master does not match the returned number, AX value = " + erpReleasedMaster.WriteObject.ItemNumber + " AGR number = " + masterData.product_no)
                         };
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true, null, null);
                 }
 
                 foreach (var item in itemsToCreate)
@@ -567,10 +583,10 @@ namespace ErpConnector.Ax
                     
                     if (erpVariants.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
                         return erpVariants.Exception;
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
                 }
             }
             return null;
@@ -602,7 +618,7 @@ namespace ErpConnector.Ax
                     order.OrderFrom = o.order_from_location_no; //"1004"; //vendor number;
                     order.OrderTo = o.location_no; //"DC"; //warehouse;
                     order.OrderType = o.vendor_location_type.ToLower() == "vendor" ? AGROrderType.PO : AGROrderType.TO;
-                    order.ReceiveDate = o.est_delivery_date;
+                    order.ReceiveDate = o.est_delivery_date < DateTime.Now.Date ? DateTime.Now.Date : o.est_delivery_date;
                     order.OrderStatus = AGROrderStatus.Created;
 
                     ArrayList orderline = new ArrayList();
@@ -682,7 +698,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException PimFull(int actionId)
         {
-            DataWriter.TruncateTables(true, false, false, true, true, true, false);
+            DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
             var cat = ItemCategoryTransfer.WriteCategories(actionId);
             if (cat != null)
             {
@@ -712,12 +728,17 @@ namespace ErpConnector.Ax
             {
                 return bom;
             }
+            var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
+            if (price != null)
+            {
+                return price;
+            }
             return null;
         }
 
         public AxBaseException TransactionFull(int actionId)
         {
-            DataWriter.TruncateTables(false, true, true, false, false, false, true);
+            DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
             GetFullIoTrans(actionId);
             GetPoTo(actionId);
             return null;
@@ -725,7 +746,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionRefresh(DateTime date, int actionId)
         {
-            DataWriter.TruncateTables(false, false, true, false, false, false, false);
+            DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
             ProductHistory ph = new ProductHistory(actionId);
             ph.WriteInventSumRefresh(date);
             ph.WriteInventTransRefresh(date);
@@ -736,6 +757,16 @@ namespace ErpConnector.Ax
             {
                 SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
                 SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
+            }
+            return null;
+        }
+        public AxBaseException UpdateProduct(int actionId)
+        {
+            DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
+            var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);
+            if (attributes != null)
+            {
+                return attributes;
             }
             return null;
         }

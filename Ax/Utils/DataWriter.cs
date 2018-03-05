@@ -40,7 +40,7 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success)
+        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success, string errorMessage, string errorStackTrace)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -53,6 +53,8 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@step", step);
                     cmd.Parameters.AddWithValue("@success", success);
                     cmd.Parameters.AddWithValue("@start_time", startTime);
+                    cmd.Parameters.AddWithValue("@error_message", errorMessage);
+                    cmd.Parameters.AddWithValue("@error_stack_trace", errorStackTrace);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -60,7 +62,8 @@ namespace ErpConnector.Ax.Utils
         }
 
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice,
+            bool clearAttributeRefresh)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -75,6 +78,8 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
                     cmd.Parameters.AddWithValue("@truncate_po_to", clearPOTO);
                     cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
+                    cmd.Parameters.AddWithValue("@truncate_price", clearPrice);
+                    cmd.Parameters.AddWithValue("@truncate_attributes_refresh", clearAttributeRefresh);
 
                     cmd.ExecuteNonQuery();
                 }

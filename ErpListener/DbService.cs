@@ -76,6 +76,20 @@ namespace ErpConnector.Listener
                                     }
                                 }
                                 break;
+                            case "update_product":
+                                if (includeBAndM)
+                                {
+                                    UpdateActionStatus(action.id, 1, null);
+                                    connectorTask = connector.UpdateProductAttributes(action.id);
+                                    connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                }
+                                break;
+                            case "confirm_items":
+                                if (includeBAndM)
+                                {
+                                    var itemsToCreate = GetItemsToCreate(action.reference_id);
+                                }
+                                break;
                             default:
                                 break;
                         }

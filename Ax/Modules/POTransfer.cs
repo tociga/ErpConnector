@@ -19,20 +19,20 @@ namespace ErpConnector.Ax.Modules
 
             //PullPoLines(context, 5000);
             var poLines = PullPurchLines(actionId);
-            if (poLines != null)
-            {
-                return poLines;
-            }
+            //if (poLines != null)
+            //{
+            //    return poLines;
+            //}
             var toTable = PullTOTable(actionId);
-            if (toTable != null)
-            {
-                return toTable;
-            }
+            //if (toTable != null)
+            //{
+            //    return toTable;
+            //}
             var toLines = PullTOLines(actionId);
-            if (toLines != null)
-            {
-                return toLines;
-            }
+            //if (toLines != null)
+            //{
+            //    return toLines;
+            //}
             return null;
         }
 
