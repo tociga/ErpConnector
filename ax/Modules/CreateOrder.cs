@@ -67,7 +67,7 @@ namespace ErpConnector.Ax.Modules
                 line.Qty = agrOrderLine.Qty;
                 line.Size = agrOrderLine.Size;
                 line.Style = agrOrderLine.Style;
-                line.OrderTo = agrOrderLine.OrderTo;
+                //line.OrderTo = agrOrderLine.OrderTo;
             }
 
             logMessageHandler(string.Format("Created distinct AGROrder '{0}' in company '{1}'.", argOrder.ARGId, targetAXLegalEntity));

@@ -6,11 +6,7 @@ namespace ErpConnector.Ax.DTO
     public class ItemInventSetupsDTO
     {
         private NoYes _stopped;
-        private NoYes _calendarDays;
-        private NoYes _mandatoryInventSite;
-        private NoYes _mandatoryInventLocation;
         private NoYes _override;
-        private SalesDeliveryDateControlType _deliverDateControlType;
         public string ItemId { get; set; }
         public string InventDimId { get; set; }
         public string dataAreaId

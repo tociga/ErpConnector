@@ -17,46 +17,48 @@ namespace TestApplication
         static void Main(string[] args)
         {
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            //Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.CustVendExternalItem);
+            //Type entityObject = typeof(ErpConnector.Ax.DTO.InventTransDTO);
 
             //if (entityObject != null)
             //{
             //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str =  sg.CreateScript("[ax].[INVENTDIM]");
+            //    string str = sg.CreateScript("[ax].[PurchTable]");
             //    Console.WriteLine(str);
             //}
-            AxODataConnector connector = new AxODataConnector();
-            //connector.PimFull(1);
 
-            List<POTOCreate> list = new List<POTOCreate>();
+            DataWriter.ValidateColumnMapping<ErpConnector.Ax.Microsoft.Dynamics.DataEntities.AGROrder>("[ax].[AGROrderTable]");
+            //AxODataConnector connector = new AxODataConnector();
+            ////connector.PimFull(1);
 
-            list.Add(new POTOCreate { order_id = 60, item_no = "0140", size = "Large", color = "Black", unit_qty_chg = 10m, location_no = "DC-WEST", order_from_location_no = "1004", est_delivery_date = new DateTime(2017, 11, 15),
-                vendor_location_type = "vendor"});
-            list.Add(new POTOCreate
-            {
-                order_id = 60,
-                item_no = "0140",
-                size = "Large",
-                color = "Black",
-                unit_qty_chg = 10m,
-                location_no = "DC-CENTRAL",
-                order_from_location_no = "1004",
-                est_delivery_date = new DateTime(2017, 11, 15),
-                vendor_location_type = "vendor"
-            });
+            //List<POTOCreate> list = new List<POTOCreate>();
 
-            list.Add(new POTOCreate
-            {
-                order_id = 60,
-                item_no = "0140",
-                size = "Large",
-                color = "Black",
-                unit_qty_chg = 10m,
-                location_no = "DC-EAST",
-                order_from_location_no = "1004",
-                est_delivery_date = new DateTime(2017, 11, 15),
-                vendor_location_type = "vendor"
-            });
+            //list.Add(new POTOCreate { order_id = 60, item_no = "0140", size = "Large", color = "Black", unit_qty_chg = 10m, location_no = "DC-WEST", order_from_location_no = "1004", est_delivery_date = new DateTime(2017, 11, 15),
+            //    vendor_location_type = "vendor"});
+            //list.Add(new POTOCreate
+            //{
+            //    order_id = 60,
+            //    item_no = "0140",
+            //    size = "Large",
+            //    color = "Black",
+            //    unit_qty_chg = 10m,
+            //    location_no = "DC-CENTRAL",
+            //    order_from_location_no = "1004",
+            //    est_delivery_date = new DateTime(2017, 11, 15),
+            //    vendor_location_type = "vendor"
+            //});
+
+            //list.Add(new POTOCreate
+            //{
+            //    order_id = 60,
+            //    item_no = "0140",
+            //    size = "Large",
+            //    color = "Black",
+            //    unit_qty_chg = 10m,
+            //    location_no = "DC-EAST",
+            //    order_from_location_no = "1004",
+            //    est_delivery_date = new DateTime(2017, 11, 15),
+            //    vendor_location_type = "vendor"
+            //});
 
             ////PO
             ////list.Add(new POTOCreate { order_id = 21, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "GMOOR", order_from_location_no = "SUP00000030", est_delivery_date = new DateTime(2017, 11, 30),
@@ -66,7 +68,7 @@ namespace TestApplication
             ////list.Add(new POTOCreate { order_id = 23, item_no = "010611", size = "010", color = "53", unit_qty_chg = 10m, location_no = "W0041-LIVE", order_from_location_no = "GMOOR", est_delivery_date = new DateTime(2017, 11, 30),
             ////    vendor_location_type = "warehose", style="-" });
 
-            var result = connector.CreatePoTo(list, -1);
+            //var result = connector.CreatePoTo(list, -1);
 
 
             //// W0041 - LIVE

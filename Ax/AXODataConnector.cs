@@ -752,6 +752,9 @@ namespace ErpConnector.Ax
             ph.WriteInventTransRefresh(date);
             ph.WriteInventTransOrigin();
             POTransfer.RefreshPurchLines(date, actionId);
+            POTransfer.PullPurchTable(actionId);
+            POTransfer.PullAGROrders(actionId);
+            POTransfer.PullAGROrderLines(actionId);
 
             if (includeB_M)
             {
