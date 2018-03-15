@@ -249,7 +249,7 @@ namespace ErpConnector.Ax
                     }
                 }
             }
-            catch(TaskCanceledException te)
+            catch(TaskCanceledException)
             {
                 return new GenericJsonOdata<T>
                 {
