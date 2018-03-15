@@ -42,7 +42,7 @@ namespace ErpConnector.Ax.Modules
             //    return dir;
             //}
             //var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
-            var vendor = ServiceConnector.CallOdataEndpoint<Vendor>("Vendors", 200, "[ax].[VENDTABLE]", actionId).Result;
+            var vendor = ServiceConnector.CallOdataEndpointWithPageSize<Vendor>("Vendors", 200, "[ax].[VENDTABLE]", actionId).Result;
             //if (vendor != null)
             //{
             //    return vendor;

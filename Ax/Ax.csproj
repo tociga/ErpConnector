@@ -113,6 +113,7 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
+    <Compile Include="AxTaskExecute.cs" />
     <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />

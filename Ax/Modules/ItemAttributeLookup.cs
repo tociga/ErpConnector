@@ -12,44 +12,47 @@ namespace ErpConnector.Ax.Modules
     {
         public static AxBaseException UpdateProductAttributes(int actionId)
         {
-            var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId, "GetValue", "AGRAttributeService", "[ax]", "[ECORESVALUE]", 10000);
+            var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId, "GetValue", "AGRAttributeService", "[ax].[ECORESVALUE]", 10000);
             if (ecoResValue != null)
             {
                 return ecoResValue;
             }
-            var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTE]", 10000);
+            var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax].[ECORESATTRIBUTE]", 10000);
             if (ecoResAttribute != null)
             {
                 return ecoResAttribute;
             }
-            var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEVALUE]", 10000);
+            var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax].[ECORESATTRIBUTEVALUE]", 10000);
             if (ecoResAttributeValue != null)
             {
                 return ecoResAttributeValue;
             }
-            var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax]", "[ECORESATTRIBUTEType]", 10000);
+            var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax].[ECORESATTRIBUTEType]", 10000);
             if (ecoResAttributeType != null)
             {
                 return ecoResAttributeType;
             }
             var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId,
-                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax]", "[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
+                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax].[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
             if (ecoResEnum != null)
             {
                 return ecoResEnum;
             }
             var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
-                 "GetCategoryAttribute", "AGRAttributeService", "[ax]", "[ECORESCATEGORYATTRIBUTE]", 10000);
+                 "GetCategoryAttribute", "AGRAttributeService", "[ax].[ECORESCATEGORYATTRIBUTE]", 10000);
             if (ecoResCatAttr != null)
             {
                 return ecoResCatAttr;
             }
             var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
-                 "GetProductInstanceValue", "AGRAttributeService", "[ax]", "[ECORESPRODUCTINSTANCEVALUE]", 10000);
+                 "GetProductInstanceValue", "AGRAttributeService", "[ax].[ECORESPRODUCTINSTANCEVALUE]", 10000);
             if (ecoResProdInstance != null)
             {
                 return ecoResProdInstance;
             }
+
+            //var prodAttributes = ServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", null, "[ax].[ProductAttributes]", actionId);
+            //var prodAttributeValues = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", null, "[ax].[ProductAttributeValues]", actionId);
             return null;
         }
         public static AxBaseException ReadItemAttributes(bool includesFashion, bool includeBandM, int actionId)
@@ -135,11 +138,11 @@ namespace ErpConnector.Ax.Modules
                     return attrValue;
                 }
 
-                var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId,  "GetValue", "AGRAttributeService", "[ax]", "[ECORESVALUE]", 10000);
-                if (ecoResValue != null)
-                {
-                    return ecoResValue;
-                }
+                //var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId,  "GetValue", "AGRAttributeService", "[ax].[ECORESVALUE]", 10000);
+                //if (ecoResValue != null)
+                //{
+                //    return ecoResValue;
+                //}
 
                 var attrViaService = UpdateProductAttributes(actionId);
 
@@ -159,90 +162,7 @@ namespace ErpConnector.Ax.Modules
 
             return null;
         }
-
-        private static IGenericDataReader ReadColorGroupLines(Resources context)
-        {
-            var colorGroupLine = context.ProductColorGroupLines.ToList();
-            List<dynamic> list = new List<dynamic>();
-            foreach(var c in colorGroupLine)
-            {
-                list.Add(
-                    new
-                    {
-                        ProductColorGroupID = c.ProductColorGroupId,
-                        ProductColorId = c.ProductColorId,
-                        ColorName = c.ColorName,
-                        ColorDescription = c.ColorDescription,
-                        DisplayOrder = c.DisplayOrder,
-                        BarcodeNumber = c.BarcodeNumber,
-                        ReplenishmentWeight = c.ReplenishmentWeight
-                    }
-                );
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadStyleGroupLines(Resources context)
-        {
-            var colorGroupLine = context.ProductStyleGroupLines.ToList();
-            List<dynamic> list = new List<dynamic>();
-            foreach (var c in colorGroupLine)
-            {
-                list.Add(
-                    new
-                    {
-                        ProductColorGroupID = c.ProductStyleGroupId,
-                        ProductColorId = c.ProductStyleId,
-                        ColorName = c.StyleName,
-                        ColorDescription = c.StyleDescription,
-                        DisplayOrder = c.DisplayOrder,
-                        BarcodeNumber = c.BarcodeNumber,
-                        ReplenishmentWeight = c.ReplenishmentWeight
-                    }
-                );
-            }
-            return list.GetDataReader<dynamic>();
-        }
-
-        private static IGenericDataReader ReadSizeGroupLines(Resources context)
-        {
-            var colorGroupLine = context.ProductSizeGroupLines.ToList();
-            List<dynamic> list = new List<dynamic>();
-            foreach (var c in colorGroupLine)
-            {
-                list.Add(
-                    new
-                    {
-                        ProductColorGroupID = c.ProductSizeGroupId,
-                        ProductColorId = c.ProductSizeId,
-                        ColorName = c.SizeName,
-                        ColorDescription = c.SizeDescription,
-                        DisplayOrder = c.DisplayOrder,
-                        BarcodeNumber = c.BarcodeNumber,
-                        ReplenishmentWeight = c.ReplenishmentWeight
-                    }
-                );
-            }
-            return list.GetDataReader<dynamic>();
-        }
-        private static IGenericDataReader ReadSeasonTable(Resources context)
-        {
-            //var seasons = context.SeasonTables.ToList();
-            List<dynamic> list = new List<dynamic>();
-            //foreach (var season in seasons)
-            //{
-            //    list.Add(
-            //        new
-            //        {
-            //            SEASONCODE = season.SeasonCode,
-            //            STARTDATE = season.StartDate.DateTime,
-            //            ENDDATE = season.EndDate.DateTime,
-            //            KRFRetailSeasonGroupId = season.KRFRetailSeasonGroupId,
-            //            Description = season.Description
-            //        });
-            //}
-            return list.GetDataReader<dynamic>();
-        }
+       
 
     }
 }

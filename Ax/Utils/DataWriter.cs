@@ -87,7 +87,7 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public static Int64 GetMaxRecId(string schema, string tableName)
+        public static Int64 GetMaxRecId(string tableName)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -95,7 +95,6 @@ namespace ErpConnector.Ax.Utils
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@schema", schema);
                     cmd.Parameters.AddWithValue("@table_name", tableName);
 
                     var reader = cmd.ExecuteReader();
