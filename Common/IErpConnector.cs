@@ -1,4 +1,5 @@
 ﻿using ErpConnector.Common.AGREntities;
+using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,6 @@ namespace ErpConnector.Common
         AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId);
         AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
         AxBaseException UpdateProduct(int actionId);
+        AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date);
     }
 }

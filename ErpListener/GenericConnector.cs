@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using ErpConnector.Common.AGREntities;
 using System.Collections.Generic;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Listener
 {
@@ -92,6 +93,12 @@ namespace ErpConnector.Listener
         public Task<AxBaseException> UpdateProductAttributes(int actionId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProduct(actionId));
+            connectorTasks.Add(task);
+            return task;
+        }
+        public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date));
             connectorTasks.Add(task);
             return task;
         }
