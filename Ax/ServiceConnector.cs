@@ -310,7 +310,7 @@ namespace ErpConnector.Ax
 
             if (request.ContentLength > 0)
             {
-                using (var requestStream = request.GetRequestStream())
+                using (var requestStream = await request.GetRequestStreamAsync())
                 {
                     using (var writer = new StreamWriter(requestStream))
                     {

@@ -151,5 +151,35 @@ namespace ErpConnector.Ax.Utils
             }
             return result;
         }
+
+        public static List<string> ValidateColumnMappingDBSide<T>(string destTable)
+        {
+            string query = "select top 1 * from " + destTable;
+            List<string> result = new List<string>();
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                con.Open();
+                using (var adapter = new SqlDataAdapter(query, con))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    Type baseType = typeof(T);
+                    var columns = (from DataColumn c in dt.Columns
+                                   select c.ColumnName).ToList();
+                    foreach (var pi in baseType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
+                        {
+                            var cols = columns.Where(x => x == pi.Name);
+                            if (!cols.Any())
+                            {
+                                result.Add(pi.Name);
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
     }
 }
