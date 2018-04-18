@@ -15,6 +15,7 @@ namespace ErpConnector.Common.AGREntities
         public int status { get; set; }
         public System.DateTime created_at { get; set; }
         public System.DateTime updated_at { get; set; }
+        public int? date_reference_id { get; set; }
 
     }
 }

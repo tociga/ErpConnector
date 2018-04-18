@@ -180,7 +180,7 @@ namespace ErpConnector.Ax
 
         }
 
-        public static async Task<AxBaseException> CallOdataEndpoint<T>(string oDataEndpoint, int maxNumber, string dbTable, int actionId)
+        public static async Task<AxBaseException> CallOdataEndpointWithPageSize<T>(string oDataEndpoint, int maxNumber, string dbTable, int actionId)
         {
             DateTime startTime = DateTime.Now;
             try
@@ -247,7 +247,7 @@ namespace ErpConnector.Ax
                     }
                 }
             }
-            catch(TaskCanceledException te)
+            catch(TaskCanceledException)
             {
                 return new GenericJsonOdata<T>
                 {
@@ -390,7 +390,7 @@ namespace ErpConnector.Ax
             }
         }
 
-        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string dbSchema, string destTable, DateTime minDate, DateTime maxDate, bool useDate = false)
+        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, DateTime minDate, DateTime maxDate, bool useDate = false)
         {
             StringBuilder sb = new StringBuilder();
             if (useDate)
@@ -406,44 +406,44 @@ namespace ErpConnector.Ax
 
             var reader = result.Result.value.GetDataReader();
 
-            DataWriter.WriteToTable<T>(reader, dbSchema+ "." + destTable);
+            DataWriter.WriteToTable<T>(reader, destTable);
 
             return result.Result;
         }
 
-        public static AxBaseException CallService<T>(int actionId, string webMethod, string serviceName, string dbSchema, string dbTable, int pageSize)
+        public static AxBaseException CallService<T>(int actionId, string webMethod, string serviceName,  string dbTable, int pageSize)
         {
             DateTime startTime = DateTime.Now;
             try
             {
-                long recId = DataWriter.GetMaxRecId(dbSchema, dbTable);
+                long recId = DataWriter.GetMaxRecId(dbTable);
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
                 bool firstRound = true;
                 while (firstRound || (result.value.Any() && result.Exception == null))
                 {
-                    result = ServiceConnector.WriteFromService<T>(recId, pageSize, webMethod, serviceName, dbSchema, dbTable, DateTime.MinValue, DateTime.MinValue, false);
-                    recId = DataWriter.GetMaxRecId(dbSchema, dbTable);
+                    result = ServiceConnector.WriteFromService<T>(recId, pageSize, webMethod, serviceName,  dbTable, DateTime.MinValue, DateTime.MinValue, false);
+                    recId = DataWriter.GetMaxRecId(dbTable);
                     firstRound = false;
                 }
 
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId,  dbTable, startTime, true, null, null);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
         }
 
-        public static AxBaseException CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName, string dbSchema, string dbTable, Func<DateTime, DateTime> nextPeriod = null )
+        public static AxBaseException CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName,  string dbTable, Func<DateTime, DateTime> nextPeriod = null )
         {
             if (nextPeriod == null)
             {
@@ -455,21 +455,21 @@ namespace ErpConnector.Ax
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
                 for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
-                    result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName, dbSchema, dbTable, d, nextPeriod(d), true);
+                    result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName,  dbTable, d, nextPeriod(d), true);
                 }
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbSchema + "." + dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
                 return new AxBaseException { ApplicationException = e };
             }
 
