@@ -17,16 +17,43 @@ namespace TestApplication
         static void Main(string[] args)
         {
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            //Type entityObject = typeof(ErpConnector.Ax.DTO.InventTransDTO);
+            Type entityObject = typeof(ErpConnector.Ax.DTO.VendorDTO);
 
-            //if (entityObject != null)
-            //{
-            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str = sg.CreateScript("[ax].[PurchTable]");
-            //    Console.WriteLine(str);
-            //}
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[VENDOR_SERVICE]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
 
-            DataWriter.ValidateColumnMapping<ErpConnector.Ax.Microsoft.Dynamics.DataEntities.AGROrder>("[ax].[AGROrderTable]");
+            entityObject = typeof(ErpConnector.Ax.DTO.SalesTableDTO);
+
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[SalesTable]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
+
+            entityObject = typeof(ErpConnector.Ax.DTO.SalesLineDTO);
+
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[SalesLine]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
+
+            entityObject = typeof(ErpConnector.Ax.DTO.ProdTableDTO);
+
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[ProdTable]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
+
+            //DataWriter.ValidateColumnMapping<ErpConnector.Ax.Microsoft.Dynamics.DataEntities.AGROrder>("[ax].[AGROrderTable]");
             //AxODataConnector connector = new AxODataConnector();
             ////connector.PimFull(1);
 

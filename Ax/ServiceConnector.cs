@@ -17,10 +17,36 @@ namespace ErpConnector.Ax
 {
     public class ServiceConnector
     {
+        public static bool IsCrossCompany
+        {
+            get
+            {
+                bool crossCompany = false;
+                Boolean.TryParse(ConfigurationManager.AppSettings["CrossCompany"], out crossCompany);
+                return crossCompany;
+            }
+        }
+
+        private static string ApplyCrossCompanyFilter(string filter)
+        {
+            if (IsCrossCompany)
+            {
+                if (string.IsNullOrEmpty(filter))
+                {
+                    return "?cross_company=true";
+                }
+                else
+                {
+                    return filter + "&?cross_company=true";
+                }
+            }
+            return filter;
+        }
+
         public static async Task<GenericWriteObject<T>> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, T postDataObject)
         {
             string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
-            string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+            string endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = Authenticator.GetAdalHeader();
@@ -150,14 +176,15 @@ namespace ErpConnector.Ax
             try
             {
                 var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-                var endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
+                var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
                 var returnODataObject = await CallOdataEndpoint<T>(endpoint);
                 DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
 
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
                 {
-                    returnODataObject = await CallOdataEndpoint<T>(returnODataObject.NextLink);
+                    endpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
+                    returnODataObject = await CallOdataEndpoint<T>(endpoint);
                     DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                     if (returnODataObject.Exception != null)
                     {
@@ -189,14 +216,14 @@ namespace ErpConnector.Ax
             {
                 var filter = "?$top=" + maxNumber;// 1000 &$top = 1000
                 var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-                var endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
+                var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
                 DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
                     filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
-                    endpoint = baseUrl + "/data/" + oDataEndpoint + filter;
+                    endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
                     returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
                     DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                     if (returnODataObject.Exception != null)
@@ -300,7 +327,7 @@ namespace ErpConnector.Ax
         {
             var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
-            var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod;
+            var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod+ApplyCrossCompanyFilter("");
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = Authenticator.GetAdalHeader();
@@ -361,7 +388,7 @@ namespace ErpConnector.Ax
         {
             var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
             var standardServiceGroup = ConfigurationManager.AppSettings["StandardServiceGroup"];
-            var endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod;
+            var endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod + ApplyCrossCompanyFilter("");
 
             var request = HttpWebRequest.Create(endpoint);
             request.Headers["Authorization"] = adalHeader;
