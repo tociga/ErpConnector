@@ -107,6 +107,20 @@ namespace ErpConnector.Ax.Utils
                 }
             }
         }
+        public static void TruncateSingleTable(string tableName)
+        {
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[ax].[truncate_single_ax_table]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@full_table_name", tableName);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
         public static List<SqlBulkCopyColumnMapping> GetDynamicBulkCopyColumnMapping<T>()
         {
