@@ -18,7 +18,7 @@ namespace ErpConnector.Ax.Modules
             //    return productMaster;
             //}
 
-            var releasedMasters = ServiceConnector.CallOdataEndpoint<ReleasedProductMaster>("ReleasedProductMasters", 2000, "[ax].[ReleasedProductMaster]", actionId).Result;
+            var releasedMasters = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedProductMaster>("ReleasedProductMasters", 2000, "[ax].[ReleasedProductMaster]", actionId).Result;
             //if (releasedMasters != null)
             //{
             //    return releasedMasters;
@@ -29,7 +29,7 @@ namespace ErpConnector.Ax.Modules
             //{
             //    return distinctProducts;
             //}
-            var items = ServiceConnector.CallOdataEndpoint<ReleasedDistinctProduct>("ReleasedDistinctProducts", 2000, "[ax].[ReleasedDistinctProducts]", actionId).Result;
+            var items = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedDistinctProduct>("ReleasedDistinctProducts", 2000, "[ax].[ReleasedDistinctProducts]", actionId).Result;
             //if (items != null)
             //{
             //    return items;
@@ -71,7 +71,7 @@ namespace ErpConnector.Ax.Modules
             //    return assortLookup;
             //}
 
-            var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", "[ax]", "[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000);
+            var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", "[ax].[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000);
             //if (retailChannelLookup != null)
             //{
             //    return retailChannelLookup;
@@ -91,7 +91,7 @@ namespace ErpConnector.Ax.Modules
             //    return reqKey;
             //}
 
-            var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax]", "[REQSAFETYLINE]", 5000);
+            var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax].[REQSAFETYLINE]", 5000);
             //if (saftyLines != null)
             //{
             //    return saftyLines;
@@ -110,12 +110,12 @@ namespace ErpConnector.Ax.Modules
             //    return itemInventSetup;
             //}
 
-            var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax]", "[UNITOFMEASURE]", 5000);
+            var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax].[UNITOFMEASURE]", 5000);
             //if (unitOfMeasure != null)
             //{
             //    return unitOfMeasure;
             //}
-            var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax]", "[UNITOFMEASURECONVERSION]", 5000);
+            var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax].[UNITOFMEASURECONVERSION]", 5000);
             //if (unitConv != null)
             //{
             //    return unitConv;

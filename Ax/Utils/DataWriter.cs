@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Reflection;
 using System.Configuration;
+using System.Linq;
 
 namespace ErpConnector.Ax.Utils
 {
@@ -61,7 +62,8 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice)
+        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice,
+            bool clearAttributeRefresh)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -77,13 +79,14 @@ namespace ErpConnector.Ax.Utils
                     cmd.Parameters.AddWithValue("@truncate_po_to", clearPOTO);
                     cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
                     cmd.Parameters.AddWithValue("@truncate_price", clearPrice);
+                    cmd.Parameters.AddWithValue("@truncate_attributes_refresh", clearAttributeRefresh);
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public static Int64 GetMaxRecId(string schema, string tableName)
+        public static Int64 GetMaxRecId(string tableName)
         {
             using (var con = new SqlConnection(ConnectionString))
             {
@@ -91,7 +94,6 @@ namespace ErpConnector.Ax.Utils
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@schema", schema);
                     cmd.Parameters.AddWithValue("@table_name", tableName);
 
                     var reader = cmd.ExecuteReader();
@@ -119,5 +121,34 @@ namespace ErpConnector.Ax.Utils
             return mappings;
         }
 
+        public static List<string> ValidateColumnMapping<T>(string destTable)
+        {
+            string query = "select top 1 * from " + destTable;
+            List<string> result = new List<string>();
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                con.Open();
+                using (var adapter = new SqlDataAdapter(query, con))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    Type baseType = typeof(T);
+                    var columns = (from DataColumn c in dt.Columns
+                            select c.ColumnName).ToList();
+                    foreach (var pi in baseType.GetProperties(BindingFlags.Public| BindingFlags.Instance))
+                    {
+                        if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
+                        {
+                            var cols = columns.Where(x => x == pi.Name);
+                            if (!cols.Any())
+                            {
+                                result.Add(pi.Name);
+                            }
+                        }
+                    }                    
+                }
+            }
+            return result;
+        }
     }
 }

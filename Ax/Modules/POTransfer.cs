@@ -19,6 +19,9 @@ namespace ErpConnector.Ax.Modules
 
             //PullPoLines(context, 5000);
             var poLines = PullPurchLines(actionId);
+            var poTable = PullPurchTable(actionId);
+            var agrOrder = PullAGROrders(actionId);
+            var agrOrderLine = PullPurchLines(actionId);
             //if (poLines != null)
             //{
             //    return poLines;
@@ -38,20 +41,32 @@ namespace ErpConnector.Ax.Modules
 
         private static AxBaseException PullPurchLines(int actionId)
         {
-            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax]", "[PurchLine]", 10000);
+            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax].[PurchLine]", 10000);
         }
         public static AxBaseException RefreshPurchLines(DateTime date, int actionId)
         {
-            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax]", "[PurchLine_Increment]");
+            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax].[PurchLine_Increment]");
 
         }
         private static AxBaseException PullTOLines(int actionId)
         {
-            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERLINE]", 5000);
+            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax].[INVENTTRANSFERLINE]", 5000);
         }
         private static AxBaseException PullTOTable(int actionId)
         {
-            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax]", "[INVENTTRANSFERTABLE]", 10000);
+            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000);
+        }
+        public static AxBaseException PullPurchTable(int actionId)
+        {
+            return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000);
+        }
+        public static AxBaseException PullAGROrders(int actionId)
+        {
+            return ServiceConnector.CallOdataEndpoint<AGROrder>("AGROrders", null, "[ax].[AGROrderTable]", actionId).Result;
+        }
+        public static AxBaseException PullAGROrderLines(int actionId)
+        {
+            return ServiceConnector.CallOdataEndpoint<AGROrderLine>("AGROrderLines", null, "[ax].[AGROrderLine]", actionId).Result;
         }
     }
 }

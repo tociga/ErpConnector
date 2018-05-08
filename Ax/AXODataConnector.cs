@@ -13,6 +13,8 @@ using System.Collections;
 using ErpConnector.Common.AGREntities;
 using System.Linq;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common.ErpTasks;
+using System.Reflection;
 
 namespace ErpConnector.Ax
 {
@@ -43,15 +45,79 @@ namespace ErpConnector.Ax
             return ScriptGeneratorModule.GenerateScript(entity);
         }
        
+        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
+        {
+            if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                Object[] parameters = new Object[4];
+                if (erpStep.MaxPageSize.HasValue)
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId };
+                }
+                else
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId };
+                }
+                generic.Invoke(null, parameters);
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize });
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                Func<DateTime, DateTime> action = null;
+                switch (erpStep.PeriodIncrement)
+                {
+                    case ErpTaskStep.PeriodIncrementType.HOURS:
+                        {
+                            action = delegate (DateTime d) { return d.AddHours(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.DAYS:
+                        {
+                            action = delegate (DateTime d) { return d.AddDays(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.MONTHS:
+                        {
+                            action = delegate (DateTime d) { return d.AddMonths(1); };
+                            break;
+                        }
+                    default:
+                        {
+                            action = null;
+                            break;
+                        }
+                }
+                Object[] parameters = new Object[6] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, action };
+                generic.Invoke(null, parameters);
+            }
+            return null;
+        }
+        public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date)
+        {
+            DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
+                erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
+            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, 4, actionId, date);
+            exec.Execute();
+            return null;
+        }        
         public AxBaseException GetBom(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, true, false, false);
+            DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
             return BomTransfer.GetBom(actionId);
         }
 
         public void GetPoTo(int actionId)
         {
-            DataWriter.TruncateTables(false, false, false, false, false, false, true, false);
+            DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
             POTransfer.GetPosAndTos(_context, actionId);
         }
         
@@ -519,7 +585,7 @@ namespace ErpConnector.Ax
                     master.ProductSearchName = masterData.product_name.Trim();
                     master.ProductSizeGroupId = masterData.size_group_no;
                     master.ProductColorGroupId = masterData.color_group_no; // possible to use color_group_no                
-                    master.RetailProductCategoryName = masterData.sup_department;
+                    //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
                     var erpMaster = CreateMaster(master);
@@ -633,6 +699,7 @@ namespace ErpConnector.Ax
                         line.Qty = po_to_create[i].unit_qty_chg;
                         line.Size = po_to_create[i].size;
                         line.Style = po_to_create[i].style;
+                        line.OrderTo = po_to_create[i].location_no;
                         orderline.Add(line);
                     }
 
@@ -696,7 +763,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException PimFull(int actionId)
         {
-            DataWriter.TruncateTables(true, false, false, true, true, true, false, true);
+            DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
             var cat = ItemCategoryTransfer.WriteCategories(actionId);
             if (cat != null)
             {
@@ -737,7 +804,7 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionFull(int actionId)
         {
-            DataWriter.TruncateTables(false, true, true, false, false, false, true, true);
+            DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
             GetFullIoTrans(actionId);
             GetPoTo(actionId);
             return null;
@@ -745,16 +812,29 @@ namespace ErpConnector.Ax
 
         public AxBaseException TransactionRefresh(DateTime date, int actionId)
         {
-            DataWriter.TruncateTables(false, false, true, false, false, false, false, false);
+            DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
             ProductHistory ph = new ProductHistory(actionId);
             ph.WriteInventSumRefresh(date);
             ph.WriteInventTransRefresh(date);
             ph.WriteInventTransOrigin();
             POTransfer.RefreshPurchLines(date, actionId);
+            POTransfer.PullPurchTable(actionId);
+            POTransfer.PullAGROrders(actionId);
+            POTransfer.PullAGROrderLines(actionId);
             if (includeB_M)
             {
                 SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
                 SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
+            }
+            return null;
+        }
+        public AxBaseException UpdateProduct(int actionId)
+        {
+            DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
+            var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);
+            if (attributes != null)
+            {
+                return attributes;
             }
             return null;
         }

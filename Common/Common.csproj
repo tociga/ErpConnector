@@ -55,6 +55,8 @@
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
+    <Compile Include="ErpTasks\ErpTask.cs" />
+    <Compile Include="ErpTasks\ErpTaskStep.cs" />
     <Compile Include="Exceptions\AxBaseException.cs" />
     <Compile Include="Exceptions\AxInnerException.cs" />
     <Compile Include="Exceptions\AxWebExceptions.cs" />
