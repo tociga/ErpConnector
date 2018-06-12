@@ -102,6 +102,12 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
+        public Task<AxBaseException> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.GetSingleTable(step, actionId, date));
+            connectorTasks.Add(task);
+            return task;
+        }
         //public string GetDBScript(string entity)
         //{
         //    return factory.GetDBScript(entity);

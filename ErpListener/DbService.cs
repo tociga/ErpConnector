@@ -98,6 +98,17 @@ namespace ErpConnector.Listener
                                 connectorTask = connector.ExecuteTask(task, action.id, GetDateById(action.date_reference_id));
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 break;
+                            case "single_table":
+                                UpdateActionStatus(action.id, 1, null);
+                                DateTime date = DateTime.MaxValue;
+                                if (action.date_reference_id.HasValue)
+                                {
+                                    date = GetDateById(action.date_reference_id);
+                                }
+                                var step = GetStep(action.reference_id);
+                                connectorTask = connector.GetSingleTable(step, action.id, date);
+                                connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                break;
                             default:
                                 break;
                         }
@@ -464,7 +475,40 @@ namespace ErpConnector.Listener
                 }
             }
         }
+        public ErpTaskStep GetStep(int stepId)
+        {
+            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
+            {
+                using (var cmd = new SqlCommand("erp.get_action_task_step", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@action_step_id", stepId);
+                    var reader = cmd.ExecuteReader();
 
+                    if (reader.Read())
+                    {
+                        return new ErpTaskStep
+                        {
+                            Id = reader.GetInt32(0),
+                            StepName = reader.GetString(1),
+                            EndPoint = ReadString(reader, 2),
+                            ServiceMethod = ReadString(reader, 3),
+                            ServiceName = ReadString(reader, 4),
+                            TaskType = (ErpTaskStep.ErpTaskType)reader.GetInt32(5),
+                            ReturnTypeStr = reader.GetString(6),
+                            IsAGRType = reader.GetBoolean(7),
+                            DbTable = reader.GetString(8),
+                            EndpointFilter = ReadString(reader, 9),
+                            MaxPageSize = ReadInt(reader, 10),
+                            PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
+                            Priority = reader.GetInt32(12)
+                        };
+                    }
+                    return null;
+                }
+            }
+        }
         public static List<ErpTaskStep> GetTaskSteps(int taskId)
         {
             using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
