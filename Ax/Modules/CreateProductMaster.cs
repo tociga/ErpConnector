@@ -95,6 +95,8 @@ namespace ErpConnector.Ax.Modules
             // use tracned entity to only update change fields
             context.TrackEntityInstance(m);
 
+            m.RetailProductCategoryName = master.RetailProductCategoryName;
+
 
             logMessageHandler(string.Format("Update AGROrder '{0}'.", master.ProductNumber));
         }

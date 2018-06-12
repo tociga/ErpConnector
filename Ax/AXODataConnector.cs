@@ -584,6 +584,13 @@ namespace ErpConnector.Ax
 
             AXODataContextConnector axConnector = new CreateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
 
+            string category = master.RetailProductCategoryName;
+            master.RetailProductCategoryName = "";
+            a.Add(master);            
+            axConnector.CreateRecordInAX(dataarea, a);
+
+            a.Clear();
+            master.RetailProductCategoryName = category;
             a.Add(master);
             axConnector.CreateRecordInAX(dataarea, a);
             return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
