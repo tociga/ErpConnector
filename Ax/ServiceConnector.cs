@@ -339,7 +339,7 @@ namespace ErpConnector.Ax
 
             if (request.ContentLength > 0)
             {
-                using (var requestStream = request.GetRequestStream())
+                using (var requestStream = await request.GetRequestStreamAsync())
                 {
                     using (var writer = new StreamWriter(requestStream))
                     {
@@ -395,7 +395,7 @@ namespace ErpConnector.Ax
             request.Method = "POST";
             request.ContentLength = postData.Length;
 
-            using (var requestStream = request.GetRequestStream())
+            using (var requestStream = await request.GetRequestStreamAsync())
             {
                 using (var writer = new StreamWriter(requestStream))
                 {
