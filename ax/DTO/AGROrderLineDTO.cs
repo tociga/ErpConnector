@@ -16,6 +16,6 @@ namespace ErpConnector.Ax.DTO
         public decimal Qty { get; set; }
         public string Size { get; set; }
         public string Style { get; set; }
-
+        public string OrderTo { get; set; }
     }
 }
