@@ -115,8 +115,21 @@ namespace ErpConnector.Ax
             //    ExecuteTask(actionId, erpStep, date); // possible to do some parallel processing.
             //}
             return null;
-        }        
+        }
 
+        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        {
+            if (date == DateTime.MaxValue)
+            {
+                DataWriter.TruncateSingleTable(step.DbTable);
+            }
+            List<ErpTaskStep> steps = new List<ErpTaskStep>();
+            steps.Add(step);
+            AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+            exec.Execute();
+            return null;
+
+        }
         public AxBaseException GetBom(int actionId)
         {
             DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);

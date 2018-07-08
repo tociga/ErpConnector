@@ -55,6 +55,7 @@ namespace ErpConnector.Ax.Modules
             order.OrderType = argOrder.OrderType; // AGROrderType.PO;
             order.ReceiveDate = argOrder.ReceiveDate; // DateTime.Now.Date.AddDays(20);
             order.OrderStatus = argOrder.OrderStatus; // AGROrderStatus.Created;
+            order.DataAreaId = targetAXLegalEntity;
 
             foreach (AGROrderLineDTO agrOrderLine in argOrder.ArgOrderLine)
             {
@@ -68,6 +69,7 @@ namespace ErpConnector.Ax.Modules
                 line.Size = agrOrderLine.Size;
                 line.Style = agrOrderLine.Style;
                 line.OrderTo = agrOrderLine.OrderTo;
+                line.DataAreaId = targetAXLegalEntity;
             }
 
             logMessageHandler(string.Format("Created distinct AGROrder '{0}' in company '{1}'.", argOrder.ARGId, targetAXLegalEntity));
