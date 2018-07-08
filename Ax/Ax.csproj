@@ -113,6 +113,7 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
+    <Compile Include="AxTaskExecute.cs" />
     <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />
@@ -130,10 +131,14 @@
     <Compile Include="DTO\OpenPurchasePriceJournalLinesDTO.cs" />
     <Compile Include="DTO\OpenSalesPriceJournalLinesDTO.cs" />
     <Compile Include="DTO\PriceDiscTableDTO.cs" />
+    <Compile Include="DTO\ProdTableDTO.cs" />
     <Compile Include="DTO\PurchLinesDTO.cs" />
+    <Compile Include="DTO\PurchTableDTO.cs" />
     <Compile Include="DTO\RetailTransactionSalesLinesDTO.cs" />
     <Compile Include="DTO\RetailTransactionTableDTO.cs" />
-    <Compile Include="DTO\SeasonTableDTO.cs" />
+    <Compile Include="DTO\SalesLineDTO.cs" />
+    <Compile Include="DTO\SalesTableDTO.cs" />
+    <Compile Include="DTO\VendorDTO.cs" />
     <Compile Include="Modules\CreateOrder.cs" />
     <Compile Include="Modules\CreateProductMaster.cs" />
     <Compile Include="Modules\PriceHistory.cs" />

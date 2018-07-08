@@ -28,11 +28,13 @@ namespace ErpConnector.Ax.Modules
         public AxBaseException WriteInventSumFull()
         {
             return ServiceConnector.CallService<InventSumDTO>(ActionId, "GetInventSum", "AGRItemCustomService", "[ax].[INVENTSUM]", 5000);
+
         }
 
         public AxBaseException WriteInventSumRefresh(DateTime minDate)
         {
             return ServiceConnector.CallServiceByDate<InventSumDTO>(minDate, ActionId, "GetInventSumByDate", "AGRItemCustomService", "[ax].[INVENTSUM_Increment]");
+
         }
 
         public AxBaseException WriteInventTransRefresh(DateTime minDate)

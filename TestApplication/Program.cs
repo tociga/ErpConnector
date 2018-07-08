@@ -17,13 +17,13 @@ namespace TestApplication
         static void Main(string[] args)
         {
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.Vendor);
+            Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.BillOfMaterialsLine);
 
             if (entityObject != null)
             {
                 ScriptGenerator sg = new ScriptGenerator(entityObject);
-                string str = sg.CreateScript("[ax].[RETAILVENDTABLE]");
-                Console.WriteLine(str);
+                string str = sg.CreateScript("[ax].[BillOfMaterialsLines]");
+                System.Diagnostics.Trace.WriteLine(str);
             }
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             //AxODataConnector connector = new AxODataConnector();
