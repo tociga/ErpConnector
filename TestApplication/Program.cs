@@ -32,15 +32,17 @@ namespace TestApplication
 
             //ErpConnector.Ax.Authentication.OAuthHelper helper = new ErpConnector.Ax.Authentication.OAuthHelper(clientconfig);
             //helper.GetAuthenticationHeaderUserPass();
-            //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            //Type entityObject = typeof(ErpConnector.Ax.DTO.VendorDTO);
+            ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxCode rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxCode();
+            Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxItemGroup);
 
-            //if (entityObject != null)
-            //{
-            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str = sg.CreateScript("[ax].[VENDOR_SERVICE]");
-            //    System.Diagnostics.Trace.WriteLine(str);
-            //}
+            var tig = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxItemGroup();
+            
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[ax].[TaxItemGroups]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
 
             //entityObject = typeof(ErpConnector.Ax.DTO.SalesTableDTO);
 
