@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace ErpConnector.Ax.Utils
+namespace ErpConnector.Common.Util
 {
     public interface IGenericDataReader : IDataReader
     {

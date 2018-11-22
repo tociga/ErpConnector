@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
+﻿using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.DTO;
-using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common;
+using ErpConnector.Common.Util;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -12,54 +11,54 @@ namespace ErpConnector.Ax.Modules
     {
         public static AxBaseException WriteItems(bool includeFashion, int actionId)
         {
-            var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", "[ax].[ProductMaster]", actionId).Result;
+            var productMaster = ServiceConnector.CallOdataEndpoint<ProductMasterReadDTO>("ProductMasters", "", "[ax].[ProductMaster]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (productMaster != null)
             //{
             //    return productMaster;
             //}
 
-            var releasedMasters = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedProductMaster>("ReleasedProductMasters", 2000, "[ax].[ReleasedProductMaster]", actionId).Result;
+            var releasedMasters = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedProductMaster>("ReleasedProductMasters", 2000, "[ax].[ReleasedProductMaster]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (releasedMasters != null)
             //{
             //    return releasedMasters;
             //}
 
-            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", "[ax].[DistinctProduct]", actionId).Result;
+            var distinctProducts = ServiceConnector.CallOdataEndpoint<DistinctProductsDTO>("DistinctProducts", "", "[ax].[DistinctProduct]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (distinctProducts != null)
             //{
             //    return distinctProducts;
             //}
-            var items = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedDistinctProduct>("ReleasedDistinctProducts", 2000, "[ax].[ReleasedDistinctProducts]", actionId).Result;
+            var items = ServiceConnector.CallOdataEndpointWithPageSize<ReleasedDistinctProduct>("ReleasedDistinctProducts", 2000, "[ax].[ReleasedDistinctProducts]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (items != null)
             //{
             //    return items;
             //}
 
-            var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", "[ax].[INVENTDIM]", actionId).Result;
+            var inventDim = ServiceConnector.CallOdataEndpoint<InventDimDTO>("InventDims", "", "[ax].[INVENTDIM]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (inventDim != null)
             //{
             //    return inventDim;
             //}
 
-            var invTableModule = ServiceConnector.CallOdataEndpoint<TableModule>("TableModules", "", "[ax].[INVENTTABLEMODULE]",actionId).Result;
+            var invTableModule = ServiceConnector.CallOdataEndpoint<TableModule>("TableModules", "", "[ax].[INVENTTABLEMODULE]",actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (invTableModule != null)
             //{
             //    return invTableModule;
             //}
 
-            var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItem>("CustVendExternalItems", "", "[ax].[CUSTVENDEXTERNALITEM]", actionId).Result;
+            var custVendExt = ServiceConnector.CallOdataEndpoint<CustVendExternalItem>("CustVendExternalItems", "", "[ax].[CUSTVENDEXTERNALITEM]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (custVendExt != null)
             //{
             //    return custVendExt;
             //}
 
-            var variants = ServiceConnector.CallOdataEndpoint<ReleasedProductVariant>("ReleasedProductVariants", "", "[ax].[ReleasedProductVariants]", actionId).Result;
+            var variants = ServiceConnector.CallOdataEndpoint<ReleasedProductVariant>("ReleasedProductVariants", "", "[ax].[ReleasedProductVariants]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (variants != null)
             //{
             //    return variants;
             //}
 
-            var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", "[ax].[INVENTDIMCOMBINATIONS]", actionId).Result;
+            var combos = ServiceConnector.CallOdataEndpoint<InventDimComboDTO>("InventDimCombinations", "", "[ax].[INVENTDIMCOMBINATIONS]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (combos != null)
             //{
             //    return combos;
@@ -71,13 +70,14 @@ namespace ErpConnector.Ax.Modules
             //    return assortLookup;
             //}
 
-            var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", "[ax].[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000);
+            var retailChannelLookup = ServiceConnector.CallService<RetailAssortmentLookupChannelGroupDTO>(actionId, "GetRetailAssortmentLookupChannelGroup", "AGRItemCustomService", 
+                "[ax].[RETAILASSORTMENTLOOKUPCHANNELGROUP]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             //if (retailChannelLookup != null)
             //{
             //    return retailChannelLookup;
             //}
 
-            var reqItems = ServiceConnector.CallOdataEndpoint<AGRReqItemTable>("AGRReqItemTables", "", "[ax].[REQITEMTABLE]", actionId).Result;
+            var reqItems = ServiceConnector.CallOdataEndpoint<AGRReqItemTable>("AGRReqItemTables", "", "[ax].[REQITEMTABLE]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (reqItems != null)
             //{
             //    return reqItems;
@@ -85,37 +85,37 @@ namespace ErpConnector.Ax.Modules
 
             
 
-            var reqKey = ServiceConnector.CallOdataEndpoint<AGRReqSafetyKey>("AGRReqSafetyKeys", "", "[ax].[REQSAFETYKEY]", actionId).Result;
+            var reqKey = ServiceConnector.CallOdataEndpoint<AGRReqSafetyKey>("AGRReqSafetyKeys", "", "[ax].[REQSAFETYKEY]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (reqKey != null)
             //{
             //    return reqKey;
             //}
 
-            var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax].[REQSAFETYLINE]", 5000);
+            var saftyLines =  ServiceConnector.CallService<ReqSafetyLineDTO>(actionId, "GetSafetyLines", "AGRItemCustomService", "[ax].[REQSAFETYLINE]", 5000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             //if (saftyLines != null)
             //{
             //    return saftyLines;
             //}
 
             // item_order_routes
-            var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", "[ax].[INVENTITEMPURCHSETUP]", actionId).Result;
+            var itemPurchSetup = ServiceConnector.CallOdataEndpoint<ItemPurchSetup>("ItemPurchSetups", "", "[ax].[INVENTITEMPURCHSETUP]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (itemPurchSetup != null)
             //{
             //    return itemPurchSetup;
             //}
 
-            var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", "[ax].[INVENTITEMINVENTSETUP]",actionId).Result;
+            var itemInventSetup = ServiceConnector.CallOdataEndpoint<ItemInventSetup>("ItemInventSetups", "", "[ax].[INVENTITEMINVENTSETUP]",actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (itemInventSetup != null)
             //{
             //    return itemInventSetup;
             //}
 
-            var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax].[UNITOFMEASURE]", 5000);
+            var unitOfMeasure = ServiceConnector.CallService<UnitOfMeasureDTO>(actionId, "GetUnitOfMeasure", "AGRItemCustomService","[ax].[UNITOFMEASURE]", 5000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             //if (unitOfMeasure != null)
             //{
             //    return unitOfMeasure;
             //}
-            var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax].[UNITOFMEASURECONVERSION]", 5000);
+            var unitConv = ServiceConnector.CallService<UnitOfMeasureConversionDTO>(actionId, "GetUnitOfMeasureConversion", "AGRItemCustomService", "[ax].[UNITOFMEASURECONVERSION]", 5000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             //if (unitConv != null)
             //{
             //    return unitConv;
@@ -138,23 +138,7 @@ namespace ErpConnector.Ax.Modules
             return null;
         }
 
-        private static IGenericDataReader ReadInventSeasonTable(Resources context)
-        {
-           // var inventSeasons = context.InventSeasonTables.ToList();
-            List<dynamic> list = new List<dynamic>();
-            //foreach (var i in inventSeasons)
-            //{
-            //    list.Add(
-            //        new
-            //        {
-            //            ItemId = i.ItemId,
-            //            SeasonCode = i.SeasonCode,
-            //            IsDefault = i.IsDefault
-            //        });
-            //}
-            return list.GetDataReader<dynamic>();
-        }
-
+        
         //private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string destTable)
         //{
         //    string postData = "{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + "}";

@@ -502,7 +502,8 @@ namespace ErpConnector.Listener
                             EndpointFilter = ReadString(reader, 9),
                             MaxPageSize = ReadInt(reader, 10),
                             PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
-                            Priority = reader.GetInt32(12)
+                            Priority = reader.GetInt32(12),
+                            AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13))
                         };
                     }
                     return null;
@@ -538,7 +539,8 @@ namespace ErpConnector.Listener
                                 EndpointFilter = ReadString(reader, 9),
                                 MaxPageSize = ReadInt(reader, 10),
                                 PeriodIncrement = (ErpTaskStep.PeriodIncrementType) (reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
-                                Priority = reader.GetInt32(12)                                
+                                Priority = reader.GetInt32(12),
+                                AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13))
                             });
                     }
                     return result;

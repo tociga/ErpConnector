@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
-using ErpConnector.Ax.Utils;
+﻿using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.DTO;
 using System;
-using System.Text;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common;
+using ErpConnector.Common.Util;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -41,35 +41,35 @@ namespace ErpConnector.Ax.Modules
 
         private static AxBaseException PullPurchLines(int actionId)
         {
-            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax].[PurchLine]", 10000);
+            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax].[PurchLine]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
         }
         public static AxBaseException RefreshPurchLines(DateTime date, int actionId)
         {
-            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax].[PurchLine_Increment]");
+            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax].[PurchLine_Increment]", Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
 
         }
         private static AxBaseException PullTOLines(int actionId)
         {
-            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax].[INVENTTRANSFERLINE]", 5000);
+            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax].[INVENTTRANSFERLINE]", 5000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
         }
         private static AxBaseException PullTOTable(int actionId)
         {
-            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000);
+            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
         }
 
         public static AxBaseException PullPurchTable(int actionId)
         {
-            return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000);
+            return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
         }
 
         public static AxBaseException PullAGROrders(int actionId)
         {
-            return ServiceConnector.CallOdataEndpoint<AGROrder>("AGROrders", null, "[ax].[AGROrderTable]", actionId).Result;
+            return ServiceConnector.CallOdataEndpoint<AGROrder>("AGROrders", null, "[ax].[AGROrderTable]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
         }
 
         public static AxBaseException PullAGROrderLines(int actionId)
         {
-            return ServiceConnector.CallOdataEndpoint<AGROrderLine>("AGROrderLines", null, "[ax].[AGROrderLine]", actionId).Result;
+            return ServiceConnector.CallOdataEndpoint<AGROrderLine>("AGROrderLines", null, "[ax].[AGROrderLine]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
         }
     }
 }

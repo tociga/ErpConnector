@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ErpConnector.Ax.DTO
+namespace ErpConnector.Common.DTO
 {
     public class GenericWriteObject<T>
     {

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestApplication\TestApplication.csproj", "{0163B839-B9C0-4686-87CD-5FF9778EAF16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira", "Jira\Jira.csproj", "{9BFFE18A-BA78-4365-9E41-AA5202760B33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{0163B839-B9C0-4686-87CD-5FF9778EAF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0163B839-B9C0-4686-87CD-5FF9778EAF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0163B839-B9C0-4686-87CD-5FF9778EAF16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

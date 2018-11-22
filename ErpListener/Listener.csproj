@@ -154,6 +154,10 @@
       <Project>{ffe8994e-25da-45be-9ef3-c548fad8563a}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jira\Jira.csproj">
+      <Project>{9bffe18a-ba78-4365-9e41-aa5202760b33}</Project>
+      <Name>Jira</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

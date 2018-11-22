@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Configuration;
 using System.Linq;
 
-namespace ErpConnector.Ax.Utils
+namespace ErpConnector.Common.Util
 {
     public static class DataWriter
     {
@@ -68,7 +68,7 @@ namespace ErpConnector.Ax.Utils
         {
             using (var con = new SqlConnection(ConnectionString))
             {
-                using (var cmd = new SqlCommand("[ax].[truncate_ax_tables]", con))
+                using (var cmd = new SqlCommand("[erp].[truncate_ax_tables]", con))
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -91,7 +91,7 @@ namespace ErpConnector.Ax.Utils
         {
             using (var con = new SqlConnection(ConnectionString))
             {
-                using (var cmd = new SqlCommand("[ax].[find_max_rec_id]", con))
+                using (var cmd = new SqlCommand("[erp].[find_max_rec_id]", con))
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -111,7 +111,7 @@ namespace ErpConnector.Ax.Utils
         {
             using (var con = new SqlConnection(ConnectionString))
             {
-                using (var cmd = new SqlCommand("[ax].[truncate_single_ax_table]", con))
+                using (var cmd = new SqlCommand("[erp].[truncate_single_ax_table]", con))
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;

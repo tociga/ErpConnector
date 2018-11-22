@@ -1,10 +1,8 @@
 ﻿using ErpConnector.Ax.DTO;
 using ErpConnector.Common.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ErpConnector.Common;
+using ErpConnector.Common.Util;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -14,19 +12,19 @@ namespace ErpConnector.Ax.Modules
         {
             if (includeBAndM)
             {
-                var openSalesPriceJournalLines = ServiceConnector.CallOdataEndpoint<OpenSalesPriceJournalLinesDTO>("OpenSalesPriceJournalLines", "", "[ax].[OpenSalesPriceJournalLines]", actionId).Result;
+                var openSalesPriceJournalLines = ServiceConnector.CallOdataEndpoint<OpenSalesPriceJournalLinesDTO>("OpenSalesPriceJournalLines", "", "[ax].[OpenSalesPriceJournalLines]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 //if (openSalesPriceJournalLines != null)
                 //{
                 //    return openSalesPriceJournalLines;
                 //}
 
-                var openPurchasePriceJournalLines = ServiceConnector.CallOdataEndpoint<OpenPurchasePriceJournalLinesDTO>("OpenPurchasePriceJournalLines", "", "[ax].[OpenPurchasePriceJournalLines]", actionId).Result;
+                var openPurchasePriceJournalLines = ServiceConnector.CallOdataEndpoint<OpenPurchasePriceJournalLinesDTO>("OpenPurchasePriceJournalLines", "", "[ax].[OpenPurchasePriceJournalLines]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 //if (openPurchasePriceJournalLines != null)
                 //{
                 //    return openPurchasePriceJournalLines;
                 //}
 
-                var bonSalesPrice = ServiceConnector.CallOdataEndpoint<BONSalesPriceDTO>("BONSalesPrices", "", "[ax].[SalesPrices]", actionId).Result;
+                var bonSalesPrice = ServiceConnector.CallOdataEndpoint<BONSalesPriceDTO>("BONSalesPrices", "", "[ax].[SalesPrices]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 //if (bonSalesPrice != null)
                 //{
                 //    return bonSalesPrice;

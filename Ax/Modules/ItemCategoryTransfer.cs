@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using ErpConnector.Ax.DTO;
+﻿using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
-using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common;
+using ErpConnector.Common.Util;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -12,24 +11,24 @@ namespace ErpConnector.Ax.Modules
     {
         public static AxBaseException WriteCategories(int actionId)
         {
-            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]", actionId).Result;
+            var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (roles != null)
             //{
             //    return roles;
             //}
-            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]", actionId).Result;
+            var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (hierarchy != null)
             //{
             //    return hierarchy;
             //}
 
-            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]", actionId).Result;
+            var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (category != null)
             //{
             //    return category;
             //}
 
-            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]", actionId).Result;
+            var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             //if (prodCat != null)
             //{
             //    return prodCat;

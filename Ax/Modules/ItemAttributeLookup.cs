@@ -1,10 +1,9 @@
 ﻿using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
-using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ErpConnector.Common;
+using ErpConnector.Common.Util;
+using ErpConnector.Common.ErpTasks;
 
 namespace ErpConnector.Ax.Modules
 {
@@ -12,40 +11,40 @@ namespace ErpConnector.Ax.Modules
     {
         public static AxBaseException UpdateProductAttributes(int actionId)
         {
-            var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId, "GetValue", "AGRAttributeService", "[ax].[ECORESVALUE]", 10000);
+            var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId, "GetValue", "AGRAttributeService", "[ax].[ECORESVALUE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResValue != null)
             {
                 return ecoResValue;
             }
-            var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax].[ECORESATTRIBUTE]", 10000);
+            var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax].[ECORESATTRIBUTE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResAttribute != null)
             {
                 return ecoResAttribute;
             }
-            var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax].[ECORESATTRIBUTEVALUE]", 10000);
+            var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax].[ECORESATTRIBUTEVALUE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResAttributeValue != null)
             {
                 return ecoResAttributeValue;
             }
-            var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax].[ECORESATTRIBUTEType]", 10000);
+            var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax].[ECORESATTRIBUTEType]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResAttributeType != null)
             {
                 return ecoResAttributeType;
             }
             var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId,
-                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax].[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
+                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax].[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResEnum != null)
             {
                 return ecoResEnum;
             }
             var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
-                 "GetCategoryAttribute", "AGRAttributeService", "[ax].[ECORESCATEGORYATTRIBUTE]", 10000);
+                 "GetCategoryAttribute", "AGRAttributeService", "[ax].[ECORESCATEGORYATTRIBUTE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResCatAttr != null)
             {
                 return ecoResCatAttr;
             }
             var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
-                 "GetProductInstanceValue", "AGRAttributeService", "[ax].[ECORESPRODUCTINSTANCEVALUE]", 10000);
+                 "GetProductInstanceValue", "AGRAttributeService", "[ax].[ECORESPRODUCTINSTANCEVALUE]", 10000, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365));
             if (ecoResProdInstance != null)
             {
                 return ecoResProdInstance;
@@ -57,18 +56,18 @@ namespace ErpConnector.Ax.Modules
         }
         public static AxBaseException ReadItemAttributes(bool includesFashion, bool includeBandM, int actionId)
         {
-            var colorGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", "[ax].[ProductColorGroup]", actionId).Result;
+            var colorGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductColorGroups", "", "[ax].[ProductColorGroup]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (colorGroups!= null)
             {
                 return colorGroups;
             }
-            var sizeGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", "[ax].[ProductSizeGroup]", actionId).Result;
+            var sizeGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductSizeGroups", "", "[ax].[ProductSizeGroup]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (sizeGroups != null)
             {
                 return sizeGroups;
             }
 
-            var styleGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", "[ax].[ProductStyleGroup]", actionId).Result;
+            var styleGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("ProductStyleGroups", "", "[ax].[ProductStyleGroup]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (styleGroups != null)
             {
                 return styleGroups;
@@ -76,7 +75,7 @@ namespace ErpConnector.Ax.Modules
 
             if (includesFashion)
             {
-                var seasonGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", "[ax].[SeasonGroup]", actionId).Result;
+                var seasonGroups = ServiceConnector.CallOdataEndpoint<VariantGroupDTO>("RetailSeasonGroups", "", "[ax].[SeasonGroup]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 if (seasonGroups != null)
                 {
                     return seasonGroups;
@@ -89,50 +88,50 @@ namespace ErpConnector.Ax.Modules
                 //}
                 
             }
-            var colorGroupLines = ServiceConnector.CallOdataEndpoint<ProductColorGroupLine>("ProductColorGroupLines", "", "[ax].[ProductColorGroupLine]", actionId).Result;
+            var colorGroupLines = ServiceConnector.CallOdataEndpoint<ProductColorGroupLine>("ProductColorGroupLines", "", "[ax].[ProductColorGroupLine]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (colorGroupLines != null)
             {
                 return colorGroupLines;
             }
 
-            var sizeGroupLines = ServiceConnector.CallOdataEndpoint<ProductSizeGroupLine>("ProductSizeGroupLines", "", "[ax].[ProductSizeGroupLine]", actionId).Result;
+            var sizeGroupLines = ServiceConnector.CallOdataEndpoint<ProductSizeGroupLine>("ProductSizeGroupLines", "", "[ax].[ProductSizeGroupLine]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (sizeGroupLines != null)
             {
                 return sizeGroupLines;
             }
 
-            var styleGroupLines = ServiceConnector.CallOdataEndpoint<ProductStyleGroupLine>("ProductStyleGroupLines", "", "[ax].[ProductStyleGroupLine]", actionId).Result;
+            var styleGroupLines = ServiceConnector.CallOdataEndpoint<ProductStyleGroupLine>("ProductStyleGroupLines", "", "[ax].[ProductStyleGroupLine]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (styleGroupLines != null)
             {
                 return styleGroupLines;
             }
 
-            var color = ServiceConnector.CallOdataEndpoint<ProductColor>("ProductColors", "", "[ax].[ProductColor]", actionId).Result;
+            var color = ServiceConnector.CallOdataEndpoint<ProductColor>("ProductColors", "", "[ax].[ProductColor]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (color != null)
             {
                 return color;
             }
 
-            var size = ServiceConnector.CallOdataEndpoint<ProductSize>("ProductSizes", "", "[ax].[ProductSize]", actionId).Result;
+            var size = ServiceConnector.CallOdataEndpoint<ProductSize>("ProductSizes", "", "[ax].[ProductSize]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (size != null)
             {
                 return size;
             }
 
-            var style = ServiceConnector.CallOdataEndpoint<ProductStyle>("ProductStyles", "", "[ax].[ProductStyle]", actionId).Result;
+            var style = ServiceConnector.CallOdataEndpoint<ProductStyle>("ProductStyles", "", "[ax].[ProductStyle]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
             if (style != null)
             {
                 return style;
             }
             if (includeBandM)
             {
-                var prodAttribute = ServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", "", "[ax].[ProductAttributes]", actionId).Result;
+                var prodAttribute = ServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", "", "[ax].[ProductAttributes]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 if (prodAttribute != null)
                 {
                     return prodAttribute;
                 }
 
-                var attrValue = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", "", "[ax].[ProductAttributeValues]", actionId).Result;
+                var attrValue = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", "", "[ax].[ProductAttributeValues]", actionId, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                 if (attrValue != null)
                 {
                     return attrValue;

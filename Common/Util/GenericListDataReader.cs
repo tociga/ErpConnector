@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Linq;
 
 
-namespace ErpConnector.Ax.Utils
+namespace ErpConnector.Common.Util
 {
     public static class GenericListDataReaderExtensions
     {

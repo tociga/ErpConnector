@@ -23,7 +23,7 @@ namespace TestApplication
             //{
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             //}
-            //string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            //string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
             //                                           ConfigurationManager.AppSettings["ax_client_secret"],
             //                                           axBaseUrl,

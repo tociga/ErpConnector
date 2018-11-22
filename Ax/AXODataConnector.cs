@@ -15,6 +15,9 @@ using System.Linq;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
 using System.Reflection;
+using ErpConnector.Common.Utils;
+using ErpConnector.Common.DTO;
+using ErpConnector.Common.Util;
 
 namespace ErpConnector.Ax
 {
@@ -26,7 +29,7 @@ namespace ErpConnector.Ax
         private bool includeB_M;
         public AxODataConnector()
         {
-            var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"]; 
+            var axBaseUrl = ConfigurationManager.AppSettings["base_url"]; 
 			Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
             Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeB_M);
             _context = new Resources(new Uri(axBaseUrl + "/data"));
@@ -35,7 +38,7 @@ namespace ErpConnector.Ax
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalHeader());
+            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365).AuthHeader);
         }
         #endregion
 
@@ -105,9 +108,9 @@ namespace ErpConnector.Ax
         }
         public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date)
         {
-            DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
-                erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, 4, actionId, date);
+            //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
+            //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
+            TaskExecute exec = new TaskExecute(erpTasks.Steps, 4, actionId, date);
             exec.Execute();
 
             //foreach (var erpStep in erpTasks.Steps)
@@ -125,7 +128,7 @@ namespace ErpConnector.Ax
             }
             List<ErpTaskStep> steps = new List<ErpTaskStep>();
             steps.Add(step);
-            AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+            TaskExecute exec = new TaskExecute(steps, 1, actionId, date);
             exec.Execute();
             return null;
 
@@ -577,7 +580,7 @@ namespace ErpConnector.Ax
 
         public GenericWriteObject<ProductMasterWriteDTO> CreateMaster(ProductMasterWriteDTO master)
         {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
                                                        ConfigurationManager.AppSettings["ax_client_secret"],
                                                        axBaseUrl,
@@ -631,7 +634,7 @@ namespace ErpConnector.Ax
                     startTime = DateTime.Now;
                     var releasedMaster = new ReleasedProductMasterWriteDTO(master.ProductNumber, master.ProductSearchName,
                         masterData.primar_vendor_no, masterData.sale_price, masterData.cost_price);
-                    var erpReleasedMaster = ServiceConnector.CallOdataEndpointPost<ReleasedProductMasterWriteDTO>("ReleasedProductMasters", null, releasedMaster).Result;
+                    var erpReleasedMaster = ServiceConnector.CallOdataEndpointPost<ReleasedProductMasterWriteDTO, EnumConverter>("ReleasedProductMasters", null, releasedMaster, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
 
                     if (erpReleasedMaster.Exception != null)
                     {
@@ -666,7 +669,7 @@ namespace ErpConnector.Ax
                         ProductMasterNumber = item.product_no                       
                     };
                     startTime = DateTime.Now;
-                    var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
+                    var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO, EnumConverter>("ReleasedProductVariants", null, variant, Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365)).Result;
                     
                     if (erpVariants.Exception != null)
                     {
@@ -683,7 +686,7 @@ namespace ErpConnector.Ax
         {
             try
             {
-                string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
                 var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
                                                            ConfigurationManager.AppSettings["ax_client_secret"],
                                                            axBaseUrl,

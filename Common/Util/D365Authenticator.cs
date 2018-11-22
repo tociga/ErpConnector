@@ -1,23 +1,13 @@
-﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
+﻿using ErpConnector.Common.DTO;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ErpConnector.Ax.Utils
+
+namespace ErpConnector.Common.Util
 {
-    public class Authenticator
+    public class D365Authenticator
     {
-        public static string GetAdalHeader()
-        {
-            return Authenticate().CreateAuthorizationHeader();
-        }
-        public static string GetAdalToken()
-        {
-            return Authenticate().AccessToken;
-        }
         private static AuthenticationResult Authenticate()
         {
             var axOAuthTokenUrl = ConfigurationManager.AppSettings["ax_oauth_token_url"];
@@ -30,10 +20,23 @@ namespace ErpConnector.Ax.Utils
             var authenticationContext = new AuthenticationContext(uri.ToString());
             var credentials = new ClientCredential(axClientKey, axClientSecret);
 
-            var authResult = authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["ax_base_url"], credentials).Result;
+            var authResult = authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["base_url"], credentials).Result;
 
             return authResult;
         }
+
+        public static ServiceData GetD365ServiceData()
+        {
+            var result = Authenticate();
+            return new ServiceData
+            {
+                AuthHeader = result.CreateAuthorizationHeader(),
+                AuthToken = result.AccessToken,
+                BaseUrl = ConfigurationManager.AppSettings["base_url"],
+                OdataUrlPostFix = "/data/"
+            };
+        }
+
 
     }
 }
