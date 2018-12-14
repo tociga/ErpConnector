@@ -146,10 +146,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ax\Ax.csproj">
-      <Project>{473F244B-5273-4747-94FE-291FBF30D218}</Project>
-      <Name>Ax</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{ffe8994e-25da-45be-9ef3-c548fad8563a}</Project>
       <Name>Common</Name>

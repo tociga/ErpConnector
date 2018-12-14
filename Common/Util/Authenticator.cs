@@ -18,11 +18,15 @@ namespace ErpConnector.Common.Util
             }
             else if (authType == ErpTaskStep.AuthenticationType.JIRA)
             {
-                return JiraAuthenticator.GetJiraServiceData();
+                return (new JiraAuthenticator()).GetJiraServiceData();
             }
             else if (authType == ErpTaskStep.AuthenticationType.JIRASERVICEDESK)
             {
                 return JiraAuthenticator.GetJiraServiceDeskData();
+            }
+            else if (authType == ErpTaskStep.AuthenticationType.JIRAISSUE)
+            {
+                return (new JiraIssueAuthenticator()).GetJiraServiceData();
             }
             else
             {

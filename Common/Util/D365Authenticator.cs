@@ -33,7 +33,9 @@ namespace ErpConnector.Common.Util
                 AuthHeader = result.CreateAuthorizationHeader(),
                 AuthToken = result.AccessToken,
                 BaseUrl = ConfigurationManager.AppSettings["base_url"],
-                OdataUrlPostFix = "/data/"
+                OdataUrlPostFix = "/data/",
+                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.D365
+               
             };
         }
 

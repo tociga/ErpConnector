@@ -170,6 +170,35 @@ namespace ErpConnector.Common
         //}
 
         //public static async Task<AxBaseException> CallOdataEndpointTask<T>
+        //public static async Task<AxBaseException> CallOdataEndpointArray<T>(string oDataEndpoint, string filters, string dbTable, int actionId, ServiceData authData)
+        //{
+        //    DateTime startTime = DateTime.Now;
+        //    try
+        //    {
+        //        var baseUrl = authData.BaseUrl;
+        //        var endpoint = baseUrl + authData.OdataUrlPostFix + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
+
+        //        var returnODataObject = await CallOdataEndpoint<T, Y>(endpoint, authData);
+        //        DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable);
+
+        //        if (returnODataObject.Exception != null)
+        //        {
+        //            DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+        //        }
+        //        else
+        //        {
+        //            DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+        //        }
+        //        return returnODataObject.Exception;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
+        //        return new AxBaseException { ApplicationException = e };
+        //    }
+
+        //}
+
         public static async Task<AxBaseException> CallOdataEndpoint<T, Y>(string oDataEndpoint, string filters, string dbTable, int actionId, ServiceData authData) where T : GenericJsonOdata<Y>
         {
             DateTime startTime = DateTime.Now;
@@ -300,8 +329,15 @@ namespace ErpConnector.Common
                         using (var streamReader = new StreamReader(responseStream))
                         {
                             var responseString = streamReader.ReadToEnd();
-                            //string sanitized = SanitizeJsonString(responseString);
-                            result = JsonConvert.DeserializeObject<T>(responseString);
+                            if (authData.AuthType == ErpTasks.ErpTaskStep.AuthenticationType.JIRA)
+                            {
+                                var resultArray = JsonConvert.DeserializeObject<List<Y>>(responseString);
+                                result.value = resultArray;
+                            }
+                            else
+                            {
+                                result = JsonConvert.DeserializeObject<T>(responseString);
+                            }
                             return result;
                         }
                     }
@@ -320,6 +356,7 @@ namespace ErpConnector.Common
                 }
             }
         }
+
 
         private static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup, ServiceData authData)
         {

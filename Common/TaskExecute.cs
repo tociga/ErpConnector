@@ -1,5 +1,6 @@
 ﻿using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common.ExternalTask;
 using ErpConnector.Common.Util;
 using System;
 using System.Collections.Concurrent;
@@ -17,23 +18,33 @@ namespace ErpConnector.Common
         private List<BlockingCollection<Task>> Queues = new List<BlockingCollection<Task>>();
         public TaskExecute(List<ErpTaskStep> steps, int numberOfQueues, int actionId, DateTime date)
         {
-            Steps = new BlockingCollection<Task>();
-            ErpTaskStep.ErpTaskStepComparer c = new ErpTaskStep.ErpTaskStepComparer();
-            steps.Sort(c);
-            for (int i = 0; i < numberOfQueues; i++)
+            if (numberOfQueues > 1)
             {
-                Queues.Add(new BlockingCollection<Task>());
-            }
+                Steps = new BlockingCollection<Task>();
+                ErpTaskStep.ErpTaskStepComparer c = new ErpTaskStep.ErpTaskStepComparer();
+                steps.Sort(c);
+                for (int i = 0; i < numberOfQueues; i++)
+                {
+                    Queues.Add(new BlockingCollection<Task>());
+                }
 
-            foreach (var step in steps)
+                foreach (var step in steps)
+                {
+                    //foreach(var queue in Queues)
+                    //{
+                    Steps.Add(new Task(() => ExecuteTask(actionId, step, date)));
+                    //}
+                }
+                Steps.CompleteAdding();
+            }
+            else
             {
-                //foreach(var queue in Queues)
-                //{
-                Steps.Add(new Task(()=>ExecuteTask(actionId, step, date)));
-                //}
+                // No parallel runs.
+                foreach(var step in steps)
+                {
+                    ExecuteTask(actionId, step, date);
+                }
             }
-            Steps.CompleteAdding();
-
         }
 
         public void Execute()
@@ -93,69 +104,95 @@ namespace ErpConnector.Common
 
         private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
-            DataWriter.TruncateSingleTable(erpStep.DbTable);
-            if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
+            if (!string.IsNullOrEmpty(erpStep.ExternalProcess))
             {
-                if (erpStep.MaxPageSize.HasValue)
+                DateTime start = DateTime.Now;
+                var baseEx= ExternalTaskExec.ExecTask(erpStep);
+                DataWriter.LogErpActionStep(actionId, erpStep.StepName, start, baseEx == null, baseEx == null ? null : baseEx.ApplicationException.InnerException.Message,
+                    baseEx == null ? null : baseEx.ApplicationException.InnerException.StackTrace);
+                return baseEx;
+            }
+            else
+            {
+                DataWriter.TruncateSingleTable(erpStep.DbTable);
+                if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
                 {
-                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointWithPageSize"); 
+                    if (erpStep.MaxPageSize.HasValue)
+                    {
+                        MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointWithPageSize");
+                        MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+
+                        Object[] parameters = new Object[5];
+                        parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        generic.Invoke(null, parameters);
+                    }
+                    else
+                    {
+
+                        Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
+                        MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
+                        MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
+
+                        Object[] parameters = new Object[5];
+                        parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        generic.Invoke(null, parameters);
+                    }
+                }
+                else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
+                {
+                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
                     MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                    generic.Invoke(null, new Object[6] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize, Authenticator.GetAuthData(erpStep.AuthenitcationType) });
+                }
+                else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
+                {
+                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
+                    MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                    Func<DateTime, DateTime> action = null;
+                    switch (erpStep.PeriodIncrement)
+                    {
+                        case ErpTaskStep.PeriodIncrementType.HOURS:
+                            {
+                                action = delegate (DateTime d) { return d.AddHours(1); };
+                                break;
+                            }
+                        case ErpTaskStep.PeriodIncrementType.DAYS:
+                            {
+                                action = delegate (DateTime d) { return d.AddDays(1); };
+                                break;
+                            }
+                        case ErpTaskStep.PeriodIncrementType.MONTHS:
+                            {
+                                action = delegate (DateTime d) { return d.AddMonths(1); };
+                                break;
+                            }
+                        default:
+                            {
+                                action = null;
+                                break;
+                            }
 
-                    Object[] parameters = new Object[5];
-                    parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                    }
+                    Object[] parameters = new Object[7] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, Authenticator.GetAuthData(erpStep.AuthenitcationType), action };
                     generic.Invoke(null, parameters);
                 }
-                else
+                else if ( erpStep.TaskType == ErpTaskStep.ErpTaskType.ITERATIVE_ENDPOINT)
                 {
+                    var list = DataWriter.GetIdsFromEntities(erpStep.BaseTypeProcedure);
+                    foreach (var id in list)
+                    {
+                        string endpoint = erpStep.EndPoint.Replace("{id}", id);
+                        Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
+                        MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
+                        MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
 
-                    Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
-                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint"); 
-                    MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
-
-                    Object[] parameters = new Object[5];
-                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
-                    generic.Invoke(null, parameters);
+                        Object[] parameters = new Object[5];
+                        parameters = new object[] { endpoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        generic.Invoke(null, parameters);
+                    }
                 }
+                return null;
             }
-            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
-            {
-                MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
-                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                generic.Invoke(null, new Object[6] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize, Authenticator.GetAuthData(erpStep.AuthenitcationType) });
-            }
-            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
-            {
-                MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
-                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                Func<DateTime, DateTime> action = null;
-                switch (erpStep.PeriodIncrement)
-                {
-                    case ErpTaskStep.PeriodIncrementType.HOURS:
-                        {
-                            action = delegate (DateTime d) { return d.AddHours(1); };
-                            break;
-                        }
-                    case ErpTaskStep.PeriodIncrementType.DAYS:
-                        {
-                            action = delegate (DateTime d) { return d.AddDays(1); };
-                            break;
-                        }
-                    case ErpTaskStep.PeriodIncrementType.MONTHS:
-                        {
-                            action = delegate (DateTime d) { return d.AddMonths(1); };
-                            break;
-                        }
-                    default:
-                        {
-                            action = null;
-                            break;
-                        }
-
-                }
-                Object[] parameters = new Object[7] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, Authenticator.GetAuthData(erpStep.AuthenitcationType), action };
-                generic.Invoke(null, parameters);
-            }
-            return null;
         }
 
     }

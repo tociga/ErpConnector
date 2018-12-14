@@ -197,5 +197,25 @@ namespace ErpConnector.Common.Util
             }
             return result;
         }
+
+        public static List<string> GetIdsFromEntities(string procedure)
+        {
+            List<string> result = new List<string>();
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                using (var cmd = new SqlCommand(procedure, con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var reader = cmd.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        result.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

@@ -503,7 +503,10 @@ namespace ErpConnector.Listener
                             MaxPageSize = ReadInt(reader, 10),
                             PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
                             Priority = reader.GetInt32(12),
-                            AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13))
+                            AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13)),
+                            ExternalProcess = ReadString(reader, 14),
+                            ExternalProcessArgument = ReadString(reader, 15),
+                            BaseTypeProcedure = ReadString(reader, 16)
                         };
                     }
                     return null;
@@ -540,7 +543,10 @@ namespace ErpConnector.Listener
                                 MaxPageSize = ReadInt(reader, 10),
                                 PeriodIncrement = (ErpTaskStep.PeriodIncrementType) (reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
                                 Priority = reader.GetInt32(12),
-                                AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13))
+                                AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13)),
+                                ExternalProcess = ReadString(reader, 14),
+                                ExternalProcessArgument = ReadString(reader, 15),
+                                BaseTypeProcedure = ReadString(reader, 16)
                             });
                     }
                     return result;

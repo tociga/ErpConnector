@@ -71,6 +71,8 @@
     <Compile Include="DTO\GenericJiraObjectList.cs" />
     <Compile Include="DTO\JiraObjectMetaData.cs" />
     <Compile Include="DTO\ServiceData.cs" />
+    <Compile Include="ErpGenericConnector.cs" />
+    <Compile Include="ExternalTask\ExternalTaskExec.cs" />
     <Compile Include="TaskExecute.cs" />
     <Compile Include="DTO\GenericJsonOdata.cs" />
     <Compile Include="DTO\GenericWriteObject.cs" />

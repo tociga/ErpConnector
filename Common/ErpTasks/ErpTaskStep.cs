@@ -9,9 +9,9 @@ namespace ErpConnector.Common.ErpTasks
 {
     public class ErpTaskStep
     {
-        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE };
+        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT };
         public enum PeriodIncrementType { NONE = 0, HOURS, DAYS, MONTHS};
-        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK};
+        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE};
         public int Id { get; set; }
         public string StepName { get; set; }
         public string EndPoint { get; set; }
@@ -51,9 +51,17 @@ namespace ErpConnector.Common.ErpTasks
                 {
                     return typeof(GenericJsonOdata<>);
                 }
-                else
+                else if (AuthenitcationType == AuthenticationType.TEMPO)
                 {
                     return typeof(GenericJiraObjectList<>);
+                }
+                else if (AuthenitcationType == AuthenticationType.JIRAISSUE)
+                {
+                    return typeof(GenericJiraIssueObject<>);
+                }
+                else
+                {
+                    return typeof(GenericJsonOdata<>);
                 }
             }
         }
@@ -65,7 +73,9 @@ namespace ErpConnector.Common.ErpTasks
         public string ReturnTypeStr { get; set; }
         public bool IsAGRType { get; set; }
         public AuthenticationType AuthenitcationType { get; set; }
-
+        public string ExternalProcess { get; set; }
+        public string ExternalProcessArgument { get; set; }
+        public string BaseTypeProcedure { get; set; }
         public class ErpTaskStepComparer : IComparer<ErpTaskStep>
         {
             public int Compare(ErpTaskStep a, ErpTaskStep b)

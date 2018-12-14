@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTO\JiraComponentDTO.cs" />
     <Compile Include="DTO\JiraIssueDTO.cs" />
     <Compile Include="DTO\JiraProjectDTO.cs" />
     <Compile Include="DTO\TempoWorklogDTO.cs" />

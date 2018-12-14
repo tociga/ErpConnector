@@ -21,7 +21,7 @@ namespace ErpConnector.Common.Util
 
         private static string GetJiraToken()
         {
-            return "l6IESyKUDLojiadw4bChrmEDxudGMt";
+            return "ZGFkaUBhZ3JpbnZlbnRvcnkuY29tOjhoZDQxMTdhcGs4MGplR1RIY09uMjdGQQ";
         }
 
         private static string GetTempoToken()
@@ -29,14 +29,15 @@ namespace ErpConnector.Common.Util
             return "l6IESyKUDLojiadw4bChrmEDxudGMt";
         }
 
-        public static ServiceData GetJiraServiceData()
+        public virtual ServiceData GetJiraServiceData()
         {
             return new ServiceData
             {
                 AuthHeader = GetJiraHeader(),
                 AuthToken = GetJiraToken(),
                 BaseUrl = "https://agrinventory.atlassian.net/",
-                OdataUrlPostFix = "/rest/api/2/"
+                OdataUrlPostFix = "/rest/api/2/",
+                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.JIRA
             };
         }
 
@@ -47,7 +48,8 @@ namespace ErpConnector.Common.Util
                 AuthHeader = GetTempoHeader(),
                 AuthToken = GetTempoToken(),
                 BaseUrl = "https://api.tempo.io",
-                OdataUrlPostFix = "/2/"
+                OdataUrlPostFix = "/2/",
+                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.TEMPO
             };
         }
 
@@ -58,7 +60,8 @@ namespace ErpConnector.Common.Util
                 AuthHeader = GetJiraHeader(),
                 AuthToken = GetJiraToken(),
                 BaseUrl = "https://agrinventory.atlassian.net/",
-                OdataUrlPostFix = "/rest/servicedeskapi/"
+                OdataUrlPostFix = "/rest/servicedeskapi/",
+                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.JIRASERVICEDESK
             };
 
         }

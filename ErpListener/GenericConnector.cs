@@ -1,5 +1,4 @@
-﻿using ErpConnector.Ax;
-using ErpConnector.Common;
+﻿using ErpConnector.Common;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
@@ -21,7 +20,7 @@ namespace ErpConnector.Listener
             switch (erpType)
             {
                 case ErpType.ax:
-                    factory = new AxODataConnector();
+                    factory = new ErpGenericConnector();
                     break;
                 case ErpType.sap:
                     break;
