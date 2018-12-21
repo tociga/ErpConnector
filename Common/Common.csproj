@@ -68,6 +68,7 @@
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
+    <Compile Include="DTO\GenericJiraIssueObject.cs" />
     <Compile Include="DTO\GenericJiraObjectList.cs" />
     <Compile Include="DTO\JiraObjectMetaData.cs" />
     <Compile Include="DTO\ServiceData.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Util\GenericListDataReader.cs" />
     <Compile Include="Util\IGenericDataReader.cs" />
     <Compile Include="Util\JiraAuthenticator.cs" />
+    <Compile Include="Util\JiraIssueAuthenticator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

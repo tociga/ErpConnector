@@ -43,6 +43,7 @@ namespace ErpConnector.Common
                 foreach(var step in steps)
                 {
                     ExecuteTask(actionId, step, date);
+                    System.Threading.Thread.Sleep(2000);
                 }
             }
         }
@@ -181,7 +182,7 @@ namespace ErpConnector.Common
                     var list = DataWriter.GetIdsFromEntities(erpStep.BaseTypeProcedure);
                     foreach (var id in list)
                     {
-                        string endpoint = erpStep.EndPoint.Replace("{id}", id);
+                        string endpoint = erpStep.EndPoint.Replace("{key}", id);
                         Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
                         MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
                         MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);

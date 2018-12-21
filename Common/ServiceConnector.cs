@@ -209,11 +209,18 @@ namespace ErpConnector.Common
 
                 var returnODataObject = await CallOdataEndpoint<T, Y>(endpoint, authData);
                 DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable);
-
+                string nextLinkEndpoint = null;
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
                 {
-                    endpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
-                    returnODataObject = await CallOdataEndpoint<T, Y>(endpoint, authData);
+                    if (returnODataObject.appendNextLink)
+                    {
+                        nextLinkEndpoint = endpoint + returnODataObject.NextLink;
+                    }
+                    else
+                    {
+                        nextLinkEndpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
+                    }
+                    returnODataObject = await CallOdataEndpoint<T, Y>(nextLinkEndpoint, authData);
                     DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable);
                     if (returnODataObject.Exception != null)
                     {
