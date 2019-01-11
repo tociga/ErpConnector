@@ -18,9 +18,9 @@ namespace ErpConnector.Common
         private List<BlockingCollection<Task>> Queues = new List<BlockingCollection<Task>>();
         public TaskExecute(List<ErpTaskStep> steps, int numberOfQueues, int actionId, DateTime date)
         {
+            Steps = new BlockingCollection<Task>();
             if (numberOfQueues > 1)
-            {
-                Steps = new BlockingCollection<Task>();
+            {                
                 ErpTaskStep.ErpTaskStepComparer c = new ErpTaskStep.ErpTaskStepComparer();
                 steps.Sort(c);
                 for (int i = 0; i < numberOfQueues; i++)
@@ -45,6 +45,7 @@ namespace ErpConnector.Common
                     ExecuteTask(actionId, step, date);
                     System.Threading.Thread.Sleep(2000);
                 }
+                Steps.CompleteAdding();
             }
         }
 
@@ -61,16 +62,20 @@ namespace ErpConnector.Common
 
         private void Wait()
         {
-            while(!Steps.IsCompleted)
+            
+            while (!Steps.IsCompleted)
             {
                 System.Threading.Thread.Sleep(1000);
             }
 
-            int activeQueueCount = Queues.Select(x => Convert.ToInt32(!x.IsCompleted)).Sum();
-            while (activeQueueCount > 0)
+            if (Queues.Any())
             {
-                activeQueueCount = Queues.Select(x => Convert.ToInt32(!x.IsCompleted)).Sum();
-                System.Threading.Thread.Sleep(200);
+                int activeQueueCount = Queues.Select(x => Convert.ToInt32(!x.IsCompleted)).Sum();
+                while (activeQueueCount > 0)
+                {
+                    activeQueueCount = Queues.Select(x => Convert.ToInt32(!x.IsCompleted)).Sum();
+                    System.Threading.Thread.Sleep(200);
+                }
             }
         }
 
@@ -188,7 +193,10 @@ namespace ErpConnector.Common
                         MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
 
                         Object[] parameters = new Object[5];
-                        parameters = new object[] { endpoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        var authData = Authenticator.GetAuthData(erpStep.AuthenitcationType);
+                        authData.InjectionPropertyName = erpStep.InjectionPropertyName;
+                        authData.InjectionPropertyValue = id;
+                        parameters = new object[] { endpoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, authData };
                         generic.Invoke(null, parameters);
                     }
                 }

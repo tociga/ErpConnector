@@ -5,6 +5,7 @@ using System.Data;
 using System.Reflection;
 using System.Configuration;
 using System.Linq;
+using ErpConnector.Common.AGREntities;
 
 namespace ErpConnector.Common.Util
 {
@@ -18,10 +19,18 @@ namespace ErpConnector.Common.Util
             }
         }
 
-        public static void WriteToTable<T>(IGenericDataReader reader, string tableName)
+        public static void WriteToTable<T>(IGenericDataReader<T> reader, string tableName, object value, string propertyName)
         {
             if (reader.HasRows())
             {
+                if (value != null && propertyName != null)
+                {
+                    foreach (var listItem in reader.GetGenericList())
+                    {
+                        PropertyInfo propInfo = listItem.GetType().GetProperty(propertyName);
+                        propInfo.SetValue(listItem, Convert.ChangeType(value, propInfo.PropertyType));
+                    }
+                }
                 using (var con = new SqlConnection(ConnectionString))
                 {
                     using (var copy = new SqlBulkCopy(con))
@@ -212,6 +221,26 @@ namespace ErpConnector.Common.Util
                     while(reader.Read())
                     {
                         result.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static List<IssuesWithoutAccount> GetIssuesWithoutAccount()
+        {
+            List<IssuesWithoutAccount> result = new List<IssuesWithoutAccount>();
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[jira].[get_issues_without_account]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var reader = cmd.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        result.Add(new IssuesWithoutAccount { issue_key = reader.GetString(0), account_id = reader.GetInt32(1), organization_id = reader.GetInt32(2) });
                     }
                 }
             }

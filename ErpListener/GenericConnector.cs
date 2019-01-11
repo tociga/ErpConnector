@@ -107,6 +107,13 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
+
+        public Task<AxBaseException> UpdateIssueAccount()
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateIssueAccount());
+            connectorTasks.Add(task);
+            return task;
+        }
         //public string GetDBScript(string entity)
         //{
         //    return factory.GetDBScript(entity);

@@ -14,5 +14,7 @@ namespace ErpConnector.Common.DTO
         public string BaseUrl { get; set; }
         public string OdataUrlPostFix { get; set; }
         public ErpTaskStep.AuthenticationType AuthType { get; set; }
+        public object InjectionPropertyValue { get; set; }
+        public string InjectionPropertyName { get; set; }
     }
 }

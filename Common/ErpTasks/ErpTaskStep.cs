@@ -59,6 +59,10 @@ namespace ErpConnector.Common.ErpTasks
                 {
                     return typeof(GenericJiraIssueObject<>);
                 }
+                else if (AuthenitcationType == AuthenticationType.JIRASERVICEDESK)
+                {
+                    return typeof(GenericJiraServiceDeskObject<>);
+                }
                 else
                 {
                     return typeof(GenericJsonOdata<>);
@@ -76,6 +80,7 @@ namespace ErpConnector.Common.ErpTasks
         public string ExternalProcess { get; set; }
         public string ExternalProcessArgument { get; set; }
         public string BaseTypeProcedure { get; set; }
+        public string InjectionPropertyName { get; set; }
         public class ErpTaskStepComparer : IComparer<ErpTaskStep>
         {
             public int Compare(ErpTaskStep a, ErpTaskStep b)
@@ -83,5 +88,6 @@ namespace ErpConnector.Common.ErpTasks
                 return a.Priority - b.Priority;
             }
         }
+
     }
 }

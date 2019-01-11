@@ -45,10 +45,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTO\JiraComponentDTO.cs" />
-    <Compile Include="DTO\JiraCustomFieldDTO.cs" />
+    <Compile Include="DTO\JiraAccountCustomFieldDTO.cs" />
     <Compile Include="DTO\JiraIssueDTO.cs" />
     <Compile Include="DTO\JiraIssueFieldsDTO.cs" />
+    <Compile Include="DTO\JiraOrganizationCustomFieldDTO.cs" />
     <Compile Include="DTO\JiraProjectDTO.cs" />
+    <Compile Include="DTO\ServiceDeskOrganizationDTO.cs" />
+    <Compile Include="DTO\ServiceDeskOrgUserDTO.cs" />
+    <Compile Include="DTO\TempoAccountDTO.cs" />
+    <Compile Include="DTO\TempoCustomerDTO.cs" />
     <Compile Include="DTO\TempoWorklogDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

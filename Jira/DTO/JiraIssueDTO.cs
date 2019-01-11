@@ -97,13 +97,25 @@ namespace ErpConnector.Jira.DTO
             }
         }
 
-        public string component
+        public string component_id
         {
             get
             {
                 if (fields != null && fields.components != null && fields.components.Any())
                 {
-                    return fields.components[0].name;
+                    return fields.components[0].id;
+                }
+                return null;
+            }
+        }
+
+        public int? organization_id
+        {
+            get
+            {
+                if (fields != null && fields.organization_custom_field != null && fields.organization_custom_field.Any())
+                {
+                    return fields.organization_custom_field[0].id;
                 }
                 return null;
             }

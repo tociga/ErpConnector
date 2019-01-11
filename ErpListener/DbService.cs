@@ -109,6 +109,11 @@ namespace ErpConnector.Listener
                                 connectorTask = connector.GetSingleTable(step, action.id, date);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 break;
+                            case "update_account":
+                                UpdateActionStatus(action.id, 1, null);                                
+                                connectorTask = connector.UpdateIssueAccount();
+                                connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                break;
                             default:
                                 break;
                         }
@@ -506,7 +511,8 @@ namespace ErpConnector.Listener
                             AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13)),
                             ExternalProcess = ReadString(reader, 14),
                             ExternalProcessArgument = ReadString(reader, 15),
-                            BaseTypeProcedure = ReadString(reader, 16)
+                            BaseTypeProcedure = ReadString(reader, 16),
+                            InjectionPropertyName = ReadString(reader, 17)
                         };
                     }
                     return null;
@@ -546,7 +552,8 @@ namespace ErpConnector.Listener
                                 AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13)),
                                 ExternalProcess = ReadString(reader, 14),
                                 ExternalProcessArgument = ReadString(reader, 15),
-                                BaseTypeProcedure = ReadString(reader, 16)
+                                BaseTypeProcedure = ReadString(reader, 16),
+                                InjectionPropertyName = ReadString(reader, 17)
                             });
                     }
                     return result;

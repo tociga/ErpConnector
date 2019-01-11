@@ -1,9 +1,12 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 
 namespace ErpConnector.Common.Util
 {
-    public interface IGenericDataReader : IDataReader
+    public interface IGenericDataReader<T> : IDataReader
     {
         bool HasRows();
+
+        IEnumerable<T> GetGenericList();
     }
 }

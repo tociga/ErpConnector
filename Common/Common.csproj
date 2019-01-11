@@ -66,10 +66,13 @@
   <ItemGroup>
     <Compile Include="AGREntities\ErpActionResult.cs" />
     <Compile Include="AGREntities\ErpActions.cs" />
+    <Compile Include="AGREntities\IssuesWithoutAccount.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
     <Compile Include="DTO\GenericJiraIssueObject.cs" />
+    <Compile Include="DTO\GenericJiraLinks.cs" />
     <Compile Include="DTO\GenericJiraObjectList.cs" />
+    <Compile Include="DTO\GenericJiraServiceDeskObject.cs" />
     <Compile Include="DTO\JiraObjectMetaData.cs" />
     <Compile Include="DTO\ServiceData.cs" />
     <Compile Include="ErpGenericConnector.cs" />

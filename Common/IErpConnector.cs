@@ -25,6 +25,7 @@ namespace ErpConnector.Common
         AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
         AxBaseException UpdateProduct(int actionId);
         AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date);
-        AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);        
+        AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
+        AxBaseException UpdateIssueAccount();      
     }
 }

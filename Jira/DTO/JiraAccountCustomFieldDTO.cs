@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Jira.DTO
 {
-    public class JiraCustomFieldDTO
+    public class JiraAccountCustomFieldDTO
     {
         public int id { get; set; }
-        public string value { get; set; }
+        public string value { get; set; }        
     }
 }

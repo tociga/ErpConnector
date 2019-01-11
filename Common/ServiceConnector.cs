@@ -112,6 +112,71 @@ namespace ErpConnector.Common
         }
 
 
+        public static async Task<AxBaseException> CallOdataEndpointPut(string oDataEndpoint, string filters, string putDataStr, ServiceData authData)
+        {
+            string baseUrl = authData.BaseUrl;
+            string endpoint = baseUrl + authData.OdataUrlPostFix + oDataEndpoint;
+
+            var request = HttpWebRequest.Create(endpoint);
+            request.Headers["Authorization"] = authData.AuthHeader;
+            //request.Headers["Accept"] = "application/json;odata.metadata=none";
+            //request.Headers["Content-Type"] = "application/json";
+
+            request.Method = "PUT";           
+            //request.ContentLength = postData != null ? postData.Length : 0;
+            request.ContentType = "application/json";
+
+            try
+            {
+                using (var requestStream = await request.GetRequestStreamAsync())
+                {
+                    using (var writer = new StreamWriter(requestStream))
+                    {
+                        writer.Write(putDataStr);
+                        writer.Flush();
+                    }
+                }
+
+                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
+                {
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        using (var streamReader = new StreamReader(responseStream))
+                        {
+                            var responseString = streamReader.ReadToEnd();
+                            //string sanitized = SanitizeJsonString(responseString);
+                            
+                            return null;
+                            //return responseString;
+                        }
+                    }
+                }
+            }
+            catch (WebException e)
+            {
+                using (var rStream = e.Response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(rStream))
+                    {
+
+                        // TODO: Need to log error;
+                        string error = reader.ReadToEnd();
+                        return JsonConvert.DeserializeObject<AxBaseException>(error);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (e is AggregateException)
+                {
+                    return new AxBaseException { ApplicationException = e.InnerException };
+                }
+                else
+                {
+                    return new AxBaseException { ApplicationException = e };
+                }
+            }
+        }
 
         //public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
         //{
@@ -208,7 +273,7 @@ namespace ErpConnector.Common
                 var endpoint = baseUrl + authData.OdataUrlPostFix + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
                 var returnODataObject = await CallOdataEndpoint<T, Y>(endpoint, authData);
-                DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable);
+                DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                 string nextLinkEndpoint = null;
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
                 {
@@ -221,7 +286,7 @@ namespace ErpConnector.Common
                         nextLinkEndpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
                     }
                     returnODataObject = await CallOdataEndpoint<T, Y>(nextLinkEndpoint, authData);
-                    DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable);
+                    DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     if (returnODataObject.Exception != null)
                     {
                         break;
@@ -255,13 +320,13 @@ namespace ErpConnector.Common
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint, authData);
-                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
                     filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
                     endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
                     returnODataObject = await CallOdataEndpointAsync<T>(endpoint, authData);
-                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     if (returnODataObject.Exception != null)
                     {
                         break;
@@ -478,7 +543,7 @@ namespace ErpConnector.Common
 
             var reader = result.Result.value.GetDataReader();
 
-            DataWriter.WriteToTable<T>(reader, destTable);
+            DataWriter.WriteToTable<T>(reader, destTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
 
             return result.Result;
         }

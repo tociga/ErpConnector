@@ -15,7 +15,7 @@ namespace ErpConnector.Common.Util
         }
     }
 
-    public class GenericListDataReader<T> : IGenericDataReader
+    public class GenericListDataReader<T> : IGenericDataReader<T>
     {
 
         private IEnumerator<T> list = null;
@@ -52,6 +52,11 @@ namespace ErpConnector.Common.Util
         public bool HasRows()
         {
             return baseList.Any();
+        }
+
+        public IEnumerable<T> GetGenericList()
+        {
+            return baseList;
         }
         public void Close()
         {

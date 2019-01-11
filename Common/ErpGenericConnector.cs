@@ -35,7 +35,7 @@ namespace ErpConnector.Common
         {
             //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
             //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-            TaskExecute exec = new TaskExecute(erpTasks.Steps, 4, actionId, date);
+            TaskExecute exec = new TaskExecute(erpTasks.Steps, erpTasks.no_of_parallel_processes, actionId, date);
             exec.Execute();
 
             //foreach (var erpStep in erpTasks.Steps)
@@ -204,6 +204,29 @@ namespace ErpConnector.Common
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             throw new NotImplementedException();
+        }
+
+        public AxBaseException UpdateIssueAccount()
+        {
+            var issuesWithoutAccount = DataWriter.GetIssuesWithoutAccount();
+            var authData = Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.JIRA);
+            foreach (var i in issuesWithoutAccount)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("{ \"fields\": { \"customfield_11330\":");
+                sb.Append(i.account_id);
+                sb.Append("} }");
+
+                string endpoint = "issue/" + i.issue_key;
+                var result = ServiceConnector.CallOdataEndpointPut(endpoint, null, sb.ToString(), authData).Result;
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            
+
+            return null;
         }
     }
 }

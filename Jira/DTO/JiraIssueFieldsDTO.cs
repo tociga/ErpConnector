@@ -13,7 +13,10 @@ namespace ErpConnector.Jira.DTO
         public string summary { get; set; }
         public JiraProjectDTO project { get; set; }
         [JsonProperty("customfield_11330")]
-        public JiraCustomFieldDTO account_custom_field { get; set; }
+        public JiraAccountCustomFieldDTO account_custom_field { get; set; }
+        [JsonProperty("customfield_11800")]
+        public List<JiraAccountCustomFieldDTO> organization_custom_field { get; set; }
+
         public List<JiraComponentDTO> components { get; set; }
 
 
