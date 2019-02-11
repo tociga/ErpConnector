@@ -21,7 +21,7 @@ namespace ErpConnector.Ax.Utils
         private static AuthenticationResult Authenticate()
         {
             var axOAuthTokenUrl = ConfigurationManager.AppSettings["ax_oauth_token_url"];
-            var axRedirectUrl = ConfigurationManager.AppSettings["ax_redirect_url"];
+            //var axRedirectUrl = ConfigurationManager.AppSettings["ax_redirect_url"];
             var axClientKey = ConfigurationManager.AppSettings["ax_client_key"];
             var axClientSecret = ConfigurationManager.AppSettings["ax_client_secret"];
 
