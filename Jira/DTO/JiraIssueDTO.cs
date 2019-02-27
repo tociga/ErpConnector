@@ -85,13 +85,13 @@ namespace ErpConnector.Jira.DTO
             }
         }
 
-        public string account
+        public int? account_id
         {
             get
             {
                 if (fields !=null && fields.account_custom_field != null)
                 {
-                    return fields.account_custom_field.value;
+                    return fields.account_custom_field.id;
                 }
                 return null;
             }
