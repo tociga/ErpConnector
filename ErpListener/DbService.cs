@@ -95,7 +95,7 @@ namespace ErpConnector.Listener
                             case "action_task":
                                 UpdateActionStatus(action.id, 1, null);
                                 var task = GetTask(action.reference_id);
-                                connectorTask = connector.ExecuteTask(task, action.id, GetDateById(action.date_reference_id));
+                                connectorTask = connector.ExecuteTask(task, action.id, GetDateById(action.date_reference_id), action.no_parallel_process);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 break;
                             case "single_table":
@@ -109,7 +109,8 @@ namespace ErpConnector.Listener
                                 connectorTask = connector.GetSingleTable(step, action.id, date);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 break;
-                            default:
+                            default:                                
+                                UpdateActionStatus(action.id, 3, CreateBaseTaskException(new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) }));
                                 break;
                         }
                     }
@@ -215,6 +216,11 @@ namespace ErpConnector.Listener
             }                    
         }
 
+        public async Task<AxBaseException> CreateBaseTaskException(AxBaseException a)
+        {
+            return a;
+        }
+
         public void UpdateActionStatus(int id, int status, Task<AxBaseException> a)
         {
             string errorMessage = null;
@@ -301,6 +307,7 @@ namespace ErpConnector.Listener
                         a.created_at = reader.GetDateTime(5);
                         a.updated_at = reader.GetDateTime(6);
                         a.date_reference_id = ReadInt(reader, 7);
+                        a.no_parallel_process = ReadInt(reader, 8);
                         actions.Add(a);
                     }
                 }

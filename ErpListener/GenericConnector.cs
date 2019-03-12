@@ -96,9 +96,9 @@ namespace ErpConnector.Listener
             return task;
         }
 
-        public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date)
+        public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date, int? noParallelProcesses)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date));
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date, noParallelProcesses));
             connectorTasks.Add(task);
             return task;
         }

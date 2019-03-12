@@ -103,11 +103,11 @@ namespace ErpConnector.Ax
             }
             return null;
         }
-        public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date)
+        public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date, int? noParallelProcess)
         {
             //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
             //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, 4, actionId, date);
+            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, noParallelProcess.HasValue ? noParallelProcess.Value : 4 , actionId, date);
             exec.Execute();
 
             //foreach (var erpStep in erpTasks.Steps)

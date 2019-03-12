@@ -24,7 +24,7 @@ namespace ErpConnector.Common
         AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId);
         AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
         AxBaseException UpdateProduct(int actionId);
-        AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date);
+        AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
         AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
     }
 }
