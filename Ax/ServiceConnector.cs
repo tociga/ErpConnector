@@ -494,15 +494,15 @@ namespace ErpConnector.Ax
             try
             {
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
-                result = ServiceConnector.WriteFromService<T>(0, 100, webMethod, serviceName, date.Date, nextPeriod(date.Date), true);
-                if (result.value.Any())
-                {
-                    DataWriter.TruncateSingleTable(dbTable);
-                }
-
+                bool firstResult = false;
                 for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
                     result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName, d, nextPeriod(d), true);
+                    if (!firstResult && result.value.Any())
+                    {
+                        DataWriter.TruncateSingleTable(dbTable);
+                        firstResult = true;
+                    }
                     DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
                 }
                 if (result.Exception == null)
