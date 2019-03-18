@@ -31,7 +31,7 @@ namespace ErpConnector.Ax
         {
             if (dataFile.Count > 0)
             {
-                bool recordCreated = this.CreateRcords(targetAXLegalEntity, dataFile);
+                bool recordCreated = this.CreateRecords(targetAXLegalEntity, dataFile);
 
                 // Save everything as a single transaction (can be otherwise if required):
                 if (recordCreated)
@@ -43,7 +43,7 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        protected abstract bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile);
+        protected abstract bool CreateRecords(string targetAXLegalEntity, System.Collections.ArrayList dataFile);
 
         private AxBaseException SaveChanges()
         {

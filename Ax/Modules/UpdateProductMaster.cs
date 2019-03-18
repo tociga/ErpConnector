@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Ax.Modules
 {
-    public class CreateProductMaster : AXODataContextConnector
+    public class UpdateProductMaster : AXODataContextConnector
     {
-        public CreateProductMaster(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
+        public UpdateProductMaster(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
         protected override bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
@@ -22,7 +22,7 @@ namespace ErpConnector.Ax.Modules
             {
                 if (!RecordExsits(master.ProductNumber))
                 {
-                    this.CreateMasterRecord(master);
+                    //this.CreateMasterRecord(master);
                     ret = true;
                 }
                 else
@@ -81,9 +81,9 @@ namespace ErpConnector.Ax.Modules
         private void UpdateMasterRecord(ProductMasterWriteDTO master)
         {
             // update customer
-            ProductMaster m;
+            ReleasedProductMaster m;
 
-            var query = from entity in context.ProductMasters
+            var query = from entity in context.ReleasedProductMasters
                         where entity.ProductNumber == master.ProductNumber
                         select entity;
 
@@ -95,7 +95,8 @@ namespace ErpConnector.Ax.Modules
             // use tracned entity to only update change fields
             context.TrackEntityInstance(m);
 
-            m.RetailProductCategoryName = master.RetailProductCategoryName;
+            //m.RetailProductCategoryName = master.RetailProductCategoryName;
+            //m.ProductLifeCycleStateId = master.ProductLifeCycleStateId;
 
             logMessageHandler(string.Format("Update AGROrder '{0}'.", master.ProductNumber));
         }
