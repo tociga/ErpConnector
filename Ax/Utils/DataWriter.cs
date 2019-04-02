@@ -114,13 +114,47 @@ namespace ErpConnector.Ax.Utils
                 using (var cmd = new SqlCommand("[ax].[truncate_single_ax_table]", con))
                 {
                     con.Open();
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.StoredProcedure;                    
                     cmd.Parameters.AddWithValue("@full_table_name", tableName);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+        public static void UpdateProductMasterLifecycleState(string productMasterNo, string plcState)
+        {
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[ax].[update_product_master_lifecycle_state]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 300;
+                    cmd.Parameters.AddWithValue("@product_master_no",productMasterNo);
+                    cmd.Parameters.AddWithValue("@lifecycle_state", plcState);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
+        public static void UpdateProductVariantLifecycleState(string productMasterNo, string size, string color, string style, string config, string plcState)
+        {
+            using (var con = new SqlConnection(ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[ax].[update_product_variant_lifecycle_state]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 300;
+                    cmd.Parameters.AddWithValue("@product_master_no", productMasterNo);
+                    cmd.Parameters.AddWithValue("@product_color_id", color);
+                    cmd.Parameters.AddWithValue("@product_size_id", size);
+                    cmd.Parameters.AddWithValue("@product_style_id", style);
+                    cmd.Parameters.AddWithValue("@product_config_id", config);
+                    cmd.Parameters.AddWithValue("@lifecycle_state", plcState);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
         public static List<SqlBulkCopyColumnMapping> GetDynamicBulkCopyColumnMapping<T>()
         {
             List<SqlBulkCopyColumnMapping> mappings = new List<SqlBulkCopyColumnMapping>();

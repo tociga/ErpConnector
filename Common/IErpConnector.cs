@@ -26,5 +26,6 @@ namespace ErpConnector.Common
         AxBaseException UpdateProduct(int actionId);
         AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
         AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
+        AxBaseException UpdateProductLifecycleState(List<ProductLifeCycleState> plcs, int actionId);
     }
 }

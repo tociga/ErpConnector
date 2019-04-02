@@ -76,6 +76,10 @@ namespace ErpConnector.Listener
                                         UpdateCreatedProductStatus(action.reference_id, option, connectorTask.Result);
                                     }
                                 }
+                                else
+                                {
+                                    UpdateActionStatus(action.id, 2, null);
+                                }
                                 break;
                             case "update_product":
                                 if (includeBAndM)
@@ -84,12 +88,20 @@ namespace ErpConnector.Listener
                                     connectorTask = connector.UpdateProductAttributes(action.id);
                                     connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
                                 }
+                                else
+                                {
+                                    UpdateActionStatus(action.id, 2, null);
+                                }
                                 break;
                             case "confirm_items":
                                 if (includeBAndM)
                                 {
                                     UpdateActionStatus(action.id, 1, null);
                                     var itemsToCreate = GetItemsToCreate(action.reference_id);
+                                }
+                                else
+                                {
+                                    UpdateActionStatus(action.id, 2, null);
                                 }
                                 break;
                             case "action_task":
@@ -108,6 +120,14 @@ namespace ErpConnector.Listener
                                 var step = GetStep(action.reference_id);
                                 connectorTask = connector.GetSingleTable(step, action.id, date);
                                 connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                break;
+                            case "update_plc":
+                                UpdateActionStatus(action.id, 1, null);
+                                var plcUpdate = GetProductLifeCycleStateUpdates(action.reference_id);
+                                UpdateProductLifeCycleState(action.reference_id, action.id, 1);
+                                connectorTask = connector.UpdateProductLifecycleStatus(action.id, plcUpdate);
+                                var updateTask = connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark));
+                                updateTask.ContinueWith((x) => UpdateProductLifeCycleState(action.reference_id, action.id, 2)).Wait();
                                 break;
                             default:                                
                                 UpdateActionStatus(action.id, 3, CreateBaseTaskException(new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) }));
@@ -552,6 +572,56 @@ namespace ErpConnector.Listener
                 }
             }
         }
+        public static List<ProductLifeCycleState> GetProductLifeCycleStateUpdates(int plc_update_id)
+        {
+            List<ProductLifeCycleState> plc = new List<ProductLifeCycleState>();
+            var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("bm.get_product_lifecycle_update", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@product_lifecycle_status_update_id", plc_update_id);
+
+                    var reader = cmd.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        plc.Add(
+                            new ProductLifeCycleState
+                            {
+                                product_lifecycle_state_update_id = ReadInt(reader, 0).Value,
+                                product_no = ReadString(reader, 1),
+                                product_size_id = ReadString(reader, 2),
+                                product_color_id = ReadString(reader, 3),
+                                product_style_id = ReadString(reader, 4),
+                                product_config_id = ReadString(reader, 5),
+                                lifecycle_status = ReadString(reader, 6)
+                            });
+                    }
+                }
+            }
+            return plc;
+        }
+
+        private void UpdateProductLifeCycleState(int plcId, int actionId, int status)
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("bm.update_product_lifecycle_update", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@id", plcId);
+                    cmd.Parameters.AddWithValue("@status", status);
+                    cmd.Parameters.AddWithValue("@erp_action_id", actionId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         private static string ReadString(IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))

@@ -108,6 +108,13 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
+
+        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<ProductLifeCycleState> plc)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plc, actionId));
+            connectorTasks.Add(task);
+            return task;
+        }
         //public string GetDBScript(string entity)
         //{
         //    return factory.GetDBScript(entity);

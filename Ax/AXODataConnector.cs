@@ -21,17 +21,30 @@ namespace ErpConnector.Ax
     public class AxODataConnector : IErpConnector
     {
         #region Initialization
-        private static Resources _context;
+        private Resources _context;
+        private Resources Context
+        {
+            get
+            {
+                if (_context == null)
+                {
+                    var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                    _context = new Resources(new Uri(axBaseUrl + "/data"));
+                    _context.SendingRequest2 += Context_SendingRequest2;
+                    return _context;
+                }
+                return _context;
+            }
+        }
         private bool includesFashion;
         private bool includeB_M;
         public AxODataConnector()
-        {
-            var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"]; 
+        { 
 			Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
             Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeB_M);
-            _context = new Resources(new Uri(axBaseUrl + "/data"));
-            _context.SendingRequest2 += Context_SendingRequest2;                      
         }
+
+
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
@@ -139,7 +152,7 @@ namespace ErpConnector.Ax
         public void GetPoTo(int actionId)
         {
             DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
-            POTransfer.GetPosAndTos(_context, actionId);
+            POTransfer.GetPosAndTos(Context, actionId);
         }
         
         public void GetFullIoTrans(int actionId)
@@ -575,7 +588,7 @@ namespace ErpConnector.Ax
             //var rv = ServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
         }
 
-        public GenericWriteObject<ProductMasterWriteDTO> CreateMaster(ProductMasterWriteDTO master)
+        public GenericWriteObject<ReleasedProductMaster> CreateMaster(List<ReleasedProductMaster> masters)
         {
             string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
             var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
@@ -584,13 +597,27 @@ namespace ErpConnector.Ax
                                                        ConfigurationManager.AppSettings["ax_oauth_token_url"],
                                                        ConfigurationManager.AppSettings["ax_client_key"]);
             var oAuthHelper = new OAuthHelper(clientconfig);
-            ArrayList a = new ArrayList();
             string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
-            AXODataContextConnector axConnector = new UpdateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
-            a.Add(master);
-            axConnector.CreateRecordInAX(dataarea, a);
-            return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
+            AXODataContextConnector<ReleasedProductMaster> axConnector = new UpdateProductMaster<ReleasedProductMaster>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, masters);
+
+            return new GenericWriteObject<ReleasedProductMaster> { Exception = null, WriteObject = masters[0] };
         }
+        public GenericWriteObject<ReleasedProductVariant> UpdateVariants(List<ReleasedProductVariant> variants)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector<ReleasedProductVariant> axConnector = new UpdateReleasedProductVariants<ReleasedProductVariant>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, variants);
+            return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
+        }
+
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
@@ -609,8 +636,8 @@ namespace ErpConnector.Ax
                     //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
-                    var erpMaster = CreateMaster(master);
-                    //var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+                    //var erpMaster = CreateMaster(master);
+                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
                     
                     if (erpMaster.Exception != null)
                     {
@@ -691,11 +718,11 @@ namespace ErpConnector.Ax
                                                            ConfigurationManager.AppSettings["ax_client_key"]);
                 var oAuthHelper = new OAuthHelper(clientconfig);
 
-                ArrayList a = new ArrayList();
+                List<AGROrderDTO> a = new List<AGROrderDTO>();
 
                 string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
 
-                AXODataContextConnector axConnector = new CreateOrder(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+                AXODataContextConnector<AGROrderDTO> axConnector = new CreateOrder<AGROrderDTO>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
                 if (po_to_create.Any())
                 {
                     var o = po_to_create.First();
@@ -738,7 +765,7 @@ namespace ErpConnector.Ax
 
                     order.OrderStatus = AGROrderStatus.Ready;
                     order.ArgOrderLine.Clear();
-                    a = new System.Collections.ArrayList();
+                    a = new List<AGROrderDTO>();
                     a.Add(order);
 
                     // Send the data file to the connector object:
@@ -857,6 +884,84 @@ namespace ErpConnector.Ax
             if (attributes != null)
             {
                 return attributes;
+            }
+            return null;
+        }
+
+        public AxBaseException UpdateProductLifecycleState(List<ProductLifeCycleState> plc, int actionId)
+        {
+            DateTime startTime = DateTime.Now;
+            if (plc.Any())
+            {
+                var distinctMaster = plc.DistinctBy(x => x.product_no).Select(y=>y.product_no);
+                foreach (var m in distinctMaster)
+                {
+                    var plcPerMaster = plc.Where(x => x.product_no == m);
+                    string masterLifecycleState = "";
+                    if (plcPerMaster.Where(x => x.lifecycle_status == "Confirmed").Any())
+                    {
+                        masterLifecycleState = "Confirmed";
+                    }
+                    else if (plcPerMaster.Count(x => x.lifecycle_status == "Delete") == plcPerMaster.Count())
+                    {
+                        masterLifecycleState = "Delete";
+                    }
+                    else
+                    {
+                        masterLifecycleState = "Shortlist";
+                    }
+
+                    if (plcPerMaster.Any())
+                    {
+                        var master = new ReleasedProductMaster();
+                        master.ProductNumber = plcPerMaster.First().product_no;
+                        master.ProductLifecycleStateId = masterLifecycleState;
+                        var erpMaster = CreateMaster(new List<ReleasedProductMaster> { master });
+
+                        if (erpMaster.Exception != null)
+                        {
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
+                            return erpMaster.Exception;
+                        }
+                        else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != plcPerMaster.First().product_no.ToLower().Trim())
+                        {
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
+                            return new AxBaseException
+                            {
+                                ApplicationException = new ApplicationException(
+                                "The product number for Product Master does not match the returned number, AX value = " + erpMaster.WriteObject.ProductNumber + " AGR number = "
+                                + plcPerMaster.First().product_no)
+                            };
+                        }
+
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
+                        startTime = DateTime.Now;
+                    }
+                    List<ReleasedProductVariant> variantList = new List<ReleasedProductVariant>();
+                    foreach (var item in plcPerMaster)
+                    {
+                        var variant = new ReleasedProductVariant
+                        {
+                            ItemNumber = item.product_no,
+                            ProductMasterNumber = item.product_no,
+                            ProductSizeId = item.product_size_id,
+                            ProductColorId = item.product_color_id,
+                            ProductStyleId = item.product_style_id,
+                            ProductConfigurationId = item.product_config_id,
+                            ProductLifecycleStateId = item.lifecycle_status
+                        };
+                        startTime = DateTime.Now;
+                        //var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
+                        variantList.Add(variant);
+                    }
+                    var erpVariants = UpdateVariants(variantList);
+                    if (erpVariants.Exception != null)
+                    {
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
+                        return erpVariants.Exception;
+                    }
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                }
             }
             return null;
         }

@@ -200,6 +200,8 @@ namespace TestApplication
             AXODataContext context = new AXODataContext(oAuthHelper, false);
 
             ReleasedProductMasterV2 master = new ReleasedProductMasterV2();
+            AGRRetailSeasonTable r = new AGRRetailSeasonTable();
+           
 
             var query = from m in context.ReleasedProductMastersV2
                         where m.ItemNumber == "0140" && m.DataAreaId == "USRT"

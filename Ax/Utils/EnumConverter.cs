@@ -100,7 +100,7 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public override bool CanConvert(Type t)
+        public override bool CanConvert(System.Type t)
         {
             return t == typeof(NoYes) || t == typeof(ItemNumAlternative) || t==typeof(PdsVendorCheckItem) || t == typeof(SalesPriceModelBasic) 
                 || t == typeof(InventBatchMergeDateCalculationMethod) || t == typeof(ABC) || t == typeof(ReqPOType) 
@@ -118,7 +118,7 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, System.Type objectType, object existingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
