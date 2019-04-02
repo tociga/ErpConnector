@@ -572,9 +572,9 @@ namespace ErpConnector.Listener
                 }
             }
         }
-        public static List<ProductLifeCycleState> GetProductLifeCycleStateUpdates(int plc_update_id)
+        public static List<AGRProductLifeCycleState> GetProductLifeCycleStateUpdates(int plc_update_id)
         {
-            List<ProductLifeCycleState> plc = new List<ProductLifeCycleState>();
+            List<AGRProductLifeCycleState> plc = new List<AGRProductLifeCycleState>();
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var con = new SqlConnection(connectionString))
             {
@@ -588,7 +588,7 @@ namespace ErpConnector.Listener
                     while(reader.Read())
                     {
                         plc.Add(
-                            new ProductLifeCycleState
+                            new AGRProductLifeCycleState
                             {
                                 product_lifecycle_state_update_id = ReadInt(reader, 0).Value,
                                 product_no = ReadString(reader, 1),

@@ -2,6 +2,9 @@
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.Utils;
+using ErpConnector.Common.Exceptions;
+using Microsoft.OData.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +15,15 @@ namespace ErpConnector.Ax.Modules
 {
     public class UpdateProductMaster<T> : AXODataContextConnector<T> where T : ReleasedProductMaster
     {
+        private List<T> plcMaster;
         public UpdateProductMaster(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
+        
         protected override bool CreateRecords(string targetAXLegalEntity, List<T> dataFile)
         {
             bool ret = false;
-
+            plcMaster = dataFile;
             foreach (var master in dataFile)
             {
                 if (!RecordExsits(master.ProductNumber))
@@ -30,15 +35,33 @@ namespace ErpConnector.Ax.Modules
                 {
                     // <update> 
                     UpdateMasterRecord(master);
-                    SaveChanges();
-                    var m = GetRecord(master.ProductNumber);
-                    DataWriter.UpdateProductMasterLifecycleState(m.ProductNumber, m.ProductLifecycleStateId);
-                    ret = false;
+                    ret = true;
                 }
             }
 
             return ret;
         }
+        protected override AxBaseException SaveChanges()
+        {
+            try
+            {
+                var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
+                foreach (var master in plcMaster)
+                {
+                    DataWriter.UpdateProductMasterLifecycleState(master.ProductNumber, master.ProductLifecycleStateId);
+                }
+                return null;
+            }
+            catch (DataServiceRequestException ex)
+            {
+                return JsonConvert.DeserializeObject<AxBaseException>(ex.InnerException.Message);
+            }
+            catch (Exception ex)
+            {
+                return new AxBaseException { ApplicationException = ex };
+            }
+        }
+
         private ReleasedProductMaster GetRecord(string productMasterNo)
         {
             var query = from entity in this.context.ReleasedProductMasters

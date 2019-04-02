@@ -12,6 +12,7 @@ namespace ErpConnector.Ax.Modules
 {
     public class UpdateReleasedProductVariants<T> : AXODataContextConnector<T> where T : ReleasedProductVariant
     {
+        private List<T> plcVar;
         public UpdateReleasedProductVariants(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
@@ -19,7 +20,7 @@ namespace ErpConnector.Ax.Modules
         protected override bool CreateRecords(string targetAXLegalEntity, List<T> dataFile)
         {
             bool ret = false;
-
+            plcVar = dataFile;
             foreach (var v in dataFile)
             {
                 if (!RecordExsits(v))
@@ -30,14 +31,14 @@ namespace ErpConnector.Ax.Modules
                 {
                     // <update> 
                     UpdateVariantRecord(v);
-                    SaveChanges();
-                    var variant = GetRecord(v);
-                    if (variant != null)
-                    {
-                        DataWriter.UpdateProductVariantLifecycleState(variant.ProductMasterNumber, variant.ProductSizeId,
-                        variant.ProductColorId, variant.ProductStyleId, variant.ProductConfigurationId, variant.ProductLifecycleStateId);
-                    }
-                    ret = false;
+                    //SaveChanges();
+                    //var variant = GetRecord(v);
+                    //if (variant != null)
+                    //{
+                    //    DataWriter.UpdateProductVariantLifecycleState(variant.ProductMasterNumber, variant.ProductSizeId,
+                    //    variant.ProductColorId, variant.ProductStyleId, variant.ProductConfigurationId, variant.ProductLifecycleStateId);
+                    //}
+                    ret = true;
                 }
             }
 
@@ -103,7 +104,11 @@ namespace ErpConnector.Ax.Modules
             try
             {
                 var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);                
-
+                foreach(var v in plcVar)
+                {
+                    DataWriter.UpdateProductVariantLifecycleState(v.ProductMasterNumber, v.ProductSizeId,
+                        v.ProductColorId, v.ProductStyleId, v.ProductConfigurationId, v.ProductLifecycleStateId);
+                }
                 return null;
             }
             catch (DataServiceRequestException ex)

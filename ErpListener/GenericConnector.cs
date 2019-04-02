@@ -109,7 +109,7 @@ namespace ErpConnector.Listener
             return task;
         }
 
-        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<ProductLifeCycleState> plc)
+        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<AGRProductLifeCycleState> plc)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plc, actionId));
             connectorTasks.Add(task);

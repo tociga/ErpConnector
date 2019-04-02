@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Common.AGREntities
 {
-    public class ProductLifeCycleState
+    public class AGRProductLifeCycleState
     {
         public int product_lifecycle_state_update_id { get; set; }
         public string product_no { get; set; }

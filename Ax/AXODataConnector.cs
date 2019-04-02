@@ -38,6 +38,18 @@ namespace ErpConnector.Ax
         }
         private bool includesFashion;
         private bool includeB_M;
+        private List<ProductLifecycleState> _plcMetaData;
+        private List<ProductLifecycleState> PlcMetaData
+        {
+            get
+            {
+                if (_plcMetaData == null)
+                {
+                    _plcMetaData = (from p in Context.ProductLifecycleStates select p).ToList();
+                }
+                return _plcMetaData;
+            }
+        }
         public AxODataConnector()
         { 
 			Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
@@ -888,8 +900,8 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException UpdateProductLifecycleState(List<ProductLifeCycleState> plc, int actionId)
-        {
+        public AxBaseException UpdateProductLifecycleState(List<AGRProductLifeCycleState> plc, int actionId)
+        {            
             DateTime startTime = DateTime.Now;
             if (plc.Any())
             {
@@ -898,17 +910,25 @@ namespace ErpConnector.Ax
                 {
                     var plcPerMaster = plc.Where(x => x.product_no == m);
                     string masterLifecycleState = "";
-                    if (plcPerMaster.Where(x => x.lifecycle_status == "Confirmed").Any())
+                    if (plcPerMaster.Where(x => x.lifecycle_status.ToLower() == "confirmed").Any())
                     {
-                        masterLifecycleState = "Confirmed";
+                        masterLifecycleState = PlcMetaData.Single(x => x.LifecycleStateId.ToLower() == "confirmed").LifecycleStateId;
                     }
-                    else if (plcPerMaster.Count(x => x.lifecycle_status == "Delete") == plcPerMaster.Count())
+                    else if (plcPerMaster.Count(x => x.lifecycle_status.ToLower() == "delete") == plcPerMaster.Count())
                     {
-                        masterLifecycleState = "Delete";
+                        masterLifecycleState = PlcMetaData.Single(x => x.LifecycleStateId.ToLower() == "delete").LifecycleStateId;
+                    }
+                    else if (PlcMetaData.Count(x => x.LifecycleStateId.ToLower() == "shortlist") == plcPerMaster.Count())
+                    {
+                        masterLifecycleState = PlcMetaData.Single(x => x.LifecycleStateId.ToLower() == "shortlist").LifecycleStateId;                        
                     }
                     else
                     {
-                        masterLifecycleState = "Shortlist";
+                        return new AxBaseException
+                        {
+                            ApplicationException = new Exception(string.Format("Plc update batch = {0} contains an invalid Product Lifecycle State in D365", 
+                                plcPerMaster.First().product_lifecycle_state_update_id))
+                        };
                     }
 
                     if (plcPerMaster.Any())
@@ -948,7 +968,7 @@ namespace ErpConnector.Ax
                             ProductColorId = item.product_color_id,
                             ProductStyleId = item.product_style_id,
                             ProductConfigurationId = item.product_config_id,
-                            ProductLifecycleStateId = item.lifecycle_status
+                            ProductLifecycleStateId = PlcMetaData.Single(x => x.LifecycleStateId.ToLower() == item.lifecycle_status.ToLower()).LifecycleStateId 
                         };
                         startTime = DateTime.Now;
                         //var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
