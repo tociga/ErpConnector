@@ -48,7 +48,7 @@ namespace ErpConnector.Common.Util
                 AuthHeader = GetTempoHeader(),
                 AuthToken = GetTempoToken(),
                 BaseUrl = "https://api.tempo.io",
-                OdataUrlPostFix = "/2/",
+                OdataUrlPostFix = "/core/3/",
                 AuthType = ErpTasks.ErpTaskStep.AuthenticationType.TEMPO
             };
         }
