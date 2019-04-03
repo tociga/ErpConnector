@@ -50,6 +50,7 @@
     <Compile Include="DTO\JiraIssueFieldsDTO.cs" />
     <Compile Include="DTO\JiraOrganizationCustomFieldDTO.cs" />
     <Compile Include="DTO\JiraProjectDTO.cs" />
+    <Compile Include="DTO\JiraUserDTO.cs" />
     <Compile Include="DTO\ServiceDeskOrganizationDTO.cs" />
     <Compile Include="DTO\ServiceDeskOrgUserDTO.cs" />
     <Compile Include="DTO\TempoAccountDTO.cs" />

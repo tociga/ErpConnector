@@ -30,30 +30,31 @@ namespace ErpConnector.Jira.DTO
         public string description { get; set; }
         public DateTime createdAt { get; set; }
         public DateTime updatedAt { get; set; }
-        public string username
+        public string accountId
         {
             get
             {
                 if (author != null)
                 {
-                    return author.username;
+                    return author.accountId;
                 }
                 return null;
             }
         }
         public JiraIssue issue { get; set; } 
-        public JiraUser author { get; set; }
+        public WorklogUser author { get; set; }
         public class JiraIssue
         {
             public string self { get; set; }
             public string key { get; set; }
         } 
         
-        public class JiraUser
+        public class WorklogUser
         {
             public string self { get; set; }
-            public string username { get; set; }
+            public string accountId { get; set; }
             public string displayname { get; set; }
+
         }      
     }
 }
