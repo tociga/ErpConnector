@@ -49,11 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AGREntities\AGRProductLifeCycleState.cs" />
     <Compile Include="AGREntities\ErpActionResult.cs" />
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
-    <Compile Include="AGREntities\ProductLifeCycleState.cs" />
     <Compile Include="ErpTasks\ErpTask.cs" />
     <Compile Include="ErpTasks\ErpTaskStep.cs" />
     <Compile Include="Exceptions\AxBaseException.cs" />
