@@ -11,10 +11,7 @@ namespace ErpConnector.Common.Exceptions
         public AxWebExceptions error { get; set; }
 
         public Exception ApplicationException { get; set; }
-<<<<<<< HEAD
 
-=======
->>>>>>> erp_listener_ax_lss
         public string ErrorMessage
         {
             get
@@ -30,10 +27,7 @@ namespace ErpConnector.Common.Exceptions
                 return "";
             }
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> erp_listener_ax_lss
         public string StackTrace
         {
             get

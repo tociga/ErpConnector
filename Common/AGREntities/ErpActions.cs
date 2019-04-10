@@ -16,10 +16,6 @@ namespace ErpConnector.Common.AGREntities
         public System.DateTime created_at { get; set; }
         public System.DateTime updated_at { get; set; }
         public int? date_reference_id { get; set; }
-<<<<<<< HEAD
-=======
         public int? no_parallel_process { get; set; }
->>>>>>> erp_listener_ax_lss
-
     }
 }

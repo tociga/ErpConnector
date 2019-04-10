@@ -62,10 +62,6 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> erp_listener_ax_lss
         public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice,
             bool clearAttributeRefresh)
         {
@@ -117,18 +113,12 @@ namespace ErpConnector.Ax.Utils
                 using (var cmd = new SqlCommand("[ax].[truncate_single_ax_table]", con))
                 {
                     con.Open();
-<<<<<<< HEAD
                     cmd.CommandType = CommandType.StoredProcedure;
-=======
-                    cmd.CommandType = CommandType.StoredProcedure;                    
->>>>>>> erp_listener_ax_lss
                     cmd.Parameters.AddWithValue("@full_table_name", tableName);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
-<<<<<<< HEAD
-=======
         public static void UpdateProductMasterLifecycleState(string productMasterNo, string plcState)
         {
             using (var con = new SqlConnection(ConnectionString))
@@ -144,7 +134,6 @@ namespace ErpConnector.Ax.Utils
                 }
             }
         }
->>>>>>> erp_listener_ax_lss
 
         public static void UpdateProductVariantLifecycleState(string productMasterNo, string size, string color, string style, string config, string plcState)
         {
@@ -186,33 +175,17 @@ namespace ErpConnector.Ax.Utils
             using (var con = new SqlConnection(ConnectionString))
             {
                 con.Open();
-<<<<<<< HEAD
-=======
-
->>>>>>> erp_listener_ax_lss
                 using (var adapter = new SqlDataAdapter(query, con))
                 {
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
-<<<<<<< HEAD
                     Type baseType = typeof(T);
                     var columns = (from DataColumn c in dt.Columns
                             select c.ColumnName).ToList();
-=======
-
-                    Type baseType = typeof(T);
-                    var columns = (from DataColumn c in dt.Columns
-                            select c.ColumnName).ToList();
-
->>>>>>> erp_listener_ax_lss
                     foreach (var pi in baseType.GetProperties(BindingFlags.Public| BindingFlags.Instance))
                     {
                         if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
                         {
-<<<<<<< HEAD
-=======
-
->>>>>>> erp_listener_ax_lss
                             var cols = columns.Where(x => x == pi.Name);
                             if (!cols.Any())
                             {
@@ -237,13 +210,8 @@ namespace ErpConnector.Ax.Utils
                     adapter.Fill(dt);
                     Type baseType = typeof(T);
                     var columns = (from DataColumn c in dt.Columns
-<<<<<<< HEAD
-                            select c.ColumnName).ToList();
-                    foreach (var pi in baseType.GetProperties(BindingFlags.Public| BindingFlags.Instance))
-=======
-                                   select c.ColumnName).ToList();
+                    select c.ColumnName).ToList();
                     foreach (var pi in baseType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
->>>>>>> erp_listener_ax_lss
                     {
                         if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
                         {
@@ -253,11 +221,7 @@ namespace ErpConnector.Ax.Utils
                                 result.Add(pi.Name);
                             }
                         }
-<<<<<<< HEAD
                     }                    
-=======
-                    }
->>>>>>> erp_listener_ax_lss
                 }
             }
             return result;

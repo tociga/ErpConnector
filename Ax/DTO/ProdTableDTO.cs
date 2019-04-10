@@ -19,22 +19,14 @@ namespace ErpConnector.Ax.DTO
         public decimal Denisity { get; set; }
         public decimal Depth { get; set; }
         public DateTime DlvDate { get; set; }
-<<<<<<< HEAD
-        public DateTime DlvTime { get; set; }
-=======
-        public int DlvTime { get; set; }
->>>>>>> erp_listener_ax_lss
+        public decimal DlvTime { get; set; }
         public DateTime FinishedDate { get; set; }
         public decimal Height { get; set; }
         public string InventDimId { get; set; }
         public string InventTransId { get; set; }
         public string ItemId { get; set; }
         public DateTime LatestSchedDate { get; set; }
-<<<<<<< HEAD
-        public DateTime LatestSchedTime { get; set; }
-=======
         public decimal LatestSchedTime { get; set; }
->>>>>>> erp_listener_ax_lss
         public int ProdStatus { get; set; }
         public int ProdType { get; set; }
         public decimal QtyCalc { get; set; }
@@ -45,17 +37,10 @@ namespace ErpConnector.Ax.DTO
         public int Reservation { get; set; }
         public DateTime SchedDate { get; set; }
         public DateTime SchedEnd { get; set; }
-<<<<<<< HEAD
-        public DateTime SchedFromTime { get; set; }
-        public DateTime SchedStart { get; set; }
-        public int SchedStatus { get; set; }
-        public DateTime SchedToTime { get; set; }
-=======
         public decimal SchedFromTime { get; set; }
         public DateTime SchedStart { get; set; }
         public int SchedStatus { get; set; }
         public decimal SchedToTime { get; set; }
->>>>>>> erp_listener_ax_lss
         public decimal Width { get; set; }
         public string ProdId { get; set; }
         public decimal RemainInventPhysical { get; set; }

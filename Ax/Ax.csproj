@@ -105,14 +105,11 @@
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
     <Compile Include="AxTaskExecute.cs" />
-<<<<<<< HEAD
-=======
     <Compile Include="D365Entities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>D365Entities.tt</DependentUpon>
     </Compile>
->>>>>>> erp_listener_ax_lss
     <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />
@@ -139,14 +136,10 @@
     <Compile Include="DTO\SalesTableDTO.cs" />
     <Compile Include="DTO\VendorDTO.cs" />
     <Compile Include="Modules\CreateOrder.cs" />
-<<<<<<< HEAD
     <Compile Include="Modules\CreateProductMaster.cs" />
-    <Compile Include="Modules\PriceHistory.cs" />
-=======
     <Compile Include="Modules\PriceHistory.cs" />
     <Compile Include="Modules\UpdateProductMaster.cs" />
     <Compile Include="Modules\UpdateReleasedProductVariants.cs" />
->>>>>>> erp_listener_ax_lss
     <Compile Include="Utils\Authenticator.cs" />
     <Compile Include="Utils\CollectionExtensions.cs" />
     <Compile Include="Utils\EnumConverter.cs" />

@@ -10,18 +10,6 @@ namespace ErpConnector.Ax.Utils
 {
     public class Authenticator
     {
-<<<<<<< HEAD
-        public static string GetAdalHeader()
-        {
-            return Authenticate().CreateAuthorizationHeader();
-        }
-
-        public static string GetAdalToken()
-        {
-            return Authenticate().AccessToken;
-        }
-
-=======
         private static AuthenticationResult _token;
         private static AuthenticationResult Token
         {
@@ -48,7 +36,7 @@ namespace ErpConnector.Ax.Utils
         {
             return Token.AccessToken;
         }
->>>>>>> erp_listener_ax_lss
+
         private static AuthenticationResult Authenticate()
         {
             var axOAuthTokenUrl = ConfigurationManager.AppSettings["ax_oauth_token_url"];
@@ -60,10 +48,6 @@ namespace ErpConnector.Ax.Utils
             var credentials = new ClientCredential(axClientKey, axClientSecret);
 
             var authResult = authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["ax_base_url"], credentials).Result;
-<<<<<<< HEAD
-
-=======
->>>>>>> erp_listener_ax_lss
             return authResult;
         }
 

@@ -17,81 +17,50 @@ namespace ErpConnector.Ax.Modules
             {
                 return ecoResValue;
             }
-<<<<<<< HEAD
 
-=======
->>>>>>> erp_listener_ax_lss
             var ecoResAttribute = ServiceConnector.CallService<AGREcoResAttributeDTO>(actionId, "GetAttribute", "AGRAttributeService", "[ax].[ECORESATTRIBUTE]", 10000);
             if (ecoResAttribute != null)
             {
                 return ecoResAttribute;
             }
-<<<<<<< HEAD
 
-=======
->>>>>>> erp_listener_ax_lss
             var ecoResAttributeValue = ServiceConnector.CallService<AGREcoResAttributeValueDTO>(actionId, "GetAttributeValue", "AGRAttributeService", "[ax].[ECORESATTRIBUTEVALUE]", 10000);
             if (ecoResAttributeValue != null)
             {
                 return ecoResAttributeValue;
             }
-<<<<<<< HEAD
 
-=======
->>>>>>> erp_listener_ax_lss
             var ecoResAttributeType = ServiceConnector.CallService<AGREcoResAttributeTypeDTO>(actionId, "GetAttributeType", "AGRAttributeService", "[ax].[ECORESATTRIBUTEType]", 10000);
             if (ecoResAttributeType != null)
             {
                 return ecoResAttributeType;
             }
-<<<<<<< HEAD
 
             var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId,
                 "GetEnumerationAttributeValue", "AGRAttributeService", "[ax].[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
-
-=======
-            var ecoResEnum = ServiceConnector.CallService<AGREcoResEnumerationAttributeValueDTO>(actionId,
-                "GetEnumerationAttributeValue", "AGRAttributeService", "[ax].[ECORESENUMERATIONATTRIBUTETYPEVALUE]", 10000);
->>>>>>> erp_listener_ax_lss
             if (ecoResEnum != null)
             {
                 return ecoResEnum;
             }
-<<<<<<< HEAD
-
             var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
                  "GetCategoryAttribute", "AGRAttributeService", "[ax].[ECORESCATEGORYATTRIBUTE]", 10000);
 
-=======
-            var ecoResCatAttr = ServiceConnector.CallService<AGREcoResCategoryAttributeDTO>(actionId,
-                 "GetCategoryAttribute", "AGRAttributeService", "[ax].[ECORESCATEGORYATTRIBUTE]", 10000);
->>>>>>> erp_listener_ax_lss
             if (ecoResCatAttr != null)
             {
                 return ecoResCatAttr;
             }
-<<<<<<< HEAD
 
             var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
                  "GetProductInstanceValue", "AGRAttributeService", "[ax].[ECORESPRODUCTINSTANCEVALUE]", 10000);
 
-=======
-            var ecoResProdInstance = ServiceConnector.CallService<AGREcoResProductInstanceDTO>(actionId,
-                 "GetProductInstanceValue", "AGRAttributeService", "[ax].[ECORESPRODUCTINSTANCEVALUE]", 10000);
->>>>>>> erp_listener_ax_lss
             if (ecoResProdInstance != null)
             {
                 return ecoResProdInstance;
             }
 
-<<<<<<< HEAD
-            return null;
-
-=======
             //var prodAttributes = ServiceConnector.CallOdataEndpoint<ProductAttribute>("ProductAttributes", null, "[ax].[ProductAttributes]", actionId);
             //var prodAttributeValues = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", null, "[ax].[ProductAttributeValues]", actionId);
             return null;
->>>>>>> erp_listener_ax_lss
         }
         public static AxBaseException ReadItemAttributes(bool includesFashion, bool includeBandM, int actionId)
         {
@@ -169,32 +138,6 @@ namespace ErpConnector.Ax.Modules
                 {
                     return prodAttribute;
                 }
-<<<<<<< HEAD
-
-                var attrValue = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", "", "[ax].[ProductAttributeValues]", actionId).Result;
-                if (attrValue != null)
-                {
-                    return attrValue;
-                }
-
-                //var ecoResValue = ServiceConnector.CallService<AGREcoResValueDTO>(actionId,  "GetValue", "AGRAttributeService", "[ax].[ECORESVALUE]", 10000);
-                //if (ecoResValue != null)
-                //{
-                //    return ecoResValue;
-                //}
-
-                var attrViaService = UpdateProductAttributes(actionId);
-                if (attrViaService != null)
-                {
-                    return null;
-                }
-            }
-
-            return null;
-        }
-       
-            //}
-=======
 
                 var attrValue = ServiceConnector.CallOdataEndpoint<ProductAttributeValue>("ProductAttributeValues", "", "[ax].[ProductAttributeValues]", actionId).Result;
                 if (attrValue != null)
@@ -226,8 +169,6 @@ namespace ErpConnector.Ax.Modules
 
             return null;
         }
-       
->>>>>>> erp_listener_ax_lss
 
     }
 }

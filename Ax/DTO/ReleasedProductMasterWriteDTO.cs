@@ -86,11 +86,7 @@ namespace ErpConnector.Ax.DTO
             BatchNumberGroupCode = "";
             CostCalculationGroupId = "";
             PackingDutyQuantity = 0;
-<<<<<<< HEAD
-            AlternativeProductConfigurationId = "";
-=======
             AlternativeProductConfigurationId = "";            
->>>>>>> erp_listener_ax_lss
             DefaultProductColorId = "";
             IsSalesPriceIncludingCharges = NoYes.No;
             ProductionType = PmfProductType.None;
@@ -133,11 +129,7 @@ namespace ErpConnector.Ax.DTO
             ProductCoverageGroupId = "";
             CostGroupId = "";
             IsPurchasePriceIncludingCharges = NoYes.No;
-<<<<<<< HEAD
             IsShipAloneEnabled = NoYes.No;
-=======
-            IsShipAloneEnabled = NoYes.No;            
->>>>>>> erp_listener_ax_lss
             RawMaterialPickingPrinciple = WHSAllowMaterialOverPick.Staging;
             FixedPurchasePriceCharges = 0;
             FreightAllocationGroupId = "";
@@ -163,11 +155,7 @@ namespace ErpConnector.Ax.DTO
             PurchaseRebateProductGroupId = "";
             PackSizeCategoryId = "";
             PackageClassId = "";
-<<<<<<< HEAD
-            FixedCostCharges = 0;
-=======
             FixedCostCharges = 0;            
->>>>>>> erp_listener_ax_lss
             SerialNumberGroupCode = "";
             CarryingCostABCCode = ABC.None;
             SalesLineDiscountProductGroupCode = "";

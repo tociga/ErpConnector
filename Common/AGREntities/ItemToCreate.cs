@@ -36,9 +36,6 @@ namespace ErpConnector.Common.AGREntities
         public string primar_vendor_no { get; set; }
         public decimal? sale_price { get; set; }
         public decimal? cost_price { get; set; }
-<<<<<<< HEAD
-=======
         public string life_cycle_state_id { get; set; }
->>>>>>> erp_listener_ax_lss
     }
 }
