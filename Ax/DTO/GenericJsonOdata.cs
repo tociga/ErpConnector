@@ -16,5 +16,6 @@ namespace ErpConnector.Ax.DTO
         public string NextLink { get; set; }
 
         public AxBaseException Exception { get; set; }
+
     }
 }

@@ -179,6 +179,10 @@ namespace ErpConnector.Ax
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
                 var returnODataObject = await CallOdataEndpoint<T>(endpoint);
+                if (returnODataObject.value.Any())
+                {
+                    DataWriter.TruncateSingleTable(dbTable);
+                }
                 DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
 
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
@@ -219,6 +223,13 @@ namespace ErpConnector.Ax
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
+<<<<<<< HEAD
+=======
+                if (returnODataObject.value.Any())
+                {
+                    DataWriter.TruncateSingleTable(dbTable);
+                }
+>>>>>>> erp_listener_ax_lss
                 DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
@@ -419,7 +430,11 @@ namespace ErpConnector.Ax
             }
         }
 
+<<<<<<< HEAD
         private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, DateTime minDate, DateTime maxDate, bool useDate = false)
+=======
+        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, DateTime minDate, DateTime maxDate, bool useDate = false)
+>>>>>>> erp_listener_ax_lss
         {
             StringBuilder sb = new StringBuilder();
             if (useDate)
@@ -433,9 +448,15 @@ namespace ErpConnector.Ax
             }
             var result = ServiceConnector.CallAGRServiceArray<T>(serviceName, webMethod, sb.ToString(), null);
 
+<<<<<<< HEAD
             var reader = result.Result.value.GetDataReader();
 
             DataWriter.WriteToTable<T>(reader, destTable);
+=======
+            //var reader = result.Result.value.GetDataReader();
+
+            //DataWriter.WriteToTable<T>(reader, destTable);
+>>>>>>> erp_listener_ax_lss
 
             return result.Result;
         }
@@ -445,6 +466,7 @@ namespace ErpConnector.Ax
             DateTime startTime = DateTime.Now;
             try
             {
+<<<<<<< HEAD
                 long recId = DataWriter.GetMaxRecId(dbTable);
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
                 bool firstRound = true;
@@ -453,6 +475,20 @@ namespace ErpConnector.Ax
                     result = ServiceConnector.WriteFromService<T>(recId, pageSize, webMethod, serviceName,  dbTable, DateTime.MinValue, DateTime.MinValue, false);
                     recId = DataWriter.GetMaxRecId(dbTable);
                     firstRound = false;
+=======
+                long recId = 0;
+                GenericJsonOdata<T> result = new GenericJsonOdata<T>();
+                result = WriteFromService<T>(recId, pageSize, webMethod, serviceName, DateTime.MinValue, DateTime.MinValue, false);
+                if (result.value.Any())
+                {
+                    DataWriter.TruncateSingleTable(dbTable);
+                }                
+                while (result.value.Any() && result.Exception == null)
+                {
+                    result = WriteFromService<T>(recId, pageSize, webMethod, serviceName, DateTime.MinValue, DateTime.MinValue, false);
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
+                    recId = DataWriter.GetMaxRecId(dbTable);                    
+>>>>>>> erp_listener_ax_lss
                 }
 
                 if (result.Exception == null)
@@ -482,9 +518,22 @@ namespace ErpConnector.Ax
             try
             {
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
+<<<<<<< HEAD
                 for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
                     result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName,  dbTable, d, nextPeriod(d), true);
+=======
+                bool firstResult = false;
+                for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
+                {
+                    result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName, d, nextPeriod(d), true);
+                    if (!firstResult && result.value.Any())
+                    {
+                        DataWriter.TruncateSingleTable(dbTable);
+                        firstResult = true;
+                    }
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
+>>>>>>> erp_listener_ax_lss
                 }
                 if (result.Exception == null)
                 {

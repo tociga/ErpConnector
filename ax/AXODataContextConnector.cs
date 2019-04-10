@@ -6,12 +6,13 @@ using System.Linq;
 using System.Xml;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Common.Exceptions;
+using System.Collections.Generic;
 
 namespace ErpConnector.Ax
 {
     public delegate void LogMessage(string msg, ConsoleColor color = ConsoleColor.Green, bool leadingLine = true);
 
-    public abstract class AXODataContextConnector
+    public abstract class AXODataContextConnector<T>
     {
         protected LogMessage logMessageHandler;
 
@@ -27,11 +28,11 @@ namespace ErpConnector.Ax
             this.context = new AXODataContext(oAuthHelper, enableCrossCompany);
         }
 
-        public AxBaseException CreateRecordInAX(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
+        public AxBaseException CreateRecordInAX(string targetAXLegalEntity, List<T> dataFile)
         {
             if (dataFile.Count > 0)
             {
-                bool recordCreated = this.CreateRcords(targetAXLegalEntity, dataFile);
+                bool recordCreated = this.CreateRecords(targetAXLegalEntity, dataFile);
 
                 // Save everything as a single transaction (can be otherwise if required):
                 if (recordCreated)
@@ -43,9 +44,9 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        protected abstract bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile);
+        protected abstract bool CreateRecords(string targetAXLegalEntity, List<T> dataFile);
 
-        private AxBaseException SaveChanges()
+        protected virtual AxBaseException SaveChanges()
         {
             try
             {

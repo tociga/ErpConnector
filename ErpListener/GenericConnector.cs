@@ -95,15 +95,32 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
+<<<<<<< HEAD
         public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date));
+=======
+
+        public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date, int? noParallelProcesses)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date, noParallelProcesses));
+>>>>>>> erp_listener_ax_lss
             connectorTasks.Add(task);
             return task;
         }
         public Task<AxBaseException> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.GetSingleTable(step, actionId, date));
+<<<<<<< HEAD
+=======
+            connectorTasks.Add(task);
+            return task;
+        }
+
+        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<AGRProductLifeCycleState> plc)
+        {
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plc, actionId));
+>>>>>>> erp_listener_ax_lss
             connectorTasks.Add(task);
             return task;
         }

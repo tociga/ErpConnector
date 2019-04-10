@@ -29,13 +29,21 @@ namespace ErpConnector.Ax.Modules
             //{
             //    return assortment;
             //}
+<<<<<<< HEAD
             ////var locSetup = context.Locations.ToList().GetDataReader<Location>();
+=======
+            //var locSetup = context.Locations.ToList().GetDataReader<Location>();
+>>>>>>> erp_listener_ax_lss
             var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "", "[ax].[INVENTLOCATION]", actionId).Result;
             //if (locSetup != null)
             //{
             //    return locSetup;
             //}
+<<<<<<< HEAD
             ////var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
+=======
+            //var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
+>>>>>>> erp_listener_ax_lss
             var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "", "[ax].[DIRPARTYTABLE]", actionId).Result;
             //if (dir != null)
             //{

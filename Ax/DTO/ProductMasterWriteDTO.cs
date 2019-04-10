@@ -35,6 +35,7 @@ namespace ErpConnector.Ax.DTO
         public string STCCCode { get; set; }
         public string TrackingDimensionGroupName { get; set; }
         public string StorageDimensionGroupName { get; set; }
+        public string ProductLifeCycleStateId { get; set; }
 
         public ProductMasterWriteDTO()
         {       

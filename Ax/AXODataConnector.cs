@@ -21,17 +21,35 @@ namespace ErpConnector.Ax
     public class AxODataConnector : IErpConnector
     {
         #region Initialization
-        private static Resources _context;
+        private Resources _context;
+        private Resources Context
+        {
+            get
+            {
+                if (_context == null)
+                {
+                    var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                    _context = new Resources(new Uri(axBaseUrl + "/data"));
+                    _context.SendingRequest2 += Context_SendingRequest2;
+                    return _context;
+                }
+                return _context;
+            }
+        }
         private bool includesFashion;
         private bool includeB_M;
         public AxODataConnector()
-        {
-            var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"]; 
+        { 
 			Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
             Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeB_M);
+<<<<<<< HEAD
             _context = new Resources(new Uri(axBaseUrl + "/data"));
             _context.SendingRequest2 += Context_SendingRequest2;                      
+=======
+>>>>>>> erp_listener_ax_lss
         }
+
+
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
@@ -44,6 +62,7 @@ namespace ErpConnector.Ax
         {
             return ScriptGeneratorModule.GenerateScript(entity);
         }
+<<<<<<< HEAD
        
         private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
@@ -123,6 +142,96 @@ namespace ErpConnector.Ax
         }
         public AxBaseException GetBom(int actionId)
         {
+=======
+        
+        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
+        {
+            if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+
+                Object[] parameters = new Object[4];
+                if (erpStep.MaxPageSize.HasValue)
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId };
+                }
+                else
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId };
+                }
+                generic.Invoke(null, parameters);
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize });
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                Func<DateTime, DateTime> action = null;
+                switch (erpStep.PeriodIncrement)
+                {
+                    case ErpTaskStep.PeriodIncrementType.HOURS:
+                        {
+                            action = delegate (DateTime d) { return d.AddHours(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.DAYS:
+                        {
+                            action = delegate (DateTime d) { return d.AddDays(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.MONTHS:
+                        {
+                            action = delegate (DateTime d) { return d.AddMonths(1); };
+                            break;
+                        }
+                    default:
+                        {
+                            action = null;
+                            break;
+                        }
+
+                }
+                Object[] parameters = new Object[6] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, action };
+                generic.Invoke(null, parameters);
+            }
+            return null;
+        }
+        public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date, int? noParallelProcess)
+        {
+            //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
+            //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
+            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, noParallelProcess.HasValue ? noParallelProcess.Value : 4 , actionId, date);
+            exec.Execute();
+
+            //foreach (var erpStep in erpTasks.Steps)
+            //{
+            //    ExecuteTask(actionId, erpStep, date); // possible to do some parallel processing.
+            //}
+            return null;
+        }
+
+        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        {
+            if (date == DateTime.MaxValue)
+            {
+                DataWriter.TruncateSingleTable(step.DbTable);
+            }
+            List<ErpTaskStep> steps = new List<ErpTaskStep>();
+            steps.Add(step);
+            AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+            exec.Execute();
+            return null;
+
+        }
+        public AxBaseException GetBom(int actionId)
+        {
+>>>>>>> erp_listener_ax_lss
             DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
             return BomTransfer.GetBom(actionId);
         }
@@ -130,7 +239,11 @@ namespace ErpConnector.Ax
         public void GetPoTo(int actionId)
         {
             DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
+<<<<<<< HEAD
             POTransfer.GetPosAndTos(_context, actionId);
+=======
+            POTransfer.GetPosAndTos(Context, actionId);
+>>>>>>> erp_listener_ax_lss
         }
         
         public void GetFullIoTrans(int actionId)
@@ -566,7 +679,11 @@ namespace ErpConnector.Ax
             //var rv = ServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
         }
 
+<<<<<<< HEAD
         public GenericWriteObject<ProductMasterWriteDTO> CreateMaster(ProductMasterWriteDTO master)
+=======
+        public GenericWriteObject<ReleasedProductMaster> CreateMaster(List<ReleasedProductMaster> masters)
+>>>>>>> erp_listener_ax_lss
         {
             string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
             var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
@@ -575,6 +692,7 @@ namespace ErpConnector.Ax
                                                        ConfigurationManager.AppSettings["ax_oauth_token_url"],
                                                        ConfigurationManager.AppSettings["ax_client_key"]);
             var oAuthHelper = new OAuthHelper(clientconfig);
+<<<<<<< HEAD
             ArrayList a = new ArrayList();
             string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
             AXODataContextConnector axConnector = new CreateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
@@ -582,6 +700,29 @@ namespace ErpConnector.Ax
             axConnector.CreateRecordInAX(dataarea, a);
             return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
         }
+=======
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector<ReleasedProductMaster> axConnector = new UpdateProductMaster<ReleasedProductMaster>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, masters);
+
+            return new GenericWriteObject<ReleasedProductMaster> { Exception = null, WriteObject = masters[0] };
+        }
+        public GenericWriteObject<ReleasedProductVariant> UpdateVariants(List<ReleasedProductVariant> variants)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector<ReleasedProductVariant> axConnector = new UpdateReleasedProductVariants<ReleasedProductVariant>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, variants);
+            return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
+        }
+
+>>>>>>> erp_listener_ax_lss
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
@@ -600,9 +741,15 @@ namespace ErpConnector.Ax
                     //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
+<<<<<<< HEAD
                     var erpMaster = CreateMaster(master);
                     //var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
 
+=======
+                    //var erpMaster = CreateMaster(master);
+                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+                    
+>>>>>>> erp_listener_ax_lss
                     if (erpMaster.Exception != null)
                     {
                         DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
@@ -640,6 +787,7 @@ namespace ErpConnector.Ax
                     }
                     DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true, null, null);
                 }
+
                 foreach (var item in itemsToCreate)
                 {
                     var variant = new ReleasedProductVariantDTO
@@ -681,11 +829,11 @@ namespace ErpConnector.Ax
                                                            ConfigurationManager.AppSettings["ax_client_key"]);
                 var oAuthHelper = new OAuthHelper(clientconfig);
 
-                ArrayList a = new ArrayList();
+                List<AGROrderDTO> a = new List<AGROrderDTO>();
 
                 string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
 
-                AXODataContextConnector axConnector = new CreateOrder(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+                AXODataContextConnector<AGROrderDTO> axConnector = new CreateOrder<AGROrderDTO>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
                 if (po_to_create.Any())
                 {
                     var o = po_to_create.First();
@@ -728,7 +876,7 @@ namespace ErpConnector.Ax
 
                     order.OrderStatus = AGROrderStatus.Ready;
                     order.ArgOrderLine.Clear();
-                    a = new System.Collections.ArrayList();
+                    a = new List<AGROrderDTO>();
                     a.Add(order);
 
                     // Send the data file to the connector object:
@@ -748,6 +896,8 @@ namespace ErpConnector.Ax
 
             if (leadingLine) Console.WriteLine();
             Console.WriteLine(msg);
+
+            //Log.Info(msg);
         }
 
 
@@ -801,11 +951,18 @@ namespace ErpConnector.Ax
             }
 
             var bom = GetBom(actionId);
+<<<<<<< HEAD
             if (bom !=null)
             {
                 return bom;
             }
 
+=======
+            if (bom != null)
+            {
+                return bom;
+            }
+>>>>>>> erp_listener_ax_lss
             var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
             if (price != null)
             {
@@ -833,6 +990,10 @@ namespace ErpConnector.Ax
             POTransfer.PullPurchTable(actionId);
             POTransfer.PullAGROrders(actionId);
             POTransfer.PullAGROrderLines(actionId);
+<<<<<<< HEAD
+=======
+
+>>>>>>> erp_listener_ax_lss
             if (includeB_M)
             {
                 SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
@@ -848,6 +1009,116 @@ namespace ErpConnector.Ax
             {
                 return attributes;
             }
+<<<<<<< HEAD
+=======
+            return null;
+        }
+
+        public AxBaseException UpdateProductLifecycleState(List<AGRProductLifeCycleState> plc, int actionId)
+        {            
+            DateTime startTime = DateTime.Now;
+            if (plc.Any())
+            {
+                var distinctMaster = plc.DistinctBy(x => x.product_no).Select(y=>y.product_no);
+                foreach (var m in distinctMaster)
+                {
+                    var plcPerMaster = plc.Where(x => x.product_no == m);
+                    string masterLifecycleState = "";
+                    if (plcPerMaster.Where(x => x.lifecycle_status.ToLower() == "confirmed").Any())
+                    {
+                        masterLifecycleState = "Confirmed";
+                    }
+                    else if (plcPerMaster.Count(x => x.lifecycle_status.ToLower() == "delete") == plcPerMaster.Count())
+                    {
+                        masterLifecycleState ="Delete";
+                    }
+                    else if (plcPerMaster.Count(x => x.lifecycle_status.ToLower() == "shortlist") == plcPerMaster.Count())
+                    {
+                        masterLifecycleState = "Shortlist";
+                    }
+                    else
+                    {
+                        return new AxBaseException
+                        {
+                            ApplicationException = new Exception(string.Format("Plc update batch = {0} contains an invalid Product Lifecycle State in D365", 
+                                plcPerMaster.First().product_lifecycle_state_update_id))
+                        };
+                    }
+
+                    if (plcPerMaster.Any())
+                    {
+                        var master = new ReleasedProductMaster();
+                        master.ProductNumber = plcPerMaster.First().product_no;
+                        master.ProductLifecycleStateId = masterLifecycleState;
+                        var erpMaster = CreateMaster(new List<ReleasedProductMaster> { master });
+
+                        if (erpMaster.Exception != null)
+                        {
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
+                            return erpMaster.Exception;
+                        }
+                        else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != plcPerMaster.First().product_no.ToLower().Trim())
+                        {
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
+                            return new AxBaseException
+                            {
+                                ApplicationException = new ApplicationException(
+                                "The product number for Product Master does not match the returned number, AX value = " + erpMaster.WriteObject.ProductNumber + " AGR number = "
+                                + plcPerMaster.First().product_no)
+                            };
+                        }
+
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
+                        startTime = DateTime.Now;
+                    }
+                    List<ReleasedProductVariant> variantList = new List<ReleasedProductVariant>();
+                    string variantPlc;
+                    foreach (var item in plcPerMaster)
+                    {
+                        if (item.lifecycle_status.ToLower() == "confirmed")
+                        {
+                            variantPlc = "Confirmed";
+                        }
+                        else if (item.lifecycle_status.ToLower() == "delete")
+                        {
+                            variantPlc = "Delete";
+                        }
+                        else if (item.lifecycle_status.ToLower() == "shortlist")
+                        {
+                            variantPlc = "Shortlist";
+                        }
+                        else
+                        {
+                            return new AxBaseException
+                            {
+                                ApplicationException = new Exception(string.Format("Plc update batch = {0} {1} {2} {3} {4} contains an invalid Product Lifecycle State {5} in D365",
+                                    item.product_no, item.product_color_id, item.product_size_id, item.product_style_id, item.product_config_id, item.lifecycle_status))
+                            };
+                        }
+                        var variant = new ReleasedProductVariant
+                        {
+                            ItemNumber = item.product_no,
+                            ProductMasterNumber = item.product_no,
+                            ProductSizeId = item.product_size_id,
+                            ProductColorId = item.product_color_id,
+                            ProductStyleId = item.product_style_id,
+                            ProductConfigurationId = item.product_config_id,
+                            ProductLifecycleStateId = variantPlc
+                        };
+                        startTime = DateTime.Now;
+                        //var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
+                        variantList.Add(variant);
+                    }
+                    var erpVariants = UpdateVariants(variantList);
+                    if (erpVariants.Exception != null)
+                    {
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
+                        return erpVariants.Exception;
+                    }
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                }
+            }
+>>>>>>> erp_listener_ax_lss
             return null;
         }
     }

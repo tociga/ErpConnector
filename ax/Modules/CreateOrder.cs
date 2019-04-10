@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Ax.Modules
 {
-    public class CreateOrder : AXODataContextConnector
+    public class CreateOrder<T> : AXODataContextConnector<T> where T: AGROrderDTO
     {
         public CreateOrder(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
-        protected override bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
+        protected override bool CreateRecords(string targetAXLegalEntity, List<T> dataFile)
         {
             bool ret = false;
 

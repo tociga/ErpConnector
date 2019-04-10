@@ -65,7 +65,7 @@ namespace ErpConnector.Ax.Modules
             //    return combos;
             //}
 
-            //var assortLookup = WriteServiceData<RetailAssortmentLookupDTO>("[ax]", "[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
+            //var assortLookup = WriteServiceData<RetailAssortmentLookupDTO>("[ax].[RETAILASSORTMENTLOOKUP]", "GetRetailAssortmentLookup");
             //if (assortLookup != null)
             //{
             //    return assortLookup;
@@ -126,7 +126,7 @@ namespace ErpConnector.Ax.Modules
             ////var inventSeason = context.InventSeasonTables.ToList().GetDataReader<InventSeasonTable>();
             ////    DataWriter.WriteToTable<InventSeasonTable>(inventSeason, "[ax].[InventSeasonTable]");
 
-            ////WriteServiceData<InventColorSeasonDTO>("[ax]", "[InventColorSeason]", "GetInventSeasonColor");
+            ////WriteServiceData<InventColorSeasonDTO>("[ax].[InventColorSeason]", "GetInventSeasonColor");
             //    var inventColorSeason = GetFromService<InventColorSeasonDTO>("AGRFashionServiceGroup", "AGRFashionService", "GetInventSeasonColor", null);
             //    if (inventColorSeason.Exception != null)
             //    {

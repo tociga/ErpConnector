@@ -56,14 +56,26 @@ namespace ErpConnector.Ax.Modules
         {
             return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> erp_listener_ax_lss
         public static AxBaseException PullPurchTable(int actionId)
         {
             return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> erp_listener_ax_lss
         public static AxBaseException PullAGROrders(int actionId)
         {
             return ServiceConnector.CallOdataEndpoint<AGROrder>("AGROrders", null, "[ax].[AGROrderTable]", actionId).Result;
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> erp_listener_ax_lss
         public static AxBaseException PullAGROrderLines(int actionId)
         {
             return ServiceConnector.CallOdataEndpoint<AGROrderLine>("AGROrderLines", null, "[ax].[AGROrderLine]", actionId).Result;
