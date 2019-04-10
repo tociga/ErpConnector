@@ -586,9 +586,9 @@ namespace ErpConnector.Ax
             var oAuthHelper = new OAuthHelper(clientconfig);
             ArrayList a = new ArrayList();
             string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
-            AXODataContextConnector axConnector = new UpdateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            //AXODataContextConnector axConnector = new UpdateProductMaster(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
             a.Add(master);
-            axConnector.CreateRecordInAX(dataarea, a);
+            //axConnector.CreateRecordInAX(dataarea, a);
             return new GenericWriteObject<ProductMasterWriteDTO> { Exception = null, WriteObject = master };
         }
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)

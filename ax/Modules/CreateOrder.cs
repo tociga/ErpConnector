@@ -14,7 +14,7 @@ namespace ErpConnector.Ax.Modules
         public CreateOrder(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
-        protected override bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
+        protected override bool CreateRecords(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
         {
             bool ret = false;
 

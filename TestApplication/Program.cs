@@ -184,8 +184,14 @@ namespace TestApplication
             //list2.Add(item);
             //var r = connector.CreateItems(list2, -1);
 
-            UpdateMaster();
-
+            //UpdateMaster();
+            var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];             
+            Resources context = new Resources(new Uri(axBaseUrl + "/data"));
+            var dirs = context.DirParties.Where(x => x.PublicRecId == 5637144576);
+            foreach (var d in dirs)
+            {
+                System.Diagnostics.Debug.WriteLine("Name" + d.Name);
+            }
         }
 
         public static void UpdateMasterV2()
