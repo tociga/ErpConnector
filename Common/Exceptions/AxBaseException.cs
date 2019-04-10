@@ -11,7 +11,6 @@ namespace ErpConnector.Common.Exceptions
         public AxWebExceptions error { get; set; }
 
         public Exception ApplicationException { get; set; }
-
         public string ErrorMessage
         {
             get
@@ -27,7 +26,6 @@ namespace ErpConnector.Common.Exceptions
                 return "";
             }
         }
-
         public string StackTrace
         {
             get

@@ -31,12 +31,11 @@ namespace ErpConnector.Ax.Utils
         {
             return Token.CreateAuthorizationHeader();
         }
-        
+
         public static string GetAdalToken()
         {
             return Token.AccessToken;
         }
-
         private static AuthenticationResult Authenticate()
         {
             var axOAuthTokenUrl = ConfigurationManager.AppSettings["ax_oauth_token_url"];

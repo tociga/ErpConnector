@@ -86,7 +86,7 @@ namespace ErpConnector.Ax.DTO
             BatchNumberGroupCode = "";
             CostCalculationGroupId = "";
             PackingDutyQuantity = 0;
-            AlternativeProductConfigurationId = "";            
+            AlternativeProductConfigurationId = "";
             DefaultProductColorId = "";
             IsSalesPriceIncludingCharges = NoYes.No;
             ProductionType = PmfProductType.None;
@@ -155,7 +155,7 @@ namespace ErpConnector.Ax.DTO
             PurchaseRebateProductGroupId = "";
             PackSizeCategoryId = "";
             PackageClassId = "";
-            FixedCostCharges = 0;            
+            FixedCostCharges = 0;
             SerialNumberGroupCode = "";
             CarryingCostABCCode = ABC.None;
             SalesLineDiscountProductGroupCode = "";
@@ -197,7 +197,7 @@ namespace ErpConnector.Ax.DTO
         }
         public decimal TransferOrderOverdeliveryPercentage { get; set; }
         public string SalesUnitSymbol { get; set; }
-        public int ProductionConsumptionWidthConversionFactor { get; set; }        
+        public int ProductionConsumptionWidthConversionFactor { get; set; }
         public NoYes IsPurchasePriceAutomaticallyUpdated { get; set; }
         public NoYes IsPurchaseWithholdingTaxCalculated { get; set; }
         public decimal TransferOrderUnderdeliveryPercentage { get; set; }
@@ -235,7 +235,7 @@ namespace ErpConnector.Ax.DTO
         public string PhysicalDimensionGroupId { get; set; }
         public int MinimumCatchWeightQuantity { get; set; }
         public string SalesChargeProductGroupId { get; set; }
-        
+
         public NoYes WillPickingWorkbenchApplyBoxingLogic { get; set; }
         public string ItemFiscalClassificationExceptionCode { get; set; }
         public string InventoryReservationHierarchyName { get; set; }
@@ -248,7 +248,7 @@ namespace ErpConnector.Ax.DTO
         public int ShelfAdvicePeriodDays { get; set; }
         public string ContinuityScheduleId { get; set; }
         public PurchMatchingPolicyWithNotSetOption VendorInvoiceLineMatchingPolicy { get; set; }
-        
+
         public NoYes MustKeyInCommentAtPOSRegister { get; set; }
         public decimal SalesPriceQuantity { get; set; }
         public string ServiceFiscalInformationCode { get; set; }
@@ -276,7 +276,7 @@ namespace ErpConnector.Ax.DTO
         public PDSPotencyAttribRecordingEnum PotencyBaseAttributeValueEntryEvent { get; set; }
         public string ItemModelGroupId { get; set; }
         public string PurchaseMultilineDiscountProductGroupCode { get; set; }
-        
+
         public decimal SalesChargesQuantity { get; set; }
         public decimal SalesPriceCalculationContributionRatio { get; set; }
         public string ProductGroupId { get; set; }
@@ -285,7 +285,7 @@ namespace ErpConnector.Ax.DTO
         public int ShippingAndReceivingSortOrderCode { get; set; }
         public decimal GrossProductHeight { get; set; }
         public DateTimeOffset ProductLifeCycleValidFromDate{ get; set; }
-        
+
         public DateTimeOffset POSRegistrationPlannedBlockedDate{ get; set; }
         public string SalesItemWithholdingTaxGroupCode { get; set; }
         public string PurchaseLineDiscountProductGroupCode { get; set; }
@@ -323,7 +323,7 @@ namespace ErpConnector.Ax.DTO
         public int ContinuityEventDuration { get; set; }
         public string PurchaseSalesTaxItemGroupCode { get; set; }
         public string DefaultDirectDeliveryWarehouse { get; set; }
-        
+
         public DateTimeOffset SalesPriceDate { get; set; }
         public string OriginCountryRegionId { get; set; }
         public ReqPOType DefaultOrderType { get; set; }
@@ -361,7 +361,7 @@ namespace ErpConnector.Ax.DTO
         public string ComparisonPriceBaseUnitSymbol { get; set; }
         public NoYes WillWorkCenterPickingAllowNegativeInventory { get; set; }
         public NoYes IsICMSTaxAppliedOnService { get; set; }
-        
+
         public RetailPriceKeyingRequirement KeyInPriceRequirementsAtPOSRegister { get; set; }
         public decimal ApproximateSalesTaxPercentage { get; set; }
         public DateTimeOffset POSRegistrationActivationDate{ get; set; }

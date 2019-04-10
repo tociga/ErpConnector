@@ -33,7 +33,6 @@ namespace TestApplication
 
             //ErpConnector.Ax.Authentication.OAuthHelper helper = new ErpConnector.Ax.Authentication.OAuthHelper(clientconfig);
             //helper.GetAuthenticationHeaderUserPass();
-<<<<<<< HEAD
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
             //Type entityObject = typeof(ErpConnector.Ax.DTO.VendorDTO);
 
@@ -63,17 +62,10 @@ namespace TestApplication
             //}
 
             //entityObject = typeof(ErpConnector.Ax.DTO.ProdTableDTO);
-=======
-            //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxCode rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxCode();
-            //Type entityObject = typeof(ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxItemGroup);
-
-            //var tig = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.TaxItemGroup();
->>>>>>> erp_listener_ax_lss
 
             //if (entityObject != null)
             //{
             //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-<<<<<<< HEAD
             //    string str = sg.CreateScript("[ax].[ProdTable]");
             //    System.Diagnostics.Trace.WriteLine(str);
             //}
@@ -190,20 +182,6 @@ namespace TestApplication
             //var r = connector.CreateItems(list2, -1);
 
 
-
-=======
-            //    string str = sg.CreateScript("[ax].[TaxItemGroups]");
-            //    System.Diagnostics.Trace.WriteLine(str);
-            //}
-
-            //entityObject = typeof(ErpConnector.Ax.DTO.SalesTableDTO);
-
-            //if (entityObject != null)
-            //{
-            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str = sg.CreateScript("[ax].[SalesTable]");
-            //    System.Diagnostics.Trace.WriteLine(str);
-            //}
 
             //entityObject = typeof(ErpConnector.Ax.DTO.SalesLineDTO);
 
@@ -352,7 +330,7 @@ namespace TestApplication
 
             ReleasedProductMasterV2 master = new ReleasedProductMasterV2();
             AGRRetailSeasonTable r = new AGRRetailSeasonTable();
-           
+
 
             var query = from m in context.ReleasedProductMastersV2
                         where m.ItemNumber == "0140" && m.DataAreaId == "USRT"
@@ -366,7 +344,6 @@ namespace TestApplication
 
             context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
 
->>>>>>> erp_listener_ax_lss
         }
         public static void UpdateMaster()
         {

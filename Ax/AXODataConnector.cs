@@ -39,7 +39,7 @@ namespace ErpConnector.Ax
         private bool includesFashion;
         private bool includeB_M;
         public AxODataConnector()
-        { 
+        {
 			Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
             Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeB_M);
         }
@@ -56,7 +56,66 @@ namespace ErpConnector.Ax
         public string GetDBScript(string entity)
         {
             return ScriptGeneratorModule.GenerateScript(entity);
-        }        
+        }
+        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
+        {
+            if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+
+                Object[] parameters = new Object[4];
+                if (erpStep.MaxPageSize.HasValue)
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId };
+                }
+                else
+                {
+                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId };
+                }
+                generic.Invoke(null, parameters);
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize });
+            }
+            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
+            {
+                MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
+                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
+                Func<DateTime, DateTime> action = null;
+                switch (erpStep.PeriodIncrement)
+                {
+                    case ErpTaskStep.PeriodIncrementType.HOURS:
+                        {
+                            action = delegate (DateTime d) { return d.AddHours(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.DAYS:
+                        {
+                            action = delegate (DateTime d) { return d.AddDays(1); };
+                            break;
+                        }
+                    case ErpTaskStep.PeriodIncrementType.MONTHS:
+                        {
+                            action = delegate (DateTime d) { return d.AddMonths(1); };
+                            break;
+                        }
+                    default:
+                        {
+                            action = null;
+                            break;
+                        }
+
+                }
+                Object[] parameters = new Object[6] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, action };
+                generic.Invoke(null, parameters);
+            }
+            return null;
+        }
+
         private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
             if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
@@ -153,7 +212,7 @@ namespace ErpConnector.Ax
             DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
             POTransfer.GetPosAndTos(Context, actionId);
         }
-        
+
         public void GetFullIoTrans(int actionId)
         {
             ProductHistory ph = new ProductHistory(actionId);
@@ -577,11 +636,11 @@ namespace ErpConnector.Ax
             v.ProductStyleId = "";
             v.ProductName = master.ProductName + "_" + v.ProductColorId + "_" + v.ProductSizeId;
             v.ProductSearchName = v.ProductName;
-            v.ProductMasterNumber = master.ProductNumber;            
+            v.ProductMasterNumber = master.ProductNumber;
             var pt = new ProductTranslation { LanguageId = "en-us", ProductNumber = master.ProductNumber, ProductName = master.ProductName };
             var list = new List<ProductTranslation>();
             list.Add(pt);
-            var vv = new ReleasedProductVariant();            
+            var vv = new ReleasedProductVariant();
             var vars = new List<ReleasedProductVariantDTO>();
             vars.Add(v);
             //var rv = ServiceConnector.CallOdataEndpointPost("ReleasedProductVariants", null, v).Result;
@@ -616,11 +675,41 @@ namespace ErpConnector.Ax
             return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
         }
 
+        public GenericWriteObject<ReleasedProductMaster> CreateMaster(List<ReleasedProductMaster> masters)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector<ReleasedProductMaster> axConnector = new UpdateProductMaster<ReleasedProductMaster>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, masters);
+
+            return new GenericWriteObject<ReleasedProductMaster> { Exception = null, WriteObject = masters[0] };
+        }
+        public GenericWriteObject<ReleasedProductVariant> UpdateVariants(List<ReleasedProductVariant> variants)
+        {
+            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
+                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       axBaseUrl,
+                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
+                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+            var oAuthHelper = new OAuthHelper(clientconfig);
+            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
+            AXODataContextConnector<ReleasedProductVariant> axConnector = new UpdateReleasedProductVariants<ReleasedProductVariant>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
+            axConnector.CreateRecordInAX(dataarea, variants);
+            return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
+        }
+
         public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
         {
             DateTime startTime = DateTime.Now;
             if (itemsToCreate.Any())
-            {                                
+            {
                 var masterData = itemsToCreate.First();
                 if (masterData.master_status < 2)
                 {
@@ -630,12 +719,13 @@ namespace ErpConnector.Ax
                     master.ProductName = masterData.product_name;
                     master.ProductSearchName = masterData.product_name.Trim();
                     master.ProductSizeGroupId = masterData.size_group_no;
-                    master.ProductColorGroupId = masterData.color_group_no; // possible to use color_group_no                
+                    master.ProductColorGroupId = masterData.color_group_no; // possible to use color_group_no
                     //master.RetailProductCategoryName = masterData.sup_department;
                     master.ProductDescription = masterData.description;
 
                     //var erpMaster = CreateMaster(master);
-                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;                    
+                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+
                     if (erpMaster.Exception != null)
                     {
                         DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
@@ -687,11 +777,11 @@ namespace ErpConnector.Ax
                         ProductDescription = item.description,
                         ProductName = item.product_name + "_" + item.color_no + "_" + item.size,
                         ProductSearchName = (item.product_name + "_" + item.color_no + "_" + item.size).Trim(),
-                        ProductMasterNumber = item.product_no                       
+                        ProductMasterNumber = item.product_no
                     };
                     startTime = DateTime.Now;
                     var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
-                    
+
                     if (erpVariants.Exception != null)
                     {
                         DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
@@ -772,7 +862,7 @@ namespace ErpConnector.Ax
             catch (Exception e)
             {
                 return new AxBaseException { ApplicationException = e };
-            }            
+            }
             return null;
         }
 
@@ -888,7 +978,7 @@ namespace ErpConnector.Ax
         }
 
         public AxBaseException UpdateProductLifecycleState(List<AGRProductLifeCycleState> plc, int actionId)
-        {            
+        {
             DateTime startTime = DateTime.Now;
             if (plc.Any())
             {
@@ -913,7 +1003,7 @@ namespace ErpConnector.Ax
                     {
                         return new AxBaseException
                         {
-                            ApplicationException = new Exception(string.Format("Plc update batch = {0} contains an invalid Product Lifecycle State in D365", 
+                            ApplicationException = new Exception(string.Format("Plc update batch = {0} contains an invalid Product Lifecycle State in D365",
                                 plcPerMaster.First().product_lifecycle_state_update_id))
                         };
                     }

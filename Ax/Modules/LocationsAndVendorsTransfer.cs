@@ -11,7 +11,7 @@ namespace ErpConnector.Ax.Modules
     {
         public static AxBaseException WriteLocationsAndVendors(int actionId)
         {
-            //var channel = ReadRetailChannel(context);            
+            //var channel = ReadRetailChannel(context);
             var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
                 "", "[ax].[RETAILCHANNELTABLE]", actionId).Result;
@@ -29,13 +29,13 @@ namespace ErpConnector.Ax.Modules
             //{
             //    return assortment;
             //}
-
+            //var locSetup = context.Locations.ToList().GetDataReader<Location>();
             var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "", "[ax].[INVENTLOCATION]", actionId).Result;
             //if (locSetup != null)
             //{
             //    return locSetup;
             //}
-
+            //var dir = context.DirParties.ToList().GetDataReader<DirParty>();
             var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "", "[ax].[DIRPARTYTABLE]", actionId).Result;
             //if (dir != null)
             //{

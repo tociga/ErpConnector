@@ -62,6 +62,7 @@ namespace ErpConnector.Ax.Utils
             }
         }
 
+
         public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice,
             bool clearAttributeRefresh)
         {
@@ -175,24 +176,28 @@ namespace ErpConnector.Ax.Utils
             using (var con = new SqlConnection(ConnectionString))
             {
                 con.Open();
+
                 using (var adapter = new SqlDataAdapter(query, con))
                 {
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
+
                     Type baseType = typeof(T);
                     var columns = (from DataColumn c in dt.Columns
                             select c.ColumnName).ToList();
+
                     foreach (var pi in baseType.GetProperties(BindingFlags.Public| BindingFlags.Instance))
                     {
                         if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
                         {
+
                             var cols = columns.Where(x => x == pi.Name);
                             if (!cols.Any())
                             {
                                 result.Add(pi.Name);
                             }
                         }
-                    }                    
+                    }
                 }
             }
             return result;
@@ -210,7 +215,7 @@ namespace ErpConnector.Ax.Utils
                     adapter.Fill(dt);
                     Type baseType = typeof(T);
                     var columns = (from DataColumn c in dt.Columns
-                    select c.ColumnName).ToList();
+                                   select c.ColumnName).ToList();
                     foreach (var pi in baseType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
                         if (pi.PropertyType.IsValueType || pi.PropertyType == typeof(String))
@@ -221,7 +226,7 @@ namespace ErpConnector.Ax.Utils
                                 result.Add(pi.Name);
                             }
                         }
-                    }                    
+                    }
                 }
             }
             return result;
