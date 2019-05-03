@@ -1,5 +1,4 @@
-﻿using ErpConnector.Ax;
-using ErpConnector.Common;
+﻿using ErpConnector.Common;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
@@ -7,6 +6,7 @@ using ErpConnector.Common.AGREntities;
 using System.Collections.Generic;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
+using ErpConnector.Ax;
 
 namespace ErpConnector.Listener
 {
@@ -22,6 +22,9 @@ namespace ErpConnector.Listener
             {
                 case ErpType.ax:
                     factory = new AxODataConnector();
+                    break;
+                case ErpType.jira:
+                    factory = new ErpGenericConnector();
                     break;
                 case ErpType.sap:
                     break;
@@ -52,7 +55,7 @@ namespace ErpConnector.Listener
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreatePoTo(po_to_create, actionId));
             connectorTasks.Add(task);
-            return task;
+            return task;            
         }
 
         public Task<AxBaseException> PimFull(int actionId)
@@ -83,9 +86,9 @@ namespace ErpConnector.Listener
             return task;
         }
 
-        public Task<AxBaseException> CreateItem(List<ItemToCreate> itemsToCreate, int actionId)
+        public Task<AxBaseException> CreateItem(int itemCreateBatchId, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemsToCreate, actionId));
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemCreateBatchId, actionId));
             connectorTasks.Add(task);
             return task;
         }
@@ -109,9 +112,9 @@ namespace ErpConnector.Listener
             return task;
         }
 
-        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<AGRProductLifeCycleState> plc)
+        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, int plcUdpdateId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plc, actionId));
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
             connectorTasks.Add(task);
             return task;
         }

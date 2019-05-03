@@ -104,12 +104,12 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
-    <Compile Include="AxTaskExecute.cs" />
     <Compile Include="D365Entities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>D365Entities.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\AxDbHandler.cs" />
     <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />

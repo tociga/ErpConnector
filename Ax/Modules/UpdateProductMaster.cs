@@ -48,7 +48,7 @@ namespace ErpConnector.Ax.Modules
                 var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
                 foreach (var master in plcMaster)
                 {
-                    DataWriter.UpdateProductMasterLifecycleState(master.ProductNumber, master.ProductLifecycleStateId);
+                    //DataWriter.UpdateProductMasterLifecycleState(master.ProductNumber, master.ProductLifecycleStateId);
                 }
                 return null;
             }
@@ -138,9 +138,9 @@ namespace ErpConnector.Ax.Modules
             context.TrackEntityInstance(m);
 
             //m.RetailProductCategoryName = master.RetailProductCategoryName;
-            m.ProductLifecycleStateId = master.ProductLifecycleStateId;
+            //m.ProductLifecycleStateId = master.ProductLifecycleStateId;
 
-            logMessageHandler(string.Format("Update ProductMaster '{0}', PLC state = {1}", master.ProductNumber, master.ProductLifecycleStateId));
+            //logMessageHandler(string.Format("Update ProductMaster '{0}', PLC state = {1}", master.ProductNumber, master.ProductLifecycleStateId));
         }
 
 

@@ -94,9 +94,9 @@ namespace ErpConnector.Ax.Modules
             context.TrackEntityInstance(m);
 
             //m.RetailProductCategoryName = master.RetailProductCategoryName;
-            m.ProductLifecycleStateId = v.ProductLifecycleStateId;
+            //m.ProductLifecycleStateId = v.ProductLifecycleStateId;
 
-            logMessageHandler(string.Format("Update Variant '{0}', to plc state = {1}", m.ProductVariantNumber, m.ProductLifecycleStateId));
+            //logMessageHandler(string.Format("Update Variant '{0}', to plc state = {1}", m.ProductVariantNumber, m.ProductLifecycleStateId));
         }
 
         protected override AxBaseException SaveChanges()
@@ -106,8 +106,8 @@ namespace ErpConnector.Ax.Modules
                 var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);                
                 foreach(var v in plcVar)
                 {
-                    DataWriter.UpdateProductVariantLifecycleState(v.ProductMasterNumber, v.ProductSizeId,
-                        v.ProductColorId, v.ProductStyleId, v.ProductConfigurationId, v.ProductLifecycleStateId);
+                    //DataWriter.UpdateProductVariantLifecycleState(v.ProductMasterNumber, v.ProductSizeId,
+                    //    v.ProductColorId, v.ProductStyleId, v.ProductConfigurationId, v.ProductLifecycleStateId);
                 }
                 return null;
             }

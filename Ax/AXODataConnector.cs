@@ -15,6 +15,7 @@ using System.Linq;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
 using System.Reflection;
+using ErpConnector.Ax.DB;
 
 namespace ErpConnector.Ax
 {
@@ -115,70 +116,11 @@ namespace ErpConnector.Ax
             }
             return null;
         }
-
-        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
-        {
-            if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
-            {
-                MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
-                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-
-                Object[] parameters = new Object[4];
-                if (erpStep.MaxPageSize.HasValue)
-                {
-                    parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId };
-                }
-                else
-                {
-                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId };
-                }
-                generic.Invoke(null, parameters);
-            }
-            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
-            {
-                MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
-                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize });
-            }
-            else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
-            {
-                MethodInfo method = typeof(ServiceConnector).GetMethod("CallServiceByDate");
-                MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                Func<DateTime, DateTime> action = null;
-                switch (erpStep.PeriodIncrement)
-                {
-                    case ErpTaskStep.PeriodIncrementType.HOURS:
-                        {
-                            action = delegate (DateTime d) { return d.AddHours(1); };
-                            break;
-                        }
-                    case ErpTaskStep.PeriodIncrementType.DAYS:
-                        {
-                            action = delegate (DateTime d) { return d.AddDays(1); };
-                            break;
-                        }
-                    case ErpTaskStep.PeriodIncrementType.MONTHS:
-                        {
-                            action = delegate (DateTime d) { return d.AddMonths(1); };
-                            break;
-                        }
-                    default:
-                        {
-                            action = null;
-                            break;
-                        }
-
-                }
-                Object[] parameters = new Object[6] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, action };
-                generic.Invoke(null, parameters);
-            }
-            return null;
-        }
         public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date, int? noParallelProcess)
         {
             //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
             //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-            AxTaskExecute exec = new AxTaskExecute(erpTasks.Steps, noParallelProcess.HasValue ? noParallelProcess.Value : 4 , actionId, date);
+            TaskExecute exec = new TaskExecute(erpTasks.Steps, noParallelProcess.HasValue ? noParallelProcess.Value : 4 , actionId, date);
             exec.Execute();
 
             //foreach (var erpStep in erpTasks.Steps)
@@ -196,7 +138,7 @@ namespace ErpConnector.Ax
             }
             List<ErpTaskStep> steps = new List<ErpTaskStep>();
             steps.Add(step);
-            AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+            TaskExecute exec = new TaskExecute(steps, 1, actionId, date);
             exec.Execute();
             return null;
 
@@ -675,38 +617,9 @@ namespace ErpConnector.Ax
             return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
         }
 
-        public GenericWriteObject<ReleasedProductMaster> CreateMaster(List<ReleasedProductMaster> masters)
+        public AxBaseException CreateItems(int tempId, int actionId)
         {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                       ConfigurationManager.AppSettings["ax_client_secret"],
-                                                       axBaseUrl,
-                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                       ConfigurationManager.AppSettings["ax_client_key"]);
-            var oAuthHelper = new OAuthHelper(clientconfig);
-            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
-            AXODataContextConnector<ReleasedProductMaster> axConnector = new UpdateProductMaster<ReleasedProductMaster>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
-            axConnector.CreateRecordInAX(dataarea, masters);
-
-            return new GenericWriteObject<ReleasedProductMaster> { Exception = null, WriteObject = masters[0] };
-        }
-        public GenericWriteObject<ReleasedProductVariant> UpdateVariants(List<ReleasedProductVariant> variants)
-        {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
-            var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                       ConfigurationManager.AppSettings["ax_client_secret"],
-                                                       axBaseUrl,
-                                                       ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                       ConfigurationManager.AppSettings["ax_client_key"]);
-            var oAuthHelper = new OAuthHelper(clientconfig);
-            string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
-            AXODataContextConnector<ReleasedProductVariant> axConnector = new UpdateReleasedProductVariants<ReleasedProductVariant>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
-            axConnector.CreateRecordInAX(dataarea, variants);
-            return new GenericWriteObject<ReleasedProductVariant> { Exception = null, WriteObject = variants[0] };
-        }
-
-        public AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId)
-        {
+            List<ItemToCreate> itemsToCreate = AxDbHandler.GetItemsToCreate(tempId);
             DateTime startTime = DateTime.Now;
             if (itemsToCreate.Any())
             {
@@ -977,12 +890,13 @@ namespace ErpConnector.Ax
             return null;
         }
 
-        public AxBaseException UpdateProductLifecycleState(List<AGRProductLifeCycleState> plc, int actionId)
+        public AxBaseException UpdateProductLifecycleState(int plcUpdateId, int actionId)
         {
             DateTime startTime = DateTime.Now;
+            var plc = AxDbHandler.GetProductLifeCycleStateUpdates(plcUpdateId);
             if (plc.Any())
             {
-                var distinctMaster = plc.DistinctBy(x => x.product_no).Select(y=>y.product_no);
+                var distinctMaster = plc.DistinctBy(x => x.product_no).Select(y => y.product_no);
                 foreach (var m in distinctMaster)
                 {
                     var plcPerMaster = plc.Where(x => x.product_no == m);
@@ -993,7 +907,7 @@ namespace ErpConnector.Ax
                     }
                     else if (plcPerMaster.Count(x => x.lifecycle_status.ToLower() == "delete") == plcPerMaster.Count())
                     {
-                        masterLifecycleState ="Delete";
+                        masterLifecycleState = "Delete";
                     }
                     else if (plcPerMaster.Count(x => x.lifecycle_status.ToLower() == "shortlist") == plcPerMaster.Count())
                     {
@@ -1012,7 +926,7 @@ namespace ErpConnector.Ax
                     {
                         var master = new ReleasedProductMaster();
                         master.ProductNumber = plcPerMaster.First().product_no;
-                        master.ProductLifecycleStateId = masterLifecycleState;
+                        //master.ProductLifecycleStateId = masterLifecycleState;
                         var erpMaster = CreateMaster(new List<ReleasedProductMaster> { master });
 
                         if (erpMaster.Exception != null)
@@ -1066,7 +980,7 @@ namespace ErpConnector.Ax
                             ProductColorId = item.product_color_id,
                             ProductStyleId = item.product_style_id,
                             ProductConfigurationId = item.product_config_id,
-                            ProductLifecycleStateId = variantPlc
+                            //ProductLifecycleStateId = variantPlc
                         };
                         startTime = DateTime.Now;
                         //var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
