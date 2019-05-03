@@ -41,25 +41,25 @@ namespace ErpConnector.Ax.Modules
 
         private static AxBaseException PullPurchLines(int actionId)
         {
-            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax].[PurchLine]", 10000);
+            return ServiceConnector.CallService<PurchLinesDTO>(actionId, "GetPurchLine", "AGRInventTransService", "[ax].[PurchLine]", 10000).Result;
         }
         public static AxBaseException RefreshPurchLines(DateTime date, int actionId)
         {
-            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax].[PurchLine_Increment]");
+            return ServiceConnector.CallServiceByDate<PurchLinesDTO>(date, actionId, "GetPurchLineByDate", "AGRInventTransService", "[ax].[PurchLine_Increment]").Result;
 
         }
         private static AxBaseException PullTOLines(int actionId)
         {
-            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax].[INVENTTRANSFERLINE]", 5000);
+            return ServiceConnector.CallService<InventTransferLineDTO>(actionId, "GetInventTransferLines", "AGRItemCustomService", "[ax].[INVENTTRANSFERLINE]", 5000).Result;
         }
         private static AxBaseException PullTOTable(int actionId)
         {
-            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000);
+            return  ServiceConnector.CallService<InventTransferTableDTO>(actionId, "GetInventTransferTable", "AGRItemCustomService", "[ax].[INVENTTRANSFERTABLE]", 10000).Result;
         }
 
         public static AxBaseException PullPurchTable(int actionId)
         {
-            return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000);
+            return ServiceConnector.CallService<PurchTableDTO>(actionId, "GetPurchTable", "AGRInventTransService", "[ax].[PurchTable]", 10000).Result;
         }
 
         public static AxBaseException PullAGROrders(int actionId)

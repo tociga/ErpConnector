@@ -136,11 +136,11 @@ namespace ErpConnector.Ax
             {
                 DataWriter.TruncateSingleTable(step.DbTable);
             }
-            List<ErpTaskStep> steps = new List<ErpTaskStep>();
-            steps.Add(step);
-            AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
-            exec.Execute();
-            return null;
+            //List<ErpTaskStep> steps = new List<ErpTaskStep>();
+            //steps.Add(step);
+            //AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+            //exec.Execute();
+            return AxTaskExecute.ExecuteTask(actionId, step, date);
 
         }
         public AxBaseException GetBom(int actionId)

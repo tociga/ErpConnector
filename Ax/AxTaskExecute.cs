@@ -89,9 +89,9 @@ namespace ErpConnector.Ax
                 TryGetTask(taskList, collection);
             }
         }
-
-        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
+        public static AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
+            AxBaseException result = null;
             if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
             {
                 if (erpStep.MaxPageSize.HasValue)
@@ -101,7 +101,7 @@ namespace ErpConnector.Ax
 
                     Object[] parameters = new Object[4];
                     parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId };
-                    generic.Invoke(null, parameters);
+                    result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                 }
                 else
                 {
@@ -110,14 +110,15 @@ namespace ErpConnector.Ax
 
                     Object[] parameters = new Object[4];
                     parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId };
-                    generic.Invoke(null, parameters);
+                    result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                 }
             }
             else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
             {
                 MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
                 MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize });
+                result = ((Task<AxBaseException>)generic.Invoke(null, new Object[5] { actionId, erpStep.ServiceMethod, erpStep.ServiceName,
+                    erpStep.DbTable, erpStep.MaxPageSize })).Result;
             }
             else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
             {
@@ -149,9 +150,9 @@ namespace ErpConnector.Ax
 
                 }
                 Object[] parameters = new Object[6] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, action };
-                generic.Invoke(null, parameters);
+                result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
             }
-            return null;
+            return result;
         }
 
     }
