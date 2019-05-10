@@ -118,8 +118,8 @@ namespace ErpConnector.Listener
                                     date = GetDateById(action.date_reference_id);
                                 }
                                 var step = GetStep(action.reference_id);
-                                connectorTask = connector.GetSingleTable(step, action.id, date);
-                                connectorTask.ContinueWith((mark) => UpdateActionStatus(action.id, 2, mark)).Wait();
+                                var a = connector.GetSingleTable(step, action.id, date);
+                                UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
                                 break;
                             case "update_plc":
                                 UpdateActionStatus(action.id, 1, null);

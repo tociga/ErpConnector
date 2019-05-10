@@ -132,15 +132,22 @@ namespace ErpConnector.Ax
 
         public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            if (date == DateTime.MaxValue)
+            try
             {
-                DataWriter.TruncateSingleTable(step.DbTable);
+                if (date == DateTime.MaxValue)
+                {
+                    DataWriter.TruncateSingleTable(step.DbTable);
+                }
+                //List<ErpTaskStep> steps = new List<ErpTaskStep>();
+                //steps.Add(step);
+                //AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
+                //exec.Execute();
+                return AxTaskExecute.ExecuteTask(actionId, step, date);
             }
-            //List<ErpTaskStep> steps = new List<ErpTaskStep>();
-            //steps.Add(step);
-            //AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
-            //exec.Execute();
-            return AxTaskExecute.ExecuteTask(actionId, step, date);
+            catch(Exception e)
+            {
+                return new AxBaseException { ApplicationException = e };
+            }
 
         }
         public AxBaseException GetBom(int actionId)
