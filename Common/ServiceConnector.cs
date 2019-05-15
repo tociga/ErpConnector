@@ -264,7 +264,7 @@ namespace ErpConnector.Common
 
         //}
 
-        public static async Task<AxBaseException> CallOdataEndpoint<T, Y>(string oDataEndpoint, string filters, string dbTable, int actionId, ServiceData authData) where T : GenericJsonOdata<Y>
+        public static async Task<AxBaseException> CallOdataEndpoint<T,Y>(string oDataEndpoint, string filters, string dbTable, int actionId, ServiceData authData) where T: GenericJsonOdata<Y>
         {
             DateTime startTime = DateTime.Now;
             try
@@ -272,7 +272,11 @@ namespace ErpConnector.Common
                 var baseUrl = authData.BaseUrl;
                 var endpoint = baseUrl + authData.OdataUrlPostFix + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
-                var returnODataObject = await CallOdataEndpoint<T, Y>(endpoint, authData);
+                var returnODataObject = await CallOdataEndpointAsync<Y>(endpoint, authData);
+				if (returnODataObject.value.Any())
+                {
+                    DataWriter.TruncateSingleTable(dbTable);
+                }
                 DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                 string nextLinkEndpoint = null;
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
@@ -285,7 +289,7 @@ namespace ErpConnector.Common
                     {
                         nextLinkEndpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
                     }
-                    returnODataObject = await CallOdataEndpoint<T, Y>(nextLinkEndpoint, authData);
+                    returnODataObject = await CallOdataEndpointAsync<Y>(nextLinkEndpoint, authData);
                     DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     if (returnODataObject.Exception != null)
                     {
@@ -320,7 +324,11 @@ namespace ErpConnector.Common
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint, authData);
-                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                if (returnODataObject.value.Any())
+                {
+                    DataWriter.TruncateSingleTable(dbTable);
+                }
+                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
                     filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
@@ -361,134 +369,137 @@ namespace ErpConnector.Common
                 using (var response = await client.GetAsync(requestUri))
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
-                    return result;
-                }
-            }
-            catch (WebException e)
-            {
-                using (var rStream = e.Response.GetResponseStream())
-                {
-                    using (var reader = new StreamReader(rStream))
+                    if (response.IsSuccessStatusCode)
                     {
-                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+                        result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
                         return result;
+                    }
+                    else
+                    {
+                        return new GenericJsonOdata<T>
+                        {
+                            Exception = new AxBaseException { ApplicationException = new ApplicationException(responseString) }
+                        };
                     }
                 }
             }
-            catch(TaskCanceledException)
+            catch (ArgumentNullException ne)
+            {
+                return new GenericJsonOdata<T>
+                {
+                    Exception = new AxBaseException { ApplicationException = ne }
+                };
+            }
+            catch (TaskCanceledException)
             {
                 return new GenericJsonOdata<T>
                 {
                     Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) }
                 };
             }
-        }
-        private static async Task<T> CallOdataEndpoint<T, Y>(string requestUri, ServiceData authData) where T : GenericJsonOdata<Y>
-        {            
-            var request =(HttpWebRequest)HttpWebRequest.Create(requestUri);
-            request.Accept = "application/json;odata.metadata=none";            
-            request.Headers["Authorization"] = authData.AuthHeader;
-            request.Method = "GET";
-            request.Timeout = 1000 * 60 * 2; // we set it to 2 minutes.
-            var result = Activator.CreateInstance<T>();
-            try
+            catch (Exception e)
             {
-                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
+                return new GenericJsonOdata<T>
                 {
-                    using (var responseStream = response.GetResponseStream())
-                    {
-                        using (var streamReader = new StreamReader(responseStream))
-                        {
-                            var responseString = streamReader.ReadToEnd();
-                            if (authData.AuthType == ErpTasks.ErpTaskStep.AuthenticationType.JIRA)
-                            {
-                                var resultArray = JsonConvert.DeserializeObject<List<Y>>(responseString);
-                                result.value = resultArray;
-                            }
-                            else
-                            {
-                                result = JsonConvert.DeserializeObject<T>(responseString);
-                            }
-                            return result;
-                        }
-                    }
-                }
+                    Exception = new AxBaseException { ApplicationException = e }
+                };
             }
-            catch(WebException e)
-            {
-                using (var rStream = e.Response.GetResponseStream())
-                {
-                    using (var reader = new StreamReader(rStream))
-                    {
-                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
-                        // TODO: Need to log error;
-                        return result;
-                    }
-                }
-            }
+
         }
-
-
+        //private static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string requestUri)
+        //{            
+        //    var request =(HttpWebRequest)HttpWebRequest.Create(requestUri);
+        //    request.Accept = "application/json;odata.metadata=none";
+        //    string token = Authenticator.GetAdalHeader();
+        //    request.Headers["Authorization"] = token;
+        //    request.Method = "GET";
+        //    request.Timeout = 1;
+        //    //request.Timeout = 1000 * 60 * 2; // we set it to 2 minutes.
+        //    var result = new GenericJsonOdata<T>();
+        //    try
+        //    {
+        //        using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
+        //        {
+        //            using (var responseStream = response.GetResponseStream())
+        //            {
+        //                using (var streamReader = new StreamReader(responseStream))
+        //                {
+        //                    var responseString = streamReader.ReadToEnd();
+        //                    //string sanitized = SanitizeJsonString(responseString);
+        //                    result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+        //                    return result;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch(WebException e)
+        //    {
+        //        using (var rStream = e.Response.GetResponseStream())
+        //        {
+        //            using (var reader = new StreamReader(rStream))
+        //            {
+        //                result.Exception = JsonConvert.DeserializeObject<AxBaseException>(reader.ReadToEnd());
+        //                // TODO: Need to log error;
+        //                return result;
+        //            }
+        //        }
+        //    }
+        //}
         private static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup, ServiceData authData)
         {
             var baseUrl = authData.BaseUrl;
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
             var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod+ApplyCrossCompanyFilter("");
 
-            var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = authData.AuthHeader;
-            //request.Headers["Content-Type"] = "application/json";
-            request.Method = "POST";
-            request.ContentLength = postData != null ? postData.Length : 0;
-            System.Diagnostics.Debug.Write("Endpoint :" + endpoint+ " ");
+            HttpClient client = new HttpClient();
+            string token = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthToken;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));           
+            client.Timeout = new TimeSpan(0, 3, 0);
+
+            System.Diagnostics.Debug.Write("Endpoint :" + endpoint + " ");
             System.Diagnostics.Debug.WriteLine("postData: " + postData);
-
-            if (request.ContentLength > 0)
-            {
-                using (var requestStream = await request.GetRequestStreamAsync())
-                {
-                    using (var writer = new StreamWriter(requestStream))
-                    {
-                        writer.Write(postData);
-                        writer.Flush();
-                    }
-                }
-            }
-
             var result = new GenericJsonOdata<T>();
             try
             {
-                using (var response = (HttpWebResponse)(await request.GetResponseAsync()))
+                using (var response = await client.PostAsync(endpoint, new StringContent(postData)))
                 {
-                    using (var responseStream = response.GetResponseStream())
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
                     {
-                        using (var streamReader = new StreamReader(responseStream))
-                        {
-                            var responseString = streamReader.ReadToEnd();
-                            result.value = JsonConvert.DeserializeObject<List<T>>(responseString);
-
-                            return result;
-
-                        }
-                    }
-                }
-            }
-            catch (WebException e)
-            {
-                using (var rStream = e.Response.GetResponseStream())
-                {
-                    using (var reader = new StreamReader(rStream))
-                    {
-                        var r = reader.ReadToEnd();
-
-                        // TODO: Need to log error;
-                        result.Exception = JsonConvert.DeserializeObject<AxBaseException>(r);
+                        result.value = JsonConvert.DeserializeObject<List<T>>(responseString);
                         return result;
                     }
+                    else
+                    {
+                        return new GenericJsonOdata<T>
+                        {
+                            Exception = new AxBaseException { ApplicationException = new ApplicationException(responseString) }
+                        };
+                    }
                 }
             }
-
+            catch (ArgumentNullException ne)
+            {
+                return new GenericJsonOdata<T>
+                {
+                    Exception = new AxBaseException { ApplicationException = ne }
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                return new GenericJsonOdata<T>
+                {
+                    Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + endpoint) }
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericJsonOdata<T>
+                {
+                    Exception = new AxBaseException { ApplicationException = e }
+                };
+            }
         }
 
         public static async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData, ServiceData authData)
@@ -526,7 +537,7 @@ namespace ErpConnector.Common
             }
         }
 
-        private static GenericJsonOdata<T> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, 
+        private static async Task<GenericJsonOdata<T>> WriteFromService<T>(Int64 recId, Int64 pageSize, string webMethod, string serviceName, string destTable, 
             DateTime minDate, DateTime maxDate, ServiceData authData, bool useDate = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -539,28 +550,32 @@ namespace ErpConnector.Common
             {
                 sb.Append("{ \"lastRecId\": " + recId.ToString() + ", \"pageSize\" : " + (pageSize).ToString() + " }");
             }
-            var result = ServiceConnector.CallAGRServiceArray<T>(serviceName, webMethod, sb.ToString(), null, authData);
+            var result = await ServiceConnector.CallAGRServiceArray<T>(serviceName, webMethod, sb.ToString(), null, authData);
 
-            var reader = result.Result.value.GetDataReader();
+            //var reader = result.value.GetDataReader();
 
-            DataWriter.WriteToTable<T>(reader, destTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+            //DataWriter.WriteToTable<T>(reader, destTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
 
-            return result.Result;
+            return result;
         }
 
-        public static AxBaseException CallService<T>(int actionId, string webMethod, string serviceName,  string dbTable, int pageSize, ServiceData authData)
+        public static async Task<AxBaseException> CallService<T>(int actionId, string webMethod, string serviceName,  string dbTable, int pageSize, ServiceData authData)
         {
             DateTime startTime = DateTime.Now;
             try
             {
-                long recId = DataWriter.GetMaxRecId(dbTable);
+                long recId = 0;
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
-                bool firstRound = true;
-                while (firstRound || (result.value.Any() && result.Exception == null))
+                result = await WriteFromService<T>(0, 500, webMethod, serviceName, dbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
+                if (result.value.Any())
                 {
-                    result = ServiceConnector.WriteFromService<T>(recId, pageSize, webMethod, serviceName,  dbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
-                    recId = DataWriter.GetMaxRecId(dbTable);
-                    firstRound = false;
+                    DataWriter.TruncateSingleTable(dbTable);
+                }                
+                while (result.value.Any() && result.Exception == null)
+                {
+                    result = await WriteFromService<T>(recId, pageSize, webMethod, serviceName, dbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
+                    recId = DataWriter.GetMaxRecId(dbTable);                    
                 }
 
                 if (result.Exception == null)
@@ -580,7 +595,7 @@ namespace ErpConnector.Common
             }
         }
 
-        public static AxBaseException CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName,  string dbTable, ServiceData authData, Func<DateTime, DateTime> nextPeriod = null )
+        public static async Task<AxBaseException> CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName,  string dbTable, ServiceData authData, Func<DateTime, DateTime> nextPeriod = null )
         {
             if (nextPeriod == null)
             {
@@ -590,9 +605,16 @@ namespace ErpConnector.Common
             try
             {
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
-                for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
+                bool firstResult = false;
+                for (DateTime d = date.Date; d < DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
-                    result = ServiceConnector.WriteFromService<T>(0, 10000, webMethod, serviceName,  dbTable, d, nextPeriod(d), authData, true);
+                    result = await WriteFromService<T>(0, 10000, webMethod, serviceName, dbTable, d, nextPeriod(d), authData, true);
+                    if (!firstResult && result.value.Any())
+                    {
+                        DataWriter.TruncateSingleTable(dbTable);
+                        firstResult = true;
+                    }
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
                 }
                 if (result.Exception == null)
                 {

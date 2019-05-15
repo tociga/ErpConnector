@@ -19,10 +19,12 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ErpConnector.Common.Util.EmailSender.SendEmail(2036, DateTime.Now);
             //var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
             //if (useTsl == "true")
             //{
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                
             //}
             //string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
@@ -313,7 +315,7 @@ namespace TestApplication
             //list2.Add(item);
             //var r = connector.CreateItems(list2, -1);
 
-            UpdateMaster();
+            //UpdateMaster();
 
         }
 

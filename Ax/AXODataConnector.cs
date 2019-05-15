@@ -16,6 +16,7 @@ using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
 using System.Reflection;
 using ErpConnector.Ax.DB;
+using ErpConnector.Common.Util;
 
 namespace ErpConnector.Ax
 {
@@ -49,14 +50,14 @@ namespace ErpConnector.Ax
 
         private void Context_SendingRequest2(object sender, global::Microsoft.OData.Client.SendingRequest2EventArgs e)
         {
-            e.RequestMessage.SetHeader("Authorization", Authenticator.GetAdalHeader());
+            e.RequestMessage.SetHeader("Authorization", Common.Util.Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365).AuthHeader);
         }
         #endregion
 
         #region Public Interface
         public string GetDBScript(string entity)
         {
-            return ScriptGeneratorModule.GenerateScript(entity);
+            return Common.Util.ScriptGeneratorModule.GenerateScript(entity);
         }
         private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
@@ -142,30 +143,6 @@ namespace ErpConnector.Ax
             exec.Execute();
             return null;
 
-        }
-        public AxBaseException GetBom(int actionId)
-        {
-            DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
-            return BomTransfer.GetBom(actionId);
-        }
-
-        public void GetPoTo(int actionId)
-        {
-            DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
-            POTransfer.GetPosAndTos(Context, actionId);
-        }
-
-        public void GetFullIoTrans(int actionId)
-        {
-            ProductHistory ph = new ProductHistory(actionId);
-            ph.WriteInventTrans();
-            ph.WriteInventTransOrigin();
-            ph.WriteInventSumFull();
-            if (includeB_M)
-            {
-                SalesValueTransactions.WriteSalesValueTrans(actionId);
-                SalesValueTransactions.WriteSalesValueTransLines(actionId);
-            }
         }
         #endregion
         public void CreateItemTest()
@@ -621,6 +598,7 @@ namespace ErpConnector.Ax
         {
             List<ItemToCreate> itemsToCreate = AxDbHandler.GetItemsToCreate(tempId);
             DateTime startTime = DateTime.Now;
+            var authData = Authenticator.GetAuthData(ErpTaskStep.AuthenticationType.D365);
             if (itemsToCreate.Any())
             {
                 var masterData = itemsToCreate.First();
@@ -637,7 +615,8 @@ namespace ErpConnector.Ax
                     master.ProductDescription = masterData.description;
 
                     //var erpMaster = CreateMaster(master);
-                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO>("ProductMasters", null, master).Result;
+                    var erpMaster = ServiceConnector.CallOdataEndpointPost<ProductMasterWriteDTO, EnumConverter>("ProductMasters", null, master,
+                        authData).Result;
 
                     if (erpMaster.Exception != null)
                     {
@@ -658,7 +637,7 @@ namespace ErpConnector.Ax
                     startTime = DateTime.Now;
                     var releasedMaster = new ReleasedProductMasterWriteDTO(master.ProductNumber, master.ProductSearchName,
                         masterData.primar_vendor_no, masterData.sale_price, masterData.cost_price);
-                    var erpReleasedMaster = ServiceConnector.CallOdataEndpointPost<ReleasedProductMasterWriteDTO>("ReleasedProductMasters", null, releasedMaster).Result;
+                    var erpReleasedMaster = ServiceConnector.CallOdataEndpointPost<ReleasedProductMasterWriteDTO,EnumConverter>("ReleasedProductMasters", null, releasedMaster, authData).Result;
 
                     if (erpReleasedMaster.Exception != null)
                     {
@@ -693,7 +672,7 @@ namespace ErpConnector.Ax
                         ProductMasterNumber = item.product_no
                     };
                     startTime = DateTime.Now;
-                    var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO>("ReleasedProductVariants", null, variant).Result;
+                    var erpVariants = ServiceConnector.CallOdataEndpointPost<ReleasedProductVariantDTO, EnumConverter>("ReleasedProductVariants", null, variant, authData).Result;
 
                     if (erpVariants.Exception != null)
                     {
@@ -787,107 +766,6 @@ namespace ErpConnector.Ax
             Console.WriteLine(msg);
 
             //Log.Info(msg);
-        }
-
-
-        public AxBaseException DailyRefresh(DateTime date, int actionId)
-        {
-            var pim = PimFull(actionId);
-            if (pim != null)
-            {
-                return pim;
-            }
-            TransactionRefresh(date, actionId);
-            return null;
-        }
-
-        public AxBaseException FullTransfer(int actionId)
-        {
-            var pim = PimFull(actionId);
-            if (pim != null)
-            {
-                return pim;
-            }
-            TransactionFull(actionId);
-            return null;
-        }
-
-        public AxBaseException PimFull(int actionId)
-        {
-            DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
-            var cat = ItemCategoryTransfer.WriteCategories(actionId);
-            if (cat != null)
-            {
-                return cat;
-            }
-
-            var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
-            if (loc != null)
-            {
-                return loc;
-            }
-
-            var items = ItemTransfer.WriteItems(includesFashion, actionId);
-            if (items != null)
-            {
-                return items;
-            }
-
-            var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
-            if (attr != null)
-            {
-                return attr;
-            }
-
-            var bom = GetBom(actionId);
-            if (bom != null)
-            {
-                return bom;
-            }
-            var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
-            if (price != null)
-            {
-                return price;
-            }
-            return null;
-        }
-
-        public AxBaseException TransactionFull(int actionId)
-        {
-            DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
-            GetFullIoTrans(actionId);
-            GetPoTo(actionId);
-            return null;
-        }
-
-        public AxBaseException TransactionRefresh(DateTime date, int actionId)
-        {
-            DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
-            ProductHistory ph = new ProductHistory(actionId);
-            ph.WriteInventSumRefresh(date);
-            ph.WriteInventTransRefresh(date);
-            ph.WriteInventTransOrigin();
-            POTransfer.RefreshPurchLines(date, actionId);
-            POTransfer.PullPurchTable(actionId);
-            POTransfer.PullAGROrders(actionId);
-            POTransfer.PullAGROrderLines(actionId);
-
-            if (includeB_M)
-            {
-                SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
-                SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
-            }
-            return null;
-        }
-        public AxBaseException UpdateProduct(int actionId)
-        {
-            DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
-            var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);
-            if (attributes != null)
-            {
-                return attributes;
-            }
-            return null;
         }
 
         public AxBaseException UpdateProductLifecycleState(int plcUpdateId, int actionId)

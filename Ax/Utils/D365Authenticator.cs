@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Ax.Utils
 {
-    public class Authenticator
+    public class D365Authenticator
     {
         private static AuthenticationResult _token;
         private static AuthenticationResult Token

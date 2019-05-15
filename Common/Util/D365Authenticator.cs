@@ -19,8 +19,9 @@ namespace ErpConnector.Common.Util
 
             var authenticationContext = new AuthenticationContext(uri.ToString());
             var credentials = new ClientCredential(axClientKey, axClientSecret);
+            var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
 
-            var authResult = authenticationContext.AcquireTokenAsync(ConfigurationManager.AppSettings["base_url"], credentials).Result;
+            var authResult = authenticationContext.AcquireTokenAsync(baseUrl, credentials).Result;
 
             return authResult;
         }
@@ -32,7 +33,7 @@ namespace ErpConnector.Common.Util
             {
                 AuthHeader = result.CreateAuthorizationHeader(),
                 AuthToken = result.AccessToken,
-                BaseUrl = ConfigurationManager.AppSettings["base_url"],
+                BaseUrl = ConfigurationManager.AppSettings["ax_base_url"],
                 OdataUrlPostFix = "/data/",
                 AuthType = ErpTasks.ErpTaskStep.AuthenticationType.D365
                

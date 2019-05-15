@@ -31,35 +31,10 @@ namespace ErpConnector.Listener
 
                         switch (action.action_type)
                         {
-                            case "daily_refresh":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                var connectorTask = connector.DailyRefresh(DataWriter.GetDateById(action.reference_id), action.id);
-                                connectorTask.ContinueWith((m) => DataWriter.UpdateActionStatus(action.id, 2, m));
-                                break;
-                            case "full_refresh":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.FullTransfer(action.id);
-                                connectorTask.ContinueWith((m) => DataWriter.UpdateActionStatus(action.id, 2, m));
-                                break;
-                            case "transaction_full":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.TransactionFull(action.id);
-                                connectorTask.ContinueWith((m) => DataWriter.UpdateActionStatus(action.id, 2, m));
-                                break;
-                            case "transaction_refresh":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.TransfactionRefresh(DataWriter.GetDateById(action.reference_id), action.id);
-                                connectorTask.ContinueWith((m) => DataWriter.UpdateActionStatus(action.id, 2, m));
-                                break;
-                            case "pim_full":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                connectorTask = connector.PimFull(action.id);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
-                                break;
                             case "create_po_to":
                                 DataWriter.UpdateActionStatus(action.id, 1, null);
                                 var orders = DataWriter.GetPoToToCreate(action.reference_id);
-                                connectorTask = connector.CreatePoTo(orders, action.id);
+                                var connectorTask = connector.CreatePoTo(orders, action.id);
                                 connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
                                 DataWriter.UpdateOrderStatus(action.reference_id);
                                 break;
@@ -80,23 +55,12 @@ namespace ErpConnector.Listener
                                     DataWriter.UpdateActionStatus(action.id, 2, null);
                                 }
                                 break;
-                            case "update_product":
-                                if (includeBAndM)
-                                {
-                                    DataWriter.UpdateActionStatus(action.id, 1, null);
-                                    connectorTask = connector.UpdateProductAttributes(action.id);
-                                    connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
-                                }
-                                else
-                                {
-                                    DataWriter.UpdateActionStatus(action.id, 2, null);
-                                }
-                                break;
                             case "action_task":
                                 DataWriter.UpdateActionStatus(action.id, 1, null);
                                 var task = DataWriter.GetTask(action.reference_id);
                                 connectorTask = connector.ExecuteTask(task, action.id, DataWriter.GetDateById(action.date_reference_id), action.no_parallel_process);
                                 connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                EmailSender.SendEmail(action.id, action.created_at);
                                 break;
                             case "single_table":
                                 DataWriter.UpdateActionStatus(action.id, 1, null);

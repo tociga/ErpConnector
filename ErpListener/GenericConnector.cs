@@ -44,13 +44,6 @@ namespace ErpConnector.Listener
             }
         }
 
-        public Task<AxBaseException> DailyRefresh(DateTime date, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.DailyRefresh(date, actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
         public Task<AxBaseException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreatePoTo(po_to_create, actionId));
@@ -58,43 +51,9 @@ namespace ErpConnector.Listener
             return task;            
         }
 
-        public Task<AxBaseException> PimFull(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.PimFull(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> FullTransfer(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.FullTransfer(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> TransactionFull(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionFull(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> TransfactionRefresh(DateTime date, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionRefresh(date, actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
         public Task<AxBaseException> CreateItem(int itemCreateBatchId, int actionId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemCreateBatchId, actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-        public Task<AxBaseException> UpdateProductAttributes(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProduct(actionId));
             connectorTasks.Add(task);
             return task;
         }

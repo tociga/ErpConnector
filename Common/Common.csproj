@@ -67,6 +67,7 @@
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
+    <Compile Include="DTO\ErpActionStep.cs" />
     <Compile Include="DTO\GenericJiraIssueObject.cs" />
     <Compile Include="DTO\GenericJiraLinks.cs" />
     <Compile Include="DTO\GenericJiraObjectList.cs" />
@@ -87,13 +88,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceConnector.cs" />
     <Compile Include="Util\Authenticator.cs" />
+    <Compile Include="Util\CollectionExtensions.cs" />
     <Compile Include="Util\D365Authenticator.cs" />
     <Compile Include="Util\DataWriter.cs" />
+    <Compile Include="Util\EmailSender.cs" />
     <Compile Include="Util\GeneralAuthenticator.cs" />
     <Compile Include="Util\GenericListDataReader.cs" />
     <Compile Include="Util\IGenericDataReader.cs" />
     <Compile Include="Util\JiraAuthenticator.cs" />
     <Compile Include="Util\JiraIssueAuthenticator.cs" />
+    <Compile Include="Util\ScriptGenerator.cs" />
+    <Compile Include="Util\ScriptGeneratorModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

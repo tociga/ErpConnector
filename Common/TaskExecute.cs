@@ -63,7 +63,7 @@ namespace ErpConnector.Common
         private void Wait()
         {
             
-            while (!Steps.IsCompleted)
+            while (!Steps.IsCompleted && Steps.Count != 0)
             {
                 System.Threading.Thread.Sleep(1000);
             }
@@ -120,7 +120,7 @@ namespace ErpConnector.Common
             }
             else
             {
-                DataWriter.TruncateSingleTable(erpStep.DbTable);
+                AxBaseException result = null;
                 if (erpStep.TaskType == ErpTaskStep.ErpTaskType.ODATA_ENDPOINT)
                 {
                     if (erpStep.MaxPageSize.HasValue)
@@ -130,7 +130,7 @@ namespace ErpConnector.Common
 
                         Object[] parameters = new Object[5];
                         parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
-                        generic.Invoke(null, parameters);
+                        result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                     else
                     {
@@ -141,14 +141,14 @@ namespace ErpConnector.Common
 
                         Object[] parameters = new Object[5];
                         parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
-                        generic.Invoke(null, parameters);
+                        result=((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                 }
                 else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE)
                 {
                     MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
                     MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                    generic.Invoke(null, new Object[6] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize, Authenticator.GetAuthData(erpStep.AuthenitcationType) });
+                    result=((Task<AxBaseException>)generic.Invoke(null, new Object[6] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize, Authenticator.GetAuthData(erpStep.AuthenitcationType) })).Result;
                 }
                 else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
                 {
@@ -180,7 +180,7 @@ namespace ErpConnector.Common
 
                     }
                     Object[] parameters = new Object[7] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, Authenticator.GetAuthData(erpStep.AuthenitcationType), action };
-                    generic.Invoke(null, parameters);
+                    result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                 }
                 else if ( erpStep.TaskType == ErpTaskStep.ErpTaskType.ITERATIVE_ENDPOINT)
                 {
@@ -197,7 +197,7 @@ namespace ErpConnector.Common
                         authData.InjectionPropertyName = erpStep.InjectionPropertyName;
                         authData.InjectionPropertyValue = id;
                         parameters = new object[] { endpoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, authData };
-                        generic.Invoke(null, parameters);
+                        result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                 }
                 return null;

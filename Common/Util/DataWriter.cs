@@ -9,6 +9,7 @@ using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.AGREntities;
 using ErpConnector.Common.Exceptions;
 using System.Threading.Tasks;
+using ErpConnector.Common.DTO;
 
 namespace ErpConnector.Common.Util
 {
@@ -238,7 +239,7 @@ namespace ErpConnector.Common.Util
         }
 
 
-        public static void WriteToTable<T>(IGenericDataReader<T> reader, string tableName, object value, string propertyName)
+        public static void WriteToTable<T>(IGenericDataReader<T> reader, string tableName, object value = null, string propertyName = null)
         {
             if (reader.HasRows())
             {
@@ -654,6 +655,35 @@ namespace ErpConnector.Common.Util
             }
         }
 
+        public static List<ErpActionStep> GetActionSteps(int actionId)
+        {
+            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
+            {
+                using (var cmd = new SqlCommand("log.get_erp_action_steps", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@erp_action_id", actionId);
+                    var reader = cmd.ExecuteReader();
+                    List<ErpActionStep> result = new List<ErpActionStep>();
+                    while (reader.Read())
+                    {
+                        result.Add(
+                            new ErpActionStep
+                            {
+                                StepName = ReadString(reader, 0),
+                                DBTable = ReadString(reader, 1),
+                                D365Endpoint = ReadString(reader, 2),
+                                StartTime = reader.GetDateTime(3),
+                                EndTime = ReadDateTime(reader, 4),
+                                Success = ReadBoolean(reader, 5),
+                                ErrorMessage = ReadString(reader, 6)
+                            });
+                    }
+                    return result;
+                }
+            }
+        }
         #endregion
         public static string ReadString(IDataReader reader, int index)
         {
@@ -678,6 +708,22 @@ namespace ErpConnector.Common.Util
                 return null;
             }
             return reader.GetDecimal(index);
+        }
+        public static DateTime? ReadDateTime(IDataReader reader, int index)
+        {
+            if (reader.IsDBNull(index))
+            {
+                return null;
+            }
+            return reader.GetDateTime(index);
+        }
+        public static bool? ReadBoolean(IDataReader reader, int index)
+        {
+            if (reader.IsDBNull(index))
+            {
+                return null;
+            }
+            return reader.GetBoolean(index);
         }
 
 

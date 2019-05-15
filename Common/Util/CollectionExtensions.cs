@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ErpConnector.Ax.Utils
+namespace ErpConnector.Common.Util
 {
     public static class CollectionExtensions
     {

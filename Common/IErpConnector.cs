@@ -14,17 +14,8 @@ namespace ErpConnector.Common
     }
     public interface IErpConnector
     {
-        AxBaseException FullTransfer(int actionId);
-        //void GetPoTo();
-        //string GetDBScript(string entity);
-        //void GetBom();
-        AxBaseException DailyRefresh(DateTime date, int actionId);
-        AxBaseException PimFull(int actionId);
-        AxBaseException TransactionRefresh(DateTime date, int actionId);
-        AxBaseException TransactionFull(int actionId);
         AxBaseException CreatePoTo(List<POTOCreate> po_to_create,int actionId);
         AxBaseException CreateItems(int itemToCreateId, int actionId);
-        AxBaseException UpdateProduct(int actionId);
         AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
         AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
         AxBaseException UpdateProductLifecycleState(int plcUdateId, int actionId);
