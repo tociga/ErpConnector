@@ -32,7 +32,8 @@ namespace ErpConnector.Common.Util
                 StringBuilder sb = new StringBuilder();
                 var erpActionStep = DataWriter.GetActionSteps(actionId);
                 bool success = erpActionStep.Count(x => x.Success.HasValue && x.Success.Value) == erpActionStep.Count;
-                sb.AppendLine(string.Format("The D365 transfer started at {0} was a <b>{1}</b>,", date, success ? "success" : "failure"));
+                var environment = System.Configuration.ConfigurationManager.AppSettings["NotificationEnvironment"];
+                sb.AppendLine(string.Format("The D365 transfer started at {0} on environment <b>{2}</b> was a <b>{1}</b>,", date, success ? "success" : "failure", environment));
                 sb.AppendLine(string.Format("for the action id:{0}<br>" ,actionId));
                 
 
@@ -68,9 +69,9 @@ namespace ErpConnector.Common.Util
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //do nothing
+                DataWriter.LogCommError(e.Message, e.StackTrace, "Email Sender", e.HResult);
             }
         }
         private static string CreateErrorBody(List<ErpActionStep> steps )

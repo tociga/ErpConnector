@@ -52,20 +52,21 @@ namespace ErpConnector.Common.Util
             }
 
         }
-        public static void LogCommError(string errorMessage, int temp_id)
+        public static void LogCommError(string message, string stackTrace, object sender, int hresult)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var con = new SqlConnection(connectionString))
             {
-                using (var cmd = new SqlCommand("[dbo].[log_action_execution]"))
+                using (var cmd = new SqlCommand("[dbo].[error_log_insert]"))
                 {
                     cmd.Connection = con;
                     cmd.Connection.Open();
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@action_exec_id", -99);
-                    cmd.Parameters.AddWithValue("@extra_info", errorMessage);
-                    cmd.Parameters.AddWithValue("@action_type", "create_erp_item");
-                    cmd.Parameters.AddWithValue("@reference_id", temp_id);
+                    cmd.CommandType = CommandType.StoredProcedure;                
+                    cmd.Parameters.AddWithValue("@info", "Erp Connector Error message");
+                    cmd.Parameters.AddWithValue("@message", message);
+                    cmd.Parameters.AddWithValue("@source", sender.ToString());
+                    cmd.Parameters.AddWithValue("@stack_trace", stackTrace);
+                    cmd.Parameters.AddWithValue("@error_code", hresult);                    
 
                     cmd.ExecuteNonQuery();
                 }
@@ -130,7 +131,7 @@ namespace ErpConnector.Common.Util
             if (ex != null && ex.error != null && ex.error.innererror != null)
             {
                 status = -1;
-                LogCommError(ex.error.innererror.stacktrace, temp_id);
+                LogCommError(ex.error.innererror.message, ex.error.innererror.stacktrace, "create_product", -99);
             }
 
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;

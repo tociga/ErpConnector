@@ -47,10 +47,10 @@ namespace ErpConnector.Common
 
         public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            if (date == DateTime.MaxValue)
-            {
-                DataWriter.TruncateSingleTable(step.DbTable);
-            }
+            //if (date == DateTime.MaxValue)
+            //{
+            //    DataWriter.TruncateSingleTable(step.DbTable);
+            //}
             List<ErpTaskStep> steps = new List<ErpTaskStep>();
             steps.Add(step);
             TaskExecute exec = new TaskExecute(steps, 1, actionId, date);
