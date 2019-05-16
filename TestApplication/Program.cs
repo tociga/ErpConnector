@@ -20,7 +20,7 @@ namespace TestApplication
         static void Main(string[] args)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            ErpConnector.Common.Util.EmailSender.SendEmail(2036, DateTime.Now);
+            ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
             //var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
             //if (useTsl == "true")
             //{
