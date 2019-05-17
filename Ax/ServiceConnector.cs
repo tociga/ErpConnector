@@ -308,7 +308,7 @@ namespace ErpConnector.Ax
 
         }
         //private static async Task<GenericJsonOdata<T>> CallOdataEndpoint<T>(string requestUri)
-        //{            
+        //{
         //    var request =(HttpWebRequest)HttpWebRequest.Create(requestUri);
         //    request.Accept = "application/json;odata.metadata=none";
         //    string token = Authenticator.GetAdalHeader();
@@ -355,7 +355,7 @@ namespace ErpConnector.Ax
             HttpClient client = new HttpClient();
             string token = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthToken;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));           
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.Timeout = new TimeSpan(0, 3, 0);
 
             System.Diagnostics.Debug.Write("Endpoint :" + endpoint + " ");
@@ -532,12 +532,12 @@ namespace ErpConnector.Ax
                 if (result.value.Any())
                 {
                     DataWriter.TruncateSingleTable(dbTable);
-                }                
+                }
                 while (result.value.Any() && result.Exception == null)
                 {
                     result = await WriteFromService<T>(recId, pageSize, webMethod, serviceName, DateTime.MinValue, DateTime.MinValue, false);
                     DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
-                    recId = DataWriter.GetMaxRecId(dbTable);                    
+                    recId = DataWriter.GetMaxRecId(dbTable);
                 }
 
                 if (result.Exception == null)

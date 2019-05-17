@@ -41,6 +41,7 @@ namespace ErpConnector.Listener
             {
                 task.Start();
                 task.Wait();
+                // hvað gerist ef villa gerist hér.
             }
         }
 
@@ -64,10 +65,9 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
-        public Task<AxBaseException> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.GetSingleTable(step, actionId, date));
-            connectorTasks.Add(task);
+            AxBaseException task = factory.GetSingleTable(step, actionId, date);
             return task;
         }
 

@@ -14,7 +14,7 @@ namespace ErpConnector.Listener
     public class DbService
     {
         public bool? Sync()
-        {            
+        {
             try
             {
                 bool includeBAndM = false;
@@ -41,7 +41,7 @@ namespace ErpConnector.Listener
                             case "create_item":
                                 if (includeBAndM)
                                 {
-                                    DataWriter.UpdateActionStatus(action.id, 1, null);                                   
+                                    DataWriter.UpdateActionStatus(action.id, 1, null);
                                     connectorTask = connector.CreateItem(action.reference_id, action.id);
                                     connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
                                     //var options = itemsToCreate.Select(x => x.option_id).Distinct();
@@ -69,12 +69,12 @@ namespace ErpConnector.Listener
                                 {
                                     date = DataWriter.GetDateById(action.date_reference_id);
                                 }
-                                var step = DataWriter.GetStep(action.reference_id);
-                                connectorTask = connector.GetSingleTable(step, action.id, date);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                var step = GetStep(action.reference_id);
+                                var a = connector.GetSingleTable(step, action.id, date);
+                                UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
                                 break;
                             case "update_plc":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);                                
+                                DataWriter.UpdateActionStatus(action.id, 1, null);
                                 AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 1);
                                 connectorTask = connector.UpdateProductLifecycleStatus(action.id, action.reference_id);
                                 var updateTask = connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
