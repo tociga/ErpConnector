@@ -28,6 +28,10 @@ namespace ErpConnector.Common.Util
             {
                 return (new JiraIssueAuthenticator()).GetJiraServiceData();
             }
+            else if (authType == ErpTaskStep.AuthenticationType.BC)
+            {
+                return BusinessCentralAuthenticator.GetBCServiceData();
+            }
             else
             {
                 return D365Authenticator.GetD365ServiceData();

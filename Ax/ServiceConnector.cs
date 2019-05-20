@@ -46,7 +46,7 @@ namespace ErpConnector.Ax
 
         public static async Task<GenericWriteObject<T>> CallOdataEndpointPost<T>(string oDataEndpoint, string filters, T postDataObject)
         {
-            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            string baseUrl = System.Configuration.ConfigurationManager.AppSettings["base_url"];
             string endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
@@ -116,7 +116,7 @@ namespace ErpConnector.Ax
 
         //public static async Task<T> CreateEntity<T>(string oDataEndpoint, string filters, T postDataObject, List<string> errorMessage)
         //{
-        //    string baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+        //    string baseUrl = System.Configuration.ConfigurationManager.AppSettings["base_url"];
         //    string endpoint = baseUrl + "/data/" + oDataEndpoint + filters ?? "";
 
         //    var request = HttpWebRequest.Create(endpoint);
@@ -176,7 +176,7 @@ namespace ErpConnector.Ax
             DateTime startTime = DateTime.Now;
             try
             {
-                var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                var baseUrl = ConfigurationManager.AppSettings["base_url"];
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
@@ -220,7 +220,7 @@ namespace ErpConnector.Ax
             try
             {
                 var filter = "?$top=" + maxNumber;// 1000 &$top = 1000
-                var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                var baseUrl = ConfigurationManager.AppSettings["base_url"];
                 var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint);
@@ -348,7 +348,7 @@ namespace ErpConnector.Ax
         //}
         private static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         {
-            var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+            var baseUrl = System.Configuration.ConfigurationManager.AppSettings["base_url"];
             serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
             var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod + ApplyCrossCompanyFilter("");
 
@@ -406,7 +406,7 @@ namespace ErpConnector.Ax
 
         //private static async Task<GenericJsonOdata<T>> CallAGRServiceArray<T>(string service, string serviceMethod, string postData, string serviceGroup)
         //{
-        //    var baseUrl = System.Configuration.ConfigurationManager.AppSettings["ax_base_url"];
+        //    var baseUrl = System.Configuration.ConfigurationManager.AppSettings["base_url"];
         //    serviceGroup = serviceGroup ?? System.Configuration.ConfigurationManager.AppSettings["StandardServiceGroup"];
         //    var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod+ApplyCrossCompanyFilter("");
 
@@ -467,7 +467,7 @@ namespace ErpConnector.Ax
 
         public static async Task<T> CallAGRServiceScalar<T>(string service, string serviceMethod, string postData, string adalHeader)
         {
-            var baseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            var baseUrl = ConfigurationManager.AppSettings["base_url"];
             var standardServiceGroup = ConfigurationManager.AppSettings["StandardServiceGroup"];
             var endpoint = baseUrl + "/api/services/" + standardServiceGroup + "/" + service + "/" + serviceMethod + ApplyCrossCompanyFilter("");
 

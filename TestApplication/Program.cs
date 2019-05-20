@@ -26,12 +26,12 @@ namespace TestApplication
             //{
                 
             //}
-            //string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            //string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-            //                                           ConfigurationManager.AppSettings["ax_client_secret"],
+            //                                           ConfigurationManager.AppSettings["client_secret"],
             //                                           axBaseUrl,
             //                                           ConfigurationManager.AppSettings["ax_oauth_token_url"],
-            //                                           ConfigurationManager.AppSettings["ax_client_key"]);
+            //                                           ConfigurationManager.AppSettings["client_key"]);
 
             //ErpConnector.Ax.Authentication.OAuthHelper helper = new ErpConnector.Ax.Authentication.OAuthHelper(clientconfig);
             //helper.GetAuthenticationHeaderUserPass();
@@ -321,12 +321,12 @@ namespace TestApplication
 
         public static void UpdateMasterV2()
         {
-            //string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            //string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-            //                                               ConfigurationManager.AppSettings["ax_client_secret"],
+            //                                               ConfigurationManager.AppSettings["client_secret"],
             //                                               axBaseUrl,
             //                                               ConfigurationManager.AppSettings["ax_oauth_token_url"],
-            //                                               ConfigurationManager.AppSettings["ax_client_key"]);
+            //                                               ConfigurationManager.AppSettings["client_key"]);
             //var oAuthHelper = new OAuthHelper(clientconfig);
             //AXODataContext context = new AXODataContext(oAuthHelper, false);
 
@@ -349,12 +349,12 @@ namespace TestApplication
         }
         public static void UpdateMaster()
         {
-            //string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            //string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-            //                                               ConfigurationManager.AppSettings["ax_client_secret"],
+            //                                               ConfigurationManager.AppSettings["client_secret"],
             //                                               axBaseUrl,
             //                                               ConfigurationManager.AppSettings["ax_oauth_token_url"],
-            //                                               ConfigurationManager.AppSettings["ax_client_key"]);
+            //                                               ConfigurationManager.AppSettings["client_key"]);
             //var oAuthHelper = new OAuthHelper(clientconfig);
             //AXODataContext context = new AXODataContext(oAuthHelper, false);
 

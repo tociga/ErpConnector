@@ -30,7 +30,7 @@ namespace ErpConnector.Ax
             {
                 if (_context == null)
                 {
-                    var axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                    var axBaseUrl = ConfigurationManager.AppSettings["base_url"];
                     _context = new Resources(new Uri(axBaseUrl + "/data"));
                     _context.SendingRequest2 += Context_SendingRequest2;
                     return _context;
@@ -573,12 +573,12 @@ namespace ErpConnector.Ax
         }
         public GenericWriteObject<ReleasedProductMaster> CreateMaster(List<ReleasedProductMaster> masters)
         {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       ConfigurationManager.AppSettings["client_secret"],
                                                        axBaseUrl,
                                                        ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+                                                       ConfigurationManager.AppSettings["client_key"]);
             var oAuthHelper = new OAuthHelper(clientconfig);
             string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
             AXODataContextConnector<ReleasedProductMaster> axConnector = new UpdateProductMaster<ReleasedProductMaster>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
@@ -588,12 +588,12 @@ namespace ErpConnector.Ax
         }
         public GenericWriteObject<ReleasedProductVariant> UpdateVariants(List<ReleasedProductVariant> variants)
         {
-            string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+            string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                       ConfigurationManager.AppSettings["ax_client_secret"],
+                                                       ConfigurationManager.AppSettings["client_secret"],
                                                        axBaseUrl,
                                                        ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                       ConfigurationManager.AppSettings["ax_client_key"]);
+                                                       ConfigurationManager.AppSettings["client_key"]);
             var oAuthHelper = new OAuthHelper(clientconfig);
             string dataarea = ConfigurationManager.AppSettings["DataAreaId"];
             AXODataContextConnector<ReleasedProductVariant> axConnector = new UpdateReleasedProductVariants<ReleasedProductVariant>(oAuthHelper, logMessageHandler: WriteLine, enableCrossCompany: true);
@@ -696,12 +696,12 @@ namespace ErpConnector.Ax
         {
             try
             {
-                string axBaseUrl = ConfigurationManager.AppSettings["ax_base_url"];
+                string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
                 var clientconfig = new ClientConfiguration(axBaseUrl + "/data",
-                                                           ConfigurationManager.AppSettings["ax_client_secret"],
+                                                           ConfigurationManager.AppSettings["client_secret"],
                                                            axBaseUrl,
                                                            ConfigurationManager.AppSettings["ax_oauth_token_url"],
-                                                           ConfigurationManager.AppSettings["ax_client_key"]);
+                                                           ConfigurationManager.AppSettings["client_key"]);
                 var oAuthHelper = new OAuthHelper(clientconfig);
 
                 List<AGROrderDTO> a = new List<AGROrderDTO>();

@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestAppl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira", "Jira\Jira.csproj", "{9BFFE18A-BA78-4365-9E41-AA5202760B33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nav", "Nav\Nav.csproj", "{38F3FA70-8EBC-4525-9E8B-FC5DACA86B08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sap", "Sap\Sap.csproj", "{FC9EC8A3-B681-4222-A7D2-D38603D4E856}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BFFE18A-BA78-4365-9E41-AA5202760B33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38F3FA70-8EBC-4525-9E8B-FC5DACA86B08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38F3FA70-8EBC-4525-9E8B-FC5DACA86B08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38F3FA70-8EBC-4525-9E8B-FC5DACA86B08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38F3FA70-8EBC-4525-9E8B-FC5DACA86B08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC9EC8A3-B681-4222-A7D2-D38603D4E856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC9EC8A3-B681-4222-A7D2-D38603D4E856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC9EC8A3-B681-4222-A7D2-D38603D4E856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC9EC8A3-B681-4222-A7D2-D38603D4E856}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

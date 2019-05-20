@@ -11,7 +11,7 @@ namespace ErpConnector.Common.ErpTasks
     {
         public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT };
         public enum PeriodIncrementType { NONE = 0, HOURS, DAYS, MONTHS};
-        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE};
+        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE, BC};
         public int Id { get; set; }
         public string StepName { get; set; }
         public string EndPoint { get; set; }
