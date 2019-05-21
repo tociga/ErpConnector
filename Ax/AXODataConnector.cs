@@ -143,7 +143,7 @@ namespace ErpConnector.Ax
                 //steps.Add(step);
                 //AxTaskExecute exec = new AxTaskExecute(steps, 1, actionId, date);
                 //exec.Execute();
-                return AxTaskExecute.ExecuteTask(actionId, step, date);
+                return TaskExecute.ExecuteTask(actionId, step, date);
             }
             catch(Exception e)
             {
@@ -778,6 +778,7 @@ namespace ErpConnector.Ax
         public AxBaseException UpdateProductLifecycleState(int plcUpdateId, int actionId)
         {
             DateTime startTime = DateTime.Now;
+            AxDbHandler.UpdateProductLifeCycleState(plcUpdateId, actionId, 1);
             var plc = AxDbHandler.GetProductLifeCycleStateUpdates(plcUpdateId);
             if (plc.Any())
             {
@@ -878,6 +879,7 @@ namespace ErpConnector.Ax
                         return erpVariants.Exception;
                     }
                     DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                    AxDbHandler.UpdateProductLifeCycleState(plcUpdateId, actionId, 2);
                 }
             }
             return null;

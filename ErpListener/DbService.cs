@@ -1,5 +1,4 @@
-﻿using ErpConnector.Ax.DB;
-using ErpConnector.Common.AGREntities;
+﻿using ErpConnector.Common.AGREntities;
 using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.Util;
@@ -69,16 +68,14 @@ namespace ErpConnector.Listener
                                 {
                                     date = DataWriter.GetDateById(action.date_reference_id);
                                 }
-                                var step = GetStep(action.reference_id);
+                                var step = DataWriter.GetStep(action.reference_id);
                                 var a = connector.GetSingleTable(step, action.id, date);
-                                UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
+                                DataWriter.UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
                                 break;
                             case "update_plc":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
-                                AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 1);
+                                DataWriter.UpdateActionStatus(action.id, 1, null);                                
                                 connectorTask = connector.UpdateProductLifecycleStatus(action.id, action.reference_id);
-                                var updateTask = connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
-                                updateTask.ContinueWith((x) => AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 2)).Wait();
+                                var updateTask = connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));                                
                                 break;
                             default:
                                 DataWriter.UpdateActionStatus(action.id, 3, CreateBaseTaskException(new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) }));

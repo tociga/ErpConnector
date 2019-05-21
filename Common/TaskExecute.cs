@@ -108,7 +108,7 @@ namespace ErpConnector.Common
             }
         }
 
-        private AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
+        public static AxBaseException ExecuteTask(int actionId, ErpTaskStep erpStep, DateTime date)
         {
             if (!string.IsNullOrEmpty(erpStep.ExternalProcess))
             {
