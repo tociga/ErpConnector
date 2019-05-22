@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestApplication</RootNamespace>
     <AssemblyName>TestApplication</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -70,6 +71,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{ffe8994e-25da-45be-9ef3-c548fad8563a}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nav\Nav.csproj">
+      <Project>{76a20a0f-deb6-4839-9bfa-460307152e20}</Project>
+      <Name>Nav</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

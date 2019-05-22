@@ -13,7 +13,7 @@ public static class Configuration
 
 	// The namespace of the client code generated. It replaces the original namespace in the metadata document, 
     // unless the model has several namespaces.
-	public const string NamespacePrefix = "Nav.DTO";
+	public const string NamespacePrefix = "ErpConnector.Nav.DTO";
 
 	// The target language of the generated client code. The value must be set to "CSharp" or "VB".
 	public const string TargetLanguage = "CSharp";

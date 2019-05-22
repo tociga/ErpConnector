@@ -12,6 +12,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.OData.Client;
+using ErpConnector.Common.Util;
+using ErpConnector.Nav.DTO;
 
 namespace TestApplication
 {
@@ -20,7 +22,7 @@ namespace TestApplication
         static void Main(string[] args)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
+            //ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
             //var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
             //if (useTsl == "true")
             //{
@@ -36,14 +38,14 @@ namespace TestApplication
             //ErpConnector.Ax.Authentication.OAuthHelper helper = new ErpConnector.Ax.Authentication.OAuthHelper(clientconfig);
             //helper.GetAuthenticationHeaderUserPass();
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            //Type entityObject = typeof(ErpConnector.Ax.DTO.VendorDTO);
+            Type entityObject = typeof(AGR_Vendor);
 
-            //if (entityObject != null)
-            //{
-            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
-            //    string str = sg.CreateScript("[ax].[VENDOR_SERVICE]");
-            //    System.Diagnostics.Trace.WriteLine(str);
-            //}
+            if (entityObject != null)
+            {
+                ScriptGenerator sg = new ScriptGenerator(entityObject);
+                string str = sg.CreateScript("[nav].[purchase_line]");
+                System.Diagnostics.Trace.WriteLine(str);
+            }
 
             //entityObject = typeof(ErpConnector.Ax.DTO.SalesTableDTO);
 
