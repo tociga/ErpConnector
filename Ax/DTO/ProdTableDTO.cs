@@ -19,7 +19,7 @@ namespace ErpConnector.Ax.DTO
         public decimal Denisity { get; set; }
         public decimal Depth { get; set; }
         public DateTime DlvDate { get; set; }
-        public int DlvTime { get; set; }
+        public decimal DlvTime { get; set; }
         public DateTime FinishedDate { get; set; }
         public decimal Height { get; set; }
         public string InventDimId { get; set; }

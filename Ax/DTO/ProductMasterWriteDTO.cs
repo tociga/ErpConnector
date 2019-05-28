@@ -4,6 +4,8 @@ namespace ErpConnector.Ax.DTO
 {
     public class ProductMasterWriteDTO
     {
+ 
+
         public NoYes AreIdenticalConfigurationsAllowed{ get; set; }
         public string HarmonizedSystemCode { get; set; }
         public NoYes IsAutomaticVariantGenerationEnabled{ get; set; }

@@ -104,12 +104,12 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
-    <Compile Include="AxTaskExecute.cs" />
     <Compile Include="D365Entities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>D365Entities.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\AxDbHandler.cs" />
     <Compile Include="DTO\AGREcoResAttributeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeTypeDTO.cs" />
     <Compile Include="DTO\AGREcoResAttributeValueDTO.cs" />
@@ -136,15 +136,11 @@
     <Compile Include="DTO\SalesTableDTO.cs" />
     <Compile Include="DTO\VendorDTO.cs" />
     <Compile Include="Modules\CreateOrder.cs" />
-    <Compile Include="Modules\PriceHistory.cs" />
     <Compile Include="Modules\UpdateProductMaster.cs" />
     <Compile Include="Modules\UpdateReleasedProductVariants.cs" />
-    <Compile Include="Utils\Authenticator.cs" />
-    <Compile Include="Utils\CollectionExtensions.cs" />
+    <Compile Include="Utils\D365Authenticator.cs" />
     <Compile Include="Utils\EnumConverter.cs" />
     <Compile Include="AxODataConnector.cs" />
-    <Compile Include="ServiceConnector.cs" />
-    <Compile Include="Utils\DataWriter.cs" />
     <Compile Include="DTO\BaseComDTO.cs" />
     <Compile Include="DTO\CategoryDTO.cs" />
     <Compile Include="DTO\CategoryHierarchyDTO.cs" />
@@ -183,22 +179,9 @@
     <Compile Include="DTO\UnitOfMeasureConversionDTO.cs" />
     <Compile Include="DTO\UnitOfMeasureDTO.cs" />
     <Compile Include="DTO\VariantGroupDTO.cs" />
-    <Compile Include="Utils\GenericListDataReader.cs" />
-    <Compile Include="Utils\IGenericDataReader.cs" />
-    <Compile Include="Modules\BomTransfer.cs" />
     <Compile Include="Modules\CreateItems.cs" />
-    <Compile Include="Modules\ItemAttributeLookup.cs" />
-    <Compile Include="Modules\ItemCategoryTransfer.cs" />
-    <Compile Include="Modules\ItemTransfer.cs" />
-    <Compile Include="Modules\LocationsAndVendorsTransfer.cs" />
-    <Compile Include="Modules\POTransfer.cs" />
-    <Compile Include="Modules\ProductHistory.cs" />
-    <Compile Include="Modules\SalesValueTransactions.cs" />
-    <Compile Include="Modules\ScriptGeneratorModule.cs" />
-    <Compile Include="Modules\WritePO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyCopy.cs" />
-    <Compile Include="Utils\ScriptGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config">

@@ -1,5 +1,4 @@
-﻿using ErpConnector.Ax;
-using ErpConnector.Common;
+﻿using ErpConnector.Common;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
@@ -7,6 +6,8 @@ using ErpConnector.Common.AGREntities;
 using System.Collections.Generic;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
+using ErpConnector.Ax;
+using ErpConnector.Common.Util;
 
 namespace ErpConnector.Listener
 {
@@ -23,30 +24,41 @@ namespace ErpConnector.Listener
                 case ErpType.ax:
                     factory = new AxODataConnector();
                     break;
+                case ErpType.jira:
+                    factory = new ErpGenericConnector();
+                    break;
                 case ErpType.sap:
                     break;
                 default:
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);
             }
             connectorTasks = new BlockingCollection<Task>();
+            InvokeConnector();
+        }
+        private void InvokeConnector()
+        {
             Task.Factory.StartNew(() => StartConnector());
         }
 
+        private void RestartConnector()
+        {
+
+        }
         private void StartConnector()
         {
-            foreach(Task task in connectorTasks.GetConsumingEnumerable())
-            {
-                task.Start();
-                task.Wait();
-                // hvað gerist ef villa gerist hér.
+                foreach (Task task in connectorTasks.GetConsumingEnumerable())
+                {
+                    task.Start();
+                    try
+                    {
+                        task.Wait();
+                    }
+                    catch (Exception e)
+                    {
+                        DataWriter.LogCommError(e.Message, e.StackTrace, this, e.HResult);
+                        //RestartConnector();
+                    }
             }
-        }
-
-        public Task<AxBaseException> DailyRefresh(DateTime date, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.DailyRefresh(date, actionId));
-            connectorTasks.Add(task);
-            return task;
         }
 
         public Task<AxBaseException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
@@ -56,43 +68,9 @@ namespace ErpConnector.Listener
             return task;            
         }
 
-        public Task<AxBaseException> PimFull(int actionId)
+        public Task<AxBaseException> CreateItem(int itemCreateBatchId, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(()=>factory.PimFull(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> FullTransfer(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.FullTransfer(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> TransactionFull(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionFull(actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> TransfactionRefresh(DateTime date, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TransactionRefresh(date, actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-
-        public Task<AxBaseException> CreateItem(List<ItemToCreate> itemsToCreate, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemsToCreate, actionId));
-            connectorTasks.Add(task);
-            return task;
-        }
-        public Task<AxBaseException> UpdateProductAttributes(int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProduct(actionId));
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemCreateBatchId, actionId));
             connectorTasks.Add(task);
             return task;
         }
@@ -103,15 +81,16 @@ namespace ErpConnector.Listener
             connectorTasks.Add(task);
             return task;
         }
-        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        public Task<AxBaseException> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            AxBaseException task = factory.GetSingleTable(step, actionId, date);
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.GetSingleTable(step, actionId, date));
+            connectorTasks.Add(task);
             return task;
         }
 
-        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, List<AGRProductLifeCycleState> plc)
+        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, int plcUdpdateId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plc, actionId));
+            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
             connectorTasks.Add(task);
             return task;
         }

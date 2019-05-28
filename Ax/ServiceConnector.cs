@@ -12,6 +12,7 @@ using System.Text;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using ErpConnector.Common.Util;
 
 namespace ErpConnector.Ax
 {
@@ -49,7 +50,7 @@ namespace ErpConnector.Ax
             string endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
             var request = HttpWebRequest.Create(endpoint);
-            request.Headers["Authorization"] = Authenticator.GetAdalHeader();
+            request.Headers["Authorization"] = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthHeader;
             //request.Headers["Accept"] = "application/json;odata.metadata=none";
             //request.Headers["Content-Type"] = "application/json";
 
@@ -259,7 +260,7 @@ namespace ErpConnector.Ax
         private static async Task<GenericJsonOdata<T>> CallOdataEndpointAsync<T>(string requestUri)
         {
             HttpClient client = new HttpClient();
-            string token = Authenticator.GetAdalToken();
+            string token = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthToken;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.Timeout = new TimeSpan(0, 3, 0);
@@ -352,7 +353,7 @@ namespace ErpConnector.Ax
             var endpoint = baseUrl + "/api/services/" + serviceGroup + "/" + service + "/" + serviceMethod + ApplyCrossCompanyFilter("");
 
             HttpClient client = new HttpClient();
-            string token = Authenticator.GetAdalToken();
+            string token = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthToken;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));           
             client.Timeout = new TimeSpan(0, 3, 0);
@@ -567,7 +568,7 @@ namespace ErpConnector.Ax
             {
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
                 bool firstResult = false;
-                for (DateTime d = date.Date; d <= DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
+                for (DateTime d = date.Date; d < DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
                     result = await WriteFromService<T>(0, 10000, webMethod, serviceName, d, nextPeriod(d), true);
                     if (!firstResult && result.value.Any())

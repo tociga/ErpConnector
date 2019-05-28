@@ -1,8 +1,10 @@
 ﻿using ErpConnector.Ax.Authentication;
+using ErpConnector.Ax.DB;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
+using ErpConnector.Common.Util;
 using Microsoft.OData.Client;
 using Newtonsoft.Json;
 using System;
@@ -48,7 +50,7 @@ namespace ErpConnector.Ax.Modules
                 var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
                 foreach (var master in plcMaster)
                 {
-                    DataWriter.UpdateProductMasterLifecycleState(master.ProductNumber, master.ProductLifecycleStateId);
+                    AxDbHandler.UpdateProductMasterLifecycleState(master.ProductNumber, master.ProductLifecycleStateId);
                 }
                 return null;
             }

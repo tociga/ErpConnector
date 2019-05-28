@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ErpConnector.Ax.Authentication;
+using ErpConnector.Ax.DB;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
 using ErpConnector.Ax.Utils;
 using ErpConnector.Common.Exceptions;
@@ -106,7 +107,7 @@ namespace ErpConnector.Ax.Modules
                 var result = context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);                
                 foreach(var v in plcVar)
                 {
-                    DataWriter.UpdateProductVariantLifecycleState(v.ProductMasterNumber, v.ProductSizeId,
+                    AxDbHandler.UpdateProductVariantLifecycleState(v.ProductMasterNumber, v.ProductSizeId,
                         v.ProductColorId, v.ProductStyleId, v.ProductConfigurationId, v.ProductLifecycleStateId);
                 }
                 return null;
