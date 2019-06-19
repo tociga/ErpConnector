@@ -362,10 +362,10 @@ namespace ErpConnector.Ax
             var plc = AxDbHandler.GetProductLifeCycleStateUpdates(plcUpdateId);
             if (plc.Any())
             {
-                var distinctMaster = plc.DistinctBy(x => x.product_no).Select(y => y.product_no);
-                foreach (var m in distinctMaster)
+                var distinctMasters = plc.DistinctBy(x => x.product_no).Select(y => y.product_no);
+                foreach (var distinctMaster in distinctMasters)
                 {
-                    var plcPerMaster = plc.Where(x => x.product_no == m);
+                    var plcPerMaster = plc.Where(x => x.product_no == distinctMaster);
                     string masterLifecycleState = "";
                     if (plcPerMaster.Where(x => x.lifecycle_status.ToLower() == "confirmed").Any())
                     {
@@ -457,8 +457,17 @@ namespace ErpConnector.Ax
                     {
                         DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
                         return erpVariants.Exception;
+                    }                    
+                    if (distinctMasters.Count() == 1)
+                    {
+                        AxDbHandler.RefreshPLCStateStg(distinctMaster);
                     }
                     DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                }
+                if (distinctMasters.Count() > 1)
+                {
+                    var ids = string.Join(",", plc.DistinctBy(x => x.product_no).Select(x => x.product_id));
+                    AxDbHandler.RefreshPLCStateBulkStg(ids);
                 }
             }
             return null;

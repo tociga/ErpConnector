@@ -46,18 +46,33 @@ namespace ErpConnector.Listener
         }
         private void StartConnector()
         {
-                foreach (Task task in connectorTasks.GetConsumingEnumerable())
+            foreach (Task task in connectorTasks.GetConsumingEnumerable())
+            {
+                task.Start();
+                try
                 {
-                    task.Start();
-                    try
+                    task.Wait();
+                }
+                catch (Exception e)
+                {
+                    if (task.IsFaulted && task.Exception != null)
                     {
-                        task.Wait();
+                        if (task.Exception.InnerException != null)
+                        {
+                            DataWriter.LogCommError(task.Exception.InnerException.Message, task.Exception.InnerException.StackTrace ?? "", 
+                                this, task.Exception.InnerException.HResult);
+                        }
+                        else
+                        {
+                            DataWriter.LogCommError(task.Exception.Message, task.Exception.StackTrace ?? "", this, task.Exception.HResult);
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
                         DataWriter.LogCommError(e.Message, e.StackTrace, this, e.HResult);
-                        //RestartConnector();
                     }
+                    //RestartConnector();
+                }
             }
         }
 
