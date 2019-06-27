@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using ErpConnector.Common.Util;
+using System.Dynamic;
 
 namespace ErpConnector.Common
 {
@@ -639,6 +640,108 @@ namespace ErpConnector.Common
             return d.AddDays(1);
         }
 
+        public static async Task<AxBaseException> CallOdataEndpointDynamic(string endpoint, string filters, IDictionary<string,string> resultProperties, int actionId, ServiceData authData, 
+            string stepName)
+        {
+            DateTime startTime = DateTime.Now;
+            try
+            {
+                var baseUrl = authData.BaseUrl;
+                endpoint = baseUrl + authData.OdataUrlPostFix + endpoint;
+
+                var returnODataObject = await CallOdataEndpointAsyncDynamic(endpoint, authData);
+                foreach (var pair in resultProperties)
+                {
+                    if (returnODataObject.GetType().GetProperties(pair.Key))
+                    {
+                        DataWriter.TruncateSingleTable(pair.Value);
+                    }
+                    DataWriter.WriteToTable(returnODataObject.GetType().GetProperties(pair.Key).GetDataReader(), pair.Value, 
+                        authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                }
+                
+                //string nextLinkEndpoint = null;
+                //while (!string.IsNullOrEmpty(returnODataObject.NextLink))
+                //{
+                //    if (returnODataObject.appendNextLink)
+                //    {
+                //        nextLinkEndpoint = endpoint + returnODataObject.NextLink;
+                //    }
+                //    else
+                //    {
+                //        nextLinkEndpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
+                //    }
+                //    returnODataObject = await CallOdataEndpointAsyncDynamic(nextLinkEndpoint, authData);
+                //    DataWriter.WriteToTable(returnODataObject.value.GetDataReader(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                //    if (returnODataObject.Exception != null)
+                //    {
+                //        break;
+                //    }
+                //}
+                if (returnODataObject.Exception != null)
+                {
+                    DataWriter.LogErpActionStep(actionId, stepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, stepName, startTime, true, null, null);
+                }
+                return returnODataObject.Exception;
+            }
+            catch (Exception e)
+            {
+                DataWriter.LogErpActionStep(actionId, stepName, startTime, false, e.Message, e.StackTrace);
+                return new AxBaseException { ApplicationException = e };
+            }
+
+        }
+        private static async Task<dynamic> CallOdataEndpointAsyncDynamic(string requestUri, ServiceData authData)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authData.AuthToken);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = new TimeSpan(0, 3, 0);            
+            try
+            {
+                using (var response = await client.GetAsync(requestUri))
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return JsonConvert.DeserializeObject<dynamic>(responseString);                        
+                    }
+                    else
+                    {
+                        return new 
+                        {
+                            Exception = new AxBaseException { ApplicationException = new ApplicationException(responseString) }
+                        };
+                    }
+                }
+            }
+            catch (ArgumentNullException ne)
+            {
+                return new 
+                {
+                    Exception = new AxBaseException { ApplicationException = ne }
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                return new 
+                {
+                    Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) }
+                };
+            }
+            catch (Exception e)
+            {
+                return new 
+                {
+                    Exception = new AxBaseException { ApplicationException = e }
+                };
+            }
+
+        }
 
     }
 }
