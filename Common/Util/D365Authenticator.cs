@@ -31,7 +31,7 @@ namespace ErpConnector.Common.Util
             var result = Authenticate();
             return new ServiceData
             {
-                AuthHeader = result.CreateAuthorizationHeader(),
+                AuthMethod = result.AccessTokenType,
                 AuthToken = result.AccessToken,
                 BaseUrl = ConfigurationManager.AppSettings["base_url"],
                 OdataUrlPostFix = "/data/",

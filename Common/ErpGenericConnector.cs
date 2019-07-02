@@ -18,8 +18,7 @@ namespace ErpConnector.Common
         private bool includesFashion;
         private bool includeB_M;
         public ErpGenericConnector()
-        {
-            var axBaseUrl = ConfigurationManager.AppSettings["base_url"];
+        {            
             Boolean.TryParse(ConfigurationManager.AppSettings["includesFashion"], out includesFashion);
             Boolean.TryParse(ConfigurationManager.AppSettings["includeBAndM"], out includeB_M);
         }
@@ -196,16 +195,16 @@ namespace ErpConnector.Common
             throw new NotImplementedException();
         }
 
-        public AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        public virtual AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             throw new NotImplementedException();
         }
 
-        public AxBaseException CreateItems(int tempId, int actionId)
+        public virtual AxBaseException CreateItems(int tempId, int actionId)
         {
             throw new NotImplementedException();
         }
-        public AxBaseException UpdateProductLifecycleState(int actionId, int plcUpdateId)
+        public virtual AxBaseException UpdateProductLifecycleState(int actionId, int plcUpdateId)
         {
             throw new NotImplementedException();
         }

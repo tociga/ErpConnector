@@ -10,6 +10,7 @@ using ErpConnector.Common.AGREntities;
 using ErpConnector.Common.Exceptions;
 using System.Threading.Tasks;
 using ErpConnector.Common.DTO;
+using System.Collections;
 
 namespace ErpConnector.Common.Util
 {
@@ -239,6 +240,10 @@ namespace ErpConnector.Common.Util
             return items;
         }
 
+        public static void WriteToTable<T>(IList list, string tableName, object value, string propertyName)
+        {
+            WriteToTable<T>(((List<T>)list).GetDataReader<T>(), tableName, value, propertyName);
+        }
 
         public static void WriteToTable<T>(IGenericDataReader<T> reader, string tableName, object value = null, string propertyName = null)
         {
@@ -263,9 +268,8 @@ namespace ErpConnector.Common.Util
                             copy.ColumnMappings.Add(m);
                         }
                         copy.DestinationTableName = tableName;
-                        copy.BulkCopyTimeout = 3600;
+                        copy.BulkCopyTimeout = 30;
                         copy.WriteToServer(reader);
-
                     }
                 }
             }
@@ -286,31 +290,6 @@ namespace ErpConnector.Common.Util
                     cmd.Parameters.AddWithValue("@start_time", startTime);
                     cmd.Parameters.AddWithValue("@error_message", errorMessage);
                     cmd.Parameters.AddWithValue("@error_stack_trace", errorStackTrace);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-
-        public static void TruncateTables(bool clearItems, bool clearTrans, bool clearTransRefresh, bool clearLocations, bool clearLookup, bool clearBom, bool clearPOTO, bool clearPrice,
-            bool clearAttributeRefresh)
-        {
-            using (var con = new SqlConnection(ConnectionString))
-            {
-                using (var cmd = new SqlCommand("[erp].[truncate_ax_tables]", con))
-                {
-                    con.Open();
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@truncate_items", clearItems);
-                    cmd.Parameters.AddWithValue("@truncate_sales_trans_dumb", clearTrans);
-                    cmd.Parameters.AddWithValue("@truncate_locations_and_vendors", clearLocations);
-                    cmd.Parameters.AddWithValue("@truncate_sales_trans_refresh", clearTransRefresh);
-                    cmd.Parameters.AddWithValue("@truncate_lookup_info", clearLookup);
-                    cmd.Parameters.AddWithValue("@truncate_po_to", clearPOTO);
-                    cmd.Parameters.AddWithValue("@truncate_bom", clearBom);
-                    cmd.Parameters.AddWithValue("@truncate_price", clearPrice);
-                    cmd.Parameters.AddWithValue("@truncate_attributes_refresh", clearAttributeRefresh);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -341,7 +320,7 @@ namespace ErpConnector.Common.Util
         {
             using (var con = new SqlConnection(ConnectionString))
             {
-                using (var cmd = new SqlCommand("[erp].[truncate_single_ax_table]", con))
+                using (var cmd = new SqlCommand("[erp].[truncate_single_erp_table]", con))
                 {
                     con.Open();
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -598,8 +577,8 @@ namespace ErpConnector.Common.Util
                             ServiceName = ReadString(reader, 4),
                             TaskType = (ErpTaskStep.ErpTaskType)reader.GetInt32(5),
                             ReturnTypeStr = reader.GetString(6),
-                            IsAGRType = reader.GetBoolean(7),
-                            DbTable = reader.GetString(8),
+                            ReturnTypeAssembly = ReadString(reader, 7),
+                            DbTable = ReadString(reader, 8),
                             EndpointFilter = ReadString(reader, 9),
                             MaxPageSize = ReadInt(reader, 10),
                             PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
@@ -615,10 +594,42 @@ namespace ErpConnector.Common.Util
                 }
             }
         }
-        public static List<ErpTaskStep> GetTaskSteps(int taskId)
+        private static List<ErpTaskStepDetails> GetTaskStepDetails(int taskId)
         {
             using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
             {
+                using (var cmd = new SqlCommand("erp.get_action_task_step_details", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@erp_action_task_id", taskId);
+                    var reader = cmd.ExecuteReader();
+                    var result = new List<ErpTaskStepDetails>();
+                    while(reader.Read())
+                    {
+                        result.Add(new ErpTaskStepDetails
+                        {
+                            id = reader.GetInt32(0),
+                            erp_action_task_step_id = reader.GetInt32(1),
+                            return_type = ReadString(reader, 2),
+                            return_type_assembly = ReadString(reader, 3),
+                            nested_property_name = ReadString(reader, 4),
+                            db_table = ReadString(reader, 5),
+                            base_type_procedure = ReadString(reader, 6),
+                            injection_property_name = ReadString(reader, 7),
+                            stored_procedure = ReadString(reader, 8),
+                            stored_procedure_parameters = ReadString(reader, 9)
+                        });
+                    }
+                    return result;
+                }
+            }
+        }
+        private static List<ErpTaskStep> GetTaskSteps(int taskId)
+        {
+            var details = GetTaskStepDetails(taskId);
+            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
+            {                
                 using (var cmd = new SqlCommand("erp.get_action_task_steps", con))
                 {
                     con.Open();
@@ -638,8 +649,8 @@ namespace ErpConnector.Common.Util
                                 ServiceName = ReadString(reader, 4),
                                 TaskType = (ErpTaskStep.ErpTaskType)reader.GetInt32(5),
                                 ReturnTypeStr = reader.GetString(6),
-                                IsAGRType = reader.GetBoolean(7),
-                                DbTable = reader.GetString(8),
+                                ReturnTypeAssembly = ReadString(reader, 7),
+                                DbTable = ReadString(reader, 8),
                                 EndpointFilter = ReadString(reader, 9),
                                 MaxPageSize = ReadInt(reader, 10),
                                 PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
@@ -648,7 +659,8 @@ namespace ErpConnector.Common.Util
                                 ExternalProcess = ReadString(reader, 14),
                                 ExternalProcessArgument = ReadString(reader, 15),
                                 BaseTypeProcedure = ReadString(reader, 16),
-                                InjectionPropertyName = ReadString(reader, 17)
+                                InjectionPropertyName = ReadString(reader, 17),
+                                Details = details.Where(x=>x.erp_action_task_step_id == reader.GetInt32(0)).ToList()
                             });
                     }
                     return result;

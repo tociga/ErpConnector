@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
 using ErpConnector.Ax;
+using ErpConnector.Sap;
 
 namespace ErpConnector.Listener
 {
@@ -27,6 +28,7 @@ namespace ErpConnector.Listener
                     factory = new ErpGenericConnector();
                     break;
                 case ErpType.sap:
+                    factory = new SAPDataConnector();
                     break;
                 default:
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);

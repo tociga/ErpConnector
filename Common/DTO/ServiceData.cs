@@ -9,7 +9,14 @@ namespace ErpConnector.Common.DTO
 {
     public class ServiceData
     {
-        public string AuthHeader { get; set; }
+        public string AuthMethod { get; set; }
+        public string AuthHeader
+        {
+            get
+            {
+                return AuthMethod + AuthToken;
+            }
+        }
         public string AuthToken { get; set; }
         public string BaseUrl { get; set; }
         public string OdataUrlPostFix { get; set; }

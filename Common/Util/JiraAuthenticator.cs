@@ -33,7 +33,7 @@ namespace ErpConnector.Common.Util
         {
             return new ServiceData
             {
-                AuthHeader = GetJiraHeader(),
+                AuthMethod = "Basic",
                 AuthToken = GetJiraToken(),
                 BaseUrl = "https://agrinventory.atlassian.net/",
                 OdataUrlPostFix = "/rest/api/2/",
@@ -45,7 +45,7 @@ namespace ErpConnector.Common.Util
         {
             return new ServiceData
             {
-                AuthHeader = GetTempoHeader(),
+                AuthMethod = "Bearer",
                 AuthToken = GetTempoToken(),
                 BaseUrl = "https://api.tempo.io",
                 OdataUrlPostFix = "/core/3/",
@@ -57,7 +57,7 @@ namespace ErpConnector.Common.Util
         {
             return new ServiceData
             {
-                AuthHeader = GetJiraHeader(),
+                AuthMethod = "Basic",
                 AuthToken = GetJiraToken(),
                 BaseUrl = "https://agrinventory.atlassian.net/",
                 OdataUrlPostFix = "/rest/servicedeskapi/",

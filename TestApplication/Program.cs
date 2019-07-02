@@ -1,6 +1,6 @@
 ﻿using ErpConnector.Ax;
 using ErpConnector.Ax.Authentication;
-using ErpConnector.Ax.DTO;
+//using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Utils;
 using ErpConnector.Common.AGREntities;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
@@ -14,6 +14,10 @@ using System.Threading.Tasks;
 using Microsoft.OData.Client;
 using ErpConnector.Common.Util;
 using ErpConnector.Nav.DTO;
+using ErpConnector.Common.DTO;
+using ErpConnector.Common;
+using ErpConnector.Common.ErpTasks;
+using ErpConnector.Sap.DTO;
 
 namespace TestApplication
 {
@@ -21,7 +25,18 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServiceData authData = new ServiceData
+            {
+                AuthMethod = "Basic",                
+                AuthToken = "QUdSX0VJTkFSOkE1ZzZyN192b3I=",
+                BaseUrl = "http://sap-s4d.siminn.is:8000/siminn/agr/",
+                AuthType = ErpConnector.Common.ErpTasks.ErpTaskStep.AuthenticationType.BC
+            };
+            List<ErpTaskStepDetails> mapping = new List<ErpTaskStepDetails>();
+            mapping.Add(new ErpTaskStepDetails { nested_property_name = "tLfa1", db_table = "sap.Vendor_refresh", return_type = "SAPVendorDTO" });
+            mapping.Add(new ErpTaskStepDetails { nested_property_name = "tT001l", db_table = "sap.Locations_refresh", return_type = "SAPLocationsDTO" });
+            var result = ServiceConnector.CallOdataEndpointComplex<GenericJsonOdata<SAPSuppliersDTO>, SAPSuppliersDTO>("Suppliers", null, mapping, -1, authData, "test").Result;
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             //ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
             //var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
             //if (useTsl == "true")
@@ -38,14 +53,14 @@ namespace TestApplication
             //ErpConnector.Ax.Authentication.OAuthHelper helper = new ErpConnector.Ax.Authentication.OAuthHelper(clientconfig);
             //helper.GetAuthenticationHeaderUserPass();
             //ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct rd = new ErpConnector.Ax.Microsoft.Dynamics.DataEntities.ReleasedDistinctProduct();
-            Type entityObject = typeof(AGR_Vendor);
+            //Type entityObject = typeof(AGR_Vendor);
 
-            if (entityObject != null)
-            {
-                ScriptGenerator sg = new ScriptGenerator(entityObject);
-                string str = sg.CreateScript("[nav].[purchase_line]");
-                System.Diagnostics.Trace.WriteLine(str);
-            }
+            //if (entityObject != null)
+            //{
+            //    ScriptGenerator sg = new ScriptGenerator(entityObject);
+            //    string str = sg.CreateScript("[nav].[purchase_line]");
+            //    System.Diagnostics.Trace.WriteLine(str);
+            //}
 
             //entityObject = typeof(ErpConnector.Ax.DTO.SalesTableDTO);
 

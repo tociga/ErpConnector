@@ -32,6 +32,10 @@ namespace ErpConnector.Common.Util
             {
                 return BusinessCentralAuthenticator.GetBCServiceData();
             }
+            else if (authType == ErpTaskStep.AuthenticationType.SAP)
+            {
+                return SAPAuthenticator.GetSAPServiceData();
+            }
             else
             {
                 return D365Authenticator.GetD365ServiceData();

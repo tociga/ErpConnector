@@ -200,6 +200,18 @@ namespace ErpConnector.Common
                         result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                 }
+                else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.COMPLEX_RETURN_TYPE)
+                {
+                    Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
+                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointComplex");
+                    MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
+
+                    Object[] parameters = new Object[6];
+                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.Details, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType), erpStep.StepName };
+                    result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
+
+                    
+                }
                 return null;
             }
         }

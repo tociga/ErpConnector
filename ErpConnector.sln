@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.271
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ax", "Ax\Ax.csproj", "{473F244B-5273-4747-94FE-291FBF30D218}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira", "Jira\Jira.csproj", "{9BFFE18A-BA78-4365-9E41-AA5202760B33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nav", "Nav\Nav.csproj", "{76A20A0F-DEB6-4839-9BFA-460307152E20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sap", "Sap\Sap.csproj", "{4C02A9B5-E385-482B-B69D-285276E4EF5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{76A20A0F-DEB6-4839-9BFA-460307152E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76A20A0F-DEB6-4839-9BFA-460307152E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76A20A0F-DEB6-4839-9BFA-460307152E20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C02A9B5-E385-482B-B69D-285276E4EF5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C02A9B5-E385-482B-B69D-285276E4EF5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C02A9B5-E385-482B-B69D-285276E4EF5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C02A9B5-E385-482B-B69D-285276E4EF5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ErpConnector.Common</RootNamespace>
     <AssemblyName>ErpConnector.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,6 +69,7 @@
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
     <Compile Include="DTO\ErpActionStep.cs" />
+    <Compile Include="ErpTasks\ErpTaskStepDetails.cs" />
     <Compile Include="DTO\GenericJiraIssueObject.cs" />
     <Compile Include="DTO\GenericJiraLinks.cs" />
     <Compile Include="DTO\GenericJiraObjectList.cs" />
@@ -98,6 +100,7 @@
     <Compile Include="Util\IGenericDataReader.cs" />
     <Compile Include="Util\JiraAuthenticator.cs" />
     <Compile Include="Util\JiraIssueAuthenticator.cs" />
+    <Compile Include="Util\SAPAuthenticator.cs" />
     <Compile Include="Util\ScriptGenerator.cs" />
     <Compile Include="Util\ScriptGeneratorModule.cs" />
   </ItemGroup>

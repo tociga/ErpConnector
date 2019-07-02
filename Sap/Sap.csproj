@@ -1,16 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9BFFE18A-BA78-4365-9E41-AA5202760B33}</ProjectGuid>
+    <ProjectGuid>{4C02A9B5-E385-482B-B69D-285276E4EF5C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ErpConnector.Jira</RootNamespace>
-    <AssemblyName>ErpConnector.Jira</AssemblyName>
+    <RootNamespace>ErpConnector.Sap</RootNamespace>
+    <AssemblyName>ErpConnector.Sap</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,12 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,38 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DTO\JiraComponentDTO.cs" />
-    <Compile Include="DTO\JiraAccountCustomFieldDTO.cs" />
-    <Compile Include="DTO\JiraIssueDTO.cs" />
-    <Compile Include="DTO\JiraIssueFieldsDTO.cs" />
-    <Compile Include="DTO\JiraOrganizationCustomFieldDTO.cs" />
-    <Compile Include="DTO\JiraProjectDTO.cs" />
-    <Compile Include="DTO\JiraUserDTO.cs" />
-    <Compile Include="DTO\ServiceDeskOrganizationDTO.cs" />
-    <Compile Include="DTO\ServiceDeskOrgUserDTO.cs" />
-    <Compile Include="DTO\TempoAccountDTO.cs" />
-    <Compile Include="DTO\TempoCustomerDTO.cs" />
-    <Compile Include="DTO\TempoWorklogDTO.cs" />
+    <Compile Include="DTO\SAPLocationsDTO.cs" />
+    <Compile Include="DTO\SAPSuppliersDTO.cs" />
+    <Compile Include="DTO\SAPVendorDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SAPDataConnector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Util\" />
+    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{ffe8994e-25da-45be-9ef3-c548fad8563a}</Project>
+      <Project>{FFE8994E-25DA-45BE-9EF3-C548FAD8563A}</Project>
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

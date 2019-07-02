@@ -9,9 +9,9 @@ namespace ErpConnector.Common.ErpTasks
 {
     public class ErpTaskStep
     {
-        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT };
+        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT, COMPLEX_RETURN_TYPE };
         public enum PeriodIncrementType { NONE = 0, HOURS, DAYS, MONTHS};
-        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE, BC};
+        public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE, BC, SAP};
         public int Id { get; set; }
         public string StepName { get; set; }
         public string EndPoint { get; set; }
@@ -22,24 +22,7 @@ namespace ErpConnector.Common.ErpTasks
         {
             get
             {
-                string fullName = "";
-                if (IsAGRType)
-                {
-                    if (AuthenitcationType == AuthenticationType.D365)
-                    {
-                        fullName = "ErpConnector.Ax.DTO." + ReturnTypeStr + ",ErpConnector.Ax";
-                    }
-                    else
-                    {
-                        var builder = new StringBuilder();
-                        builder.Append(string.Format("ErpConnector.Jira.DTO.{0},ErpConnector.Jira", ReturnTypeStr));
-                        fullName = builder.ToString();
-                    }
-                }
-                else
-                {
-                    fullName = "ErpConnector.Ax.Microsoft.Dynamics.DataEntities." + ReturnTypeStr + ",ErpConnector.Ax";
-                }
+                string fullName = ReturnTypeStr + "," + ReturnTypeAssembly;
                 return Type.GetType(fullName);
             }
         }
@@ -63,10 +46,15 @@ namespace ErpConnector.Common.ErpTasks
                 {
                     return typeof(GenericJiraServiceDeskObject<>);
                 }
+                else if (AuthenitcationType == AuthenticationType.BC || AuthenitcationType == AuthenticationType.SAP)
+                {
+                    return typeof(GenericJsonOdata<>);
+                }
                 else
                 {
                     return typeof(GenericJsonOdata<>);
                 }
+
             }
         }
         public string DbTable { get; set; }
@@ -75,12 +63,13 @@ namespace ErpConnector.Common.ErpTasks
         public PeriodIncrementType PeriodIncrement { get; set; }
         public int Priority { get; set; }
         public string ReturnTypeStr { get; set; }
-        public bool IsAGRType { get; set; }
+        public string ReturnTypeAssembly { get; set; }
         public AuthenticationType AuthenitcationType { get; set; }
         public string ExternalProcess { get; set; }
         public string ExternalProcessArgument { get; set; }
         public string BaseTypeProcedure { get; set; }
         public string InjectionPropertyName { get; set; }
+        public List<ErpTaskStepDetails> Details { get; set; }
         public class ErpTaskStepComparer : IComparer<ErpTaskStep>
         {
             public int Compare(ErpTaskStep a, ErpTaskStep b)
