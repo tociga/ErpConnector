@@ -22,5 +22,7 @@ namespace ErpConnector.Common.AGREntities
         public string channel_id { get; set; }
         public string warehouse { get; set; }
         public string vendor_location_type { get; set; }
+        public string description { get; set; }
+        public string unit { get; set; }
     }
 }

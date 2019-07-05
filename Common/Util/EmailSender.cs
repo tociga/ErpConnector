@@ -73,7 +73,7 @@ namespace ErpConnector.Common.Util
             }
             catch (Exception e)
             {
-                DataWriter.LogCommError(e.Message, e.StackTrace, "Email Sender", e.HResult);
+                DataWriter.LogError(e.Message, e.StackTrace, "Email Sender", e.HResult);
             }
         }
         private static string CreateErrorBody(List<ErpActionStep> steps )

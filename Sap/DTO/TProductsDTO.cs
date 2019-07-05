@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Sap.DTO
 {
-    public class SAPProductsDTO
+    public class TProductsDTO
     {
         public string matnr { get; set; }
         public string lifnr { get; set; }

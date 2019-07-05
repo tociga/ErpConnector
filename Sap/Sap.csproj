@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -43,9 +44,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DB\SAPDbHandler.cs" />
+    <Compile Include="DTO\AGROrders.cs" />
     <Compile Include="DTO\SAPLocationsDTO.cs" />
+    <Compile Include="DTO\SAPProductHistoryDTO.cs" />
+    <Compile Include="DTO\SAPProductsDTO.cs" />
+    <Compile Include="DTO\SAPReservationDTO.cs" />
+    <Compile Include="DTO\SAPStocksDTO.cs" />
+    <Compile Include="DTO\SAPSuppliersProductsDTO.cs" />
+    <Compile Include="DTO\SAPUndeliveredDTO.cs" />
+    <Compile Include="DTO\TBapiretDTO.cs" />
+    <Compile Include="DTO\TProductHistoryDTO.cs" />
+    <Compile Include="DTO\TProductsDTO.cs" />
     <Compile Include="DTO\SAPSuppliersDTO.cs" />
     <Compile Include="DTO\SAPVendorDTO.cs" />
+    <Compile Include="DTO\TReservationDTO.cs" />
+    <Compile Include="DTO\TStocksDTO.cs" />
+    <Compile Include="DTO\TSuppliersProductsDTO.cs" />
+    <Compile Include="DTO\TUndeliveredDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SAPDataConnector.cs" />
   </ItemGroup>

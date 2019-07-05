@@ -87,7 +87,7 @@ namespace ErpConnector.Listener
             }
             catch(Exception e)
             {
-                DataWriter.LogCommError(e.Message, e.StackTrace, this, e.HResult);
+                DataWriter.LogError(e.Message, e.StackTrace, this, e.HResult);
             }
             return true;
         }

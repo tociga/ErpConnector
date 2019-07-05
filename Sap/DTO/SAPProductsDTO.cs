@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Sap.DTO
 {
-    class SAPProductsDTO
+    public class SAPProductsDTO
     {
+        public List<TProductsDTO> tProducts { get; set; }
+        public List<TBapiretDTO> tBapiret { get; set; }
     }
 }

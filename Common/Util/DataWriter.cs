@@ -53,7 +53,7 @@ namespace ErpConnector.Common.Util
             }
 
         }
-        public static void LogCommError(string message, string stackTrace, object sender, int hresult)
+        public static void LogError(string message, string stackTrace, object sender, int hresult)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             using (var con = new SqlConnection(connectionString))
@@ -132,7 +132,7 @@ namespace ErpConnector.Common.Util
             if (ex != null && ex.error != null && ex.error.innererror != null)
             {
                 status = -1;
-                LogCommError(ex.error.innererror.message, ex.error.innererror.stacktrace, "create_product", -99);
+                LogError(ex.error.innererror.message, ex.error.innererror.stacktrace, "create_product", -99);
             }
 
             var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
@@ -272,6 +272,27 @@ namespace ErpConnector.Common.Util
                         copy.WriteToServer(reader);
                     }
                 }
+            }
+        }
+        public static string GetSetting(string settingId)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    using (var cmd = new SqlCommand("ctr.getDataTransferSetting_Str", con))
+                    {
+                        cmd.Connection.Open();
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@SettingId", settingId);
+                        return (string)cmd.ExecuteScalar();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LogError("Error reading settingId from DB." + settingId,e.StackTrace, "ErpConnector", e.HResult);
+                return null;
             }
         }
 
