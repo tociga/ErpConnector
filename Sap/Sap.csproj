@@ -45,7 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB\SAPDbHandler.cs" />
-    <Compile Include="DTO\AGROrders.cs" />
+    <Compile Include="DTO\SAPPOLinesDTO.cs" />
+    <Compile Include="DTO\SAPResLineDTO.cs" />
+    <Compile Include="DTO\SAPTOHeaderDTO.cs" />
     <Compile Include="DTO\SAPLocationsDTO.cs" />
     <Compile Include="DTO\SAPProductHistoryDTO.cs" />
     <Compile Include="DTO\SAPProductsDTO.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="DTO\SAPSuppliersProductsDTO.cs" />
     <Compile Include="DTO\SAPUndeliveredDTO.cs" />
     <Compile Include="DTO\TBapiretDTO.cs" />
+    <Compile Include="DTO\TProductGroupsDTO.cs" />
     <Compile Include="DTO\TProductHistoryDTO.cs" />
     <Compile Include="DTO\TProductsDTO.cs" />
     <Compile Include="DTO\SAPSuppliersDTO.cs" />

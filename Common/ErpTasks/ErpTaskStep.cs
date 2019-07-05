@@ -9,7 +9,7 @@ namespace ErpConnector.Common.ErpTasks
 {
     public class ErpTaskStep
     {
-        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT, COMPLEX_RETURN_TYPE };
+        public enum ErpTaskType { ODATA_ENDPOINT = 0, CUSTOM_SERVICE, CUSTOM_SERVICE_BY_DATE, ITERATIVE_ENDPOINT, COMPLEX_RETURN_TYPE , COMPLEX_RETURN_TYPE_BY_DATE};
         public enum PeriodIncrementType { NONE = 0, HOURS, DAYS, MONTHS};
         public enum AuthenticationType { D365 = 1, TEMPO, JIRA, JIRASERVICEDESK, JIRAISSUE, BC, SAP};
         public int Id { get; set; }

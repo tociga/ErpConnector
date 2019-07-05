@@ -212,6 +212,19 @@ namespace ErpConnector.Common
 
                     
                 }
+                else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.COMPLEX_RETURN_TYPE_BY_DATE)
+                {
+                    //Hard code start date to be 2019-01-01
+                    DateTime startDate = new DateTime(2019, 1, 1);
+                    Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
+                    MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointComplexByDate");
+                    MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
+
+                    Object[] parameters = new Object[7];
+                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.Details, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType), erpStep.StepName,
+                        startDate};
+                    result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
+                }
                 return null;
             }
         }

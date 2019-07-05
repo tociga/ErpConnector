@@ -656,7 +656,7 @@ namespace ErpConnector.Common
                 var results = returnODataObject.WriteObject;
                 foreach (var stepDetail in resultProperties)
                 {
-                    if (results.GetType().GetProperty(stepDetail.nested_property_name) != null)
+                    if (results != null && results.GetType().GetProperty(stepDetail.nested_property_name) != null)
                     {
                         DataWriter.TruncateSingleTable(stepDetail.db_table);
                         Type genericType = typeof(List<>).MakeGenericType(stepDetail.GetReturnType());
@@ -664,11 +664,15 @@ namespace ErpConnector.Common
                         MethodInfo generic = method.MakeGenericMethod(stepDetail.GetReturnType());
 
                         Object[] parameters = new Object[5];
-                        //var list = Convert.ChangeType(results[stepDetail.PropertyName], genericType);
-                        parameters = new object[] { (IList)results.GetType().GetProperty(stepDetail.nested_property_name).GetValue(results), stepDetail.db_table, authData.InjectionPropertyValue, authData.InjectionPropertyName };
-                        generic.Invoke(null, parameters);
+                        IList list = (IList)results.GetType().GetProperty(stepDetail.nested_property_name).GetValue(results);
+                        if (list != null)
+                        {
+                            //var list = Convert.ChangeType(results[stepDetail.PropertyName], genericType);
+                            parameters = new object[] { list, stepDetail.db_table, authData.InjectionPropertyValue, authData.InjectionPropertyName };
+                            generic.Invoke(null, parameters);
+                        }
 
-                        
+
                         //DataWriter.WriteToTable(((List<dynamic>)results[stepDetail.PropertyName]).GetDataReader(), stepDetail.DbTable,
                         //    authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     }
@@ -709,6 +713,63 @@ namespace ErpConnector.Common
             }
 
         }
+        public static async Task<AxBaseException> CallOdataEndpointComplexByDate<T, Y>(string endpoint, string filters, List<ErpTaskStepDetails> resultProperties, int actionId, ServiceData authData,
+            string stepName, DateTime startDate) where T : GenericJsonOdata<Y>
+        {
+            DateTime startTime = DateTime.Now;
+            try
+            {
+                var baseUrl = authData.BaseUrl;
+                endpoint = baseUrl + authData.OdataUrlPostFix + endpoint;
+                DateTime firstDayOfMonth = new DateTime(startDate.Year, startDate.Month, 1);
+                var returnODataObject = new GenericWriteObject<Y>();
+                for (DateTime d = firstDayOfMonth; d <= DateTime.Now.Date; d = d.AddMonths(1))
+                {
+                    returnODataObject = await CallOdataEndpointAsyncComplexByDate<Y>(endpoint, authData, d, d.AddMonths(1).AddDays(-1));
+                    var results = returnODataObject.WriteObject;
+                    foreach (var stepDetail in resultProperties)
+                    {
+                        if (results!= null && results.GetType().GetProperty(stepDetail.nested_property_name) != null)
+                        {
+                            if (d == firstDayOfMonth)
+                            {
+                                DataWriter.TruncateSingleTable(stepDetail.db_table);
+                            }
+                            Type genericType = typeof(List<>).MakeGenericType(stepDetail.GetReturnType());
+                            MethodInfo method = typeof(DataWriter).GetMethod("WriteToTable", new Type[] { typeof(IList), typeof(string), typeof(object), typeof(string) });
+                            MethodInfo generic = method.MakeGenericMethod(stepDetail.GetReturnType());
+
+                            Object[] parameters = new Object[5];
+                            IList list = (IList)results.GetType().GetProperty(stepDetail.nested_property_name).GetValue(results);
+                            if (list != null)
+                            {
+                                //var list = Convert.ChangeType(results[stepDetail.PropertyName], genericType);
+                                parameters = new object[] {list , stepDetail.db_table, authData.InjectionPropertyValue, authData.InjectionPropertyName };
+                                generic.Invoke(null, parameters);
+                            }
+
+                            //DataWriter.WriteToTable(((List<dynamic>)results[stepDetail.PropertyName]).GetDataReader(), stepDetail.DbTable,
+                            //    authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                        }
+                    }
+                }
+                if (returnODataObject.Exception != null)
+                {
+                    DataWriter.LogErpActionStep(actionId, stepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                }
+                else
+                {
+                    DataWriter.LogErpActionStep(actionId, stepName, startTime, true, null, null);
+                }
+                return returnODataObject.Exception;
+            }
+            catch (Exception e)
+            {
+                DataWriter.LogErpActionStep(actionId, stepName, startTime, false, e.Message, e.StackTrace);
+                return new AxBaseException { ApplicationException = e };
+            }
+
+        }
         private static async Task<GenericWriteObject<T>> CallOdataEndpointAsyncComplex<T>(string requestUri, ServiceData authData)
         {
             HttpClient client = new HttpClient();
@@ -719,6 +780,49 @@ namespace ErpConnector.Common
             try
             {
                 using (var response = await client.GetAsync(requestUri))
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        result.WriteObject = JsonConvert.DeserializeObject<T>(responseString);
+                        return result;
+                    }
+                    else
+                    {                        
+                        result.Exception = new AxBaseException { ApplicationException = new ApplicationException(responseString) };
+                        return result;
+                    }
+                }
+            }
+            catch (ArgumentNullException ne)
+            {
+                result.Exception = new AxBaseException { ApplicationException = ne };
+                return result;
+            }
+            catch (TaskCanceledException)
+            {
+                result.Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) };                
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Exception = new AxBaseException { ApplicationException = e };
+                return result;
+            }
+
+        }
+
+        private static async Task<GenericWriteObject<T>> CallOdataEndpointAsyncComplexByDate<T>(string requestUri, ServiceData authData, DateTime startDate, DateTime endDate)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(authData.AuthMethod, authData.AuthToken);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = new TimeSpan(0, 3, 0);
+            string endPoint = requestUri + "/" + startDate.Year + "?budatf=" + startDate.ToString("yyyyMMdd") + "&budatt=" + endDate.ToString("yyyyMMdd");
+            var result = new GenericWriteObject<T>();
+            try
+            {
+                using (var response = await client.GetAsync(endPoint))
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode)
@@ -740,7 +844,7 @@ namespace ErpConnector.Common
             }
             catch (TaskCanceledException)
             {
-                result.Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) };                
+                result.Exception = new AxBaseException { ApplicationException = new ApplicationException("Timeout Expired for " + requestUri) };
                 return result;
             }
             catch (Exception e)
