@@ -18,7 +18,7 @@ namespace ErpConnector.Sap
             if (toCreate.Any())
             {
                 var firstLine = toCreate.First();
-                var resHeader = new SAPTOHeaderDTO();
+                var resHeader = new SAPResHeaderDTO();
                 //resHeader.ResNo = "0000";
                 resHeader.Plant = sapComanyCode;
                 resHeader.ResDate = DateTime.Now.ToString("yyyy-MM-dd");//po_to_create.Orders[0].DateUpdated.ToString("dd.MM.yyyy");
@@ -59,7 +59,7 @@ namespace ErpConnector.Sap
             {
                 //SapCreateRequisition.ZWS_AGR_requisition_createClient reqClient = new SapCreateRequisition.ZWS_AGR_requisition_createClient();
                 //SetCredentials(reqClient.ClientCredentials.UserName);
-                List<SAPPOLinesDTO> reqItems = new List<SAPPOLinesDTO>();
+                List<SAPRequisitionDTO> reqItems = new List<SAPRequisitionDTO>();
                 //SapCreateRequisition.Bapiparex[] extension = new SapCreateRequisition.Bapiparex[0];
                 //SapCreateRequisition.Bapiebkn[] accountAssignment = new SapCreateRequisition.Bapiebkn[0];
                 //SapCreateRequisition.Bapimerqaddrdelivery[] addressDeliv = new SapCreateRequisition.Bapimerqaddrdelivery[0];
@@ -75,7 +75,7 @@ namespace ErpConnector.Sap
                 {
                     if (row.unit_qty_chg > 0)
                     {
-                        SAPPOLinesDTO reqItem = new SAPPOLinesDTO();
+                        SAPRequisitionDTO reqItem = new SAPRequisitionDTO();
                         //reqItem.PreqItem = "0000";
                         reqItem.CreatedBy = "AGR";//po_to_create.Orders[0].UserId;
                         reqItem.DocType = "NB";
@@ -149,7 +149,7 @@ namespace ErpConnector.Sap
                                 //SetCredentials(resClient.ClientCredentials.UserName);
                                 //List<SapCreateReservation.Bapiresbc> resItems = new List<SapCreateReservation.Bapiresbc>();
                                 //SapCreateReservation.Bapirkpfc resHeader = new SapCreateReservation.Bapirkpfc();
-                                var resHeader = new SAPTOHeaderDTO();
+                                var resHeader = new SAPResHeaderDTO();
                                 //resHeader.ResNo = "0000";
                                 resHeader.Plant = SapComanyCode;
                                 resHeader.ResDate = DateTime.Now.ToString("yyyy-MM-dd");//po_to_create.Orders[0].DateUpdated.ToString("dd.MM.yyyy");

@@ -45,9 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB\SAPDbHandler.cs" />
-    <Compile Include="DTO\SAPPOLinesDTO.cs" />
+    <Compile Include="DTO\SAPRequisitionDTO.cs" />
+    <Compile Include="DTO\SAPReservationWriteDTO.cs" />
     <Compile Include="DTO\SAPResLineDTO.cs" />
-    <Compile Include="DTO\SAPTOHeaderDTO.cs" />
+    <Compile Include="DTO\SAPResHeaderDTO.cs" />
     <Compile Include="DTO\SAPLocationsDTO.cs" />
     <Compile Include="DTO\SAPProductHistoryDTO.cs" />
     <Compile Include="DTO\SAPProductsDTO.cs" />

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Sap.DTO
 {
-    public class SAPPOLinesDTO
+    public class SAPRequisitionDTO
     {
         public string CreatedBy { get; set; }
         public string DocType { get; set; }

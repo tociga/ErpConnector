@@ -18,6 +18,7 @@ using ErpConnector.Common.DTO;
 using ErpConnector.Common;
 using ErpConnector.Common.ErpTasks;
 using ErpConnector.Sap.DTO;
+using Newtonsoft.Json;
 
 namespace TestApplication
 {
@@ -25,23 +26,90 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            ServiceData authData = new ServiceData
+            var sapReservation = new SAPReservationWriteDTO
             {
-                AuthMethod = "Basic",                
-                AuthToken = "QUdSX0VJTkFSOkE1ZzZyN192b3I=",
-                BaseUrl = "http://sap-s4d.siminn.is:8000/siminn/agr/",
-                AuthType = ErpConnector.Common.ErpTasks.ErpTaskStep.AuthenticationType.BC
+                Header = new SAPResHeaderDTO { CreatedBy = "AGR", MovePlant = "1000", MoveStloc = "Test Location No", Plant = "1000", MoveType = "311", ProfitCtr = "0000916299", ResDate = DateTime.Now.ToString("yyyy-MM-dd") },
+                Lines = new List<SAPResLineDTO>()
             };
-            List<ErpTaskStepDetails> mapping = new List<ErpTaskStepDetails>();
-            mapping.Add(new ErpTaskStepDetails { nested_property_name = "tLfa1", db_table = "sap.Vendor_refresh", return_type = "SAPVendorDTO" });
-            mapping.Add(new ErpTaskStepDetails { nested_property_name = "tT001l", db_table = "sap.Locations_refresh", return_type = "SAPLocationsDTO" });
-            var result = ServiceConnector.CallOdataEndpointComplex<GenericJsonOdata<SAPSuppliersDTO>, SAPSuppliersDTO>("Suppliers", null, mapping, -1, authData, "test").Result;
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            //ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
-            //var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
-            //if (useTsl == "true")
+            sapReservation.Lines.Add(new SAPResLineDTO
+            {
+                Material = "Item no 1",
+                Plant = "1000",
+                Quantity = 100m,
+                ShortText = "Description from AGR",
+                StoreLoc = "Sending location no from AGR",
+                Unit = "M or ST"
+            });
+
+            sapReservation.Lines.Add(new SAPResLineDTO
+            {
+                Material = "Item no 2",
+                Plant = "1000",
+                Quantity = 50m,
+                ShortText = "Description from AGR",
+                StoreLoc = "Sending location no from AGR",
+                Unit = "M or ST"
+            });
+
+            var reservation = Newtonsoft.Json.JsonConvert.SerializeObject(sapReservation);
+            System.Diagnostics.Debug.WriteLine(reservation);
+
+            List<SAPRequisitionDTO> req = new List<SAPRequisitionDTO>();
+            req.Add(
+                new SAPRequisitionDTO
+                {
+                    CreatedBy = "AGR",
+                    DocType = "NB",
+                    PreqName = "AGR",
+                    ShortText = "Description from AGR",
+                    Material = "Item no 1",
+                    Plant = "1000",
+                    StoreLoc = "Location no",
+                    Quantity = 150m,
+                    Unit = "M or ST",
+                    DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
+                    GrPrTime = 340m,
+                    CAmtBapi = 0m,
+                    PriceUnit = 0m
+                }
+            );
+            req.Add(
+                new SAPRequisitionDTO
+                {
+                    CreatedBy = "AGR",
+                    DocType = "NB",
+                    PreqName = "AGR",
+                    ShortText = "Description from AGR",
+                    Material = "Item no 2",
+                    Plant = "1000",
+                    StoreLoc = "Location no",
+                    Quantity = 150m,
+                    Unit = "M or ST",
+                    DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
+                    GrPrTime = 340m,
+                    CAmtBapi = 0m,
+                    PriceUnit = 0m
+                }
+            );
+            var requisition = JsonConvert.SerializeObject(req);
+            System.Diagnostics.Debug.WriteLine(requisition);
+            //ServiceData authData = new ServiceData
             //{
-                
+            //    AuthMethod = "Basic",                
+            //    AuthToken = "QUdSX0VJTkFSOkE1ZzZyN192b3I=",
+            //    BaseUrl = "http://sap-s4d.siminn.is:8000/siminn/agr/",
+            //    AuthType = ErpConnector.Common.ErpTasks.ErpTaskStep.AuthenticationType.BC
+            //};
+            //List<ErpTaskStepDetails> mapping = new List<ErpTaskStepDetails>();
+            //mapping.Add(new ErpTaskStepDetails { nested_property_name = "tLfa1", db_table = "sap.Vendor_refresh", return_type = "SAPVendorDTO" });
+            //mapping.Add(new ErpTaskStepDetails { nested_property_name = "tT001l", db_table = "sap.Locations_refresh", return_type = "SAPLocationsDTO" });
+            //var result = ServiceConnector.CallOdataEndpointComplex<GenericJsonOdata<SAPSuppliersDTO>, SAPSuppliersDTO>("Suppliers", null, mapping, -1, authData, "test").Result;
+            ////ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ////ErpConnector.Common.Util.EmailSender.SendEmail(2031, DateTime.Now);
+            ////var useTsl = System.Configuration.ConfigurationManager.AppSettings["use_security_tsl"];
+            ////if (useTsl == "true")
+            //{
+
             //}
             //string axBaseUrl = ConfigurationManager.AppSettings["base_url"];
             //var clientconfig = new ClientConfiguration(axBaseUrl + "/data",

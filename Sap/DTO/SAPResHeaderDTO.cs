@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Sap.DTO
 {
-    public class SAPTOHeaderDTO
+    public class SAPResHeaderDTO
     {
         public string Plant { get; set; }
         public string ResDate { get; set; }

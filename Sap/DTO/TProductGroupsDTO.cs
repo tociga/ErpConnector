@@ -8,9 +8,9 @@ namespace ErpConnector.Sap.DTO
 {
     public class TProductGroupsDTO
     {
-        public string Mandt { get; set; }
-        public string Prodh { get; set; }
-        public string Stufe { get; set; }
-        public string Vtext { get; set; }
+        public string mandt { get; set; }
+        public string prodh { get; set; }
+        public string stufe { get; set; }
+        public string vtext { get; set; }
     }
 }
