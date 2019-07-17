@@ -535,7 +535,8 @@ namespace ErpConnector.Common.Util
                                 site_id = ReadString(reader, 11),
                                 channel_id = ReadString(reader, 12),
                                 warehouse = ReadString(reader, 13),
-                                unit = reader.IsDBNull(14) ? "ST" : reader.GetString(14)
+                                unit = reader.IsDBNull(14) ? "ST" : reader.GetString(14),
+                                description = ReadString(reader, 15)
                             };
                             orders.Add(order);
                         }
