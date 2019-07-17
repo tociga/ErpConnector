@@ -1,19 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using ErpConnector.Common;
 using ErpConnector.Common.AGREntities;
+using ErpConnector.Common.DTO;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.Util;
+using ErpConnector.Sap.DB;
 using ErpConnector.Sap.DTO;
+using Newtonsoft.Json;
 
 namespace ErpConnector.Sap
 {
     public class SAPDataConnector : ErpGenericConnector
     {
-        private AxBaseException CreateTO(List<POTOCreate> toCreate, string sapComanyCode)
+        private readonly CookieContainer cookieContainer = new CookieContainer();
+        private GenericWriteObject<SAPReservationWriteDTO> CreateTO(List<POTOCreate> toCreate, string sapComanyCode)
         {
             if (toCreate.Any())
             {
@@ -29,7 +37,7 @@ namespace ErpConnector.Sap
                 //resHeader.MoveStloc = oRow.OrderFromSupplierId;
                 resHeader.MoveStloc = firstLine.location_no; // supplierid
                 List<SAPResLineDTO> resItems = new List<SAPResLineDTO>();
-                foreach(var line in toCreate)
+                foreach (var line in toCreate)
                 {
                     if (line.unit_qty_chg > 0)
                     {
@@ -48,74 +56,51 @@ namespace ErpConnector.Sap
                         resItems.Add(resItem);
                     }
                 }
-
+                var writeObject = new SAPReservationWriteDTO { Header = resHeader, Lines = resItems };
+                var authData = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.SAP);
+                var fixedFilter = ConfigurationManager.AppSettings["fixedEndPointFilter"];
+                var csrfToken = GetCSRFToken(authData).Result;
+                var result = CallOdataEndpointPostStringReturn<SAPReservationWriteDTO>("Reservationcreate", fixedFilter, writeObject, authData, csrfToken).Result;
+                return result;
             }
             return null;
         }
 
-        private AxBaseException CreatePO(List<POTOCreate> poCreate, string sapCompanyCode)
+        private GenericWriteObject<SAPRequisitionDTO> CreatePO(POTOCreate poCreate, string sapCompanyCode)
         {
-            if (poCreate.Any())
+            if (poCreate != null)
             {
-                //SapCreateRequisition.ZWS_AGR_requisition_createClient reqClient = new SapCreateRequisition.ZWS_AGR_requisition_createClient();
-                //SetCredentials(reqClient.ClientCredentials.UserName);
-                List<SAPRequisitionDTO> reqItems = new List<SAPRequisitionDTO>();
-                //SapCreateRequisition.Bapiparex[] extension = new SapCreateRequisition.Bapiparex[0];
-                //SapCreateRequisition.Bapiebkn[] accountAssignment = new SapCreateRequisition.Bapiebkn[0];
-                //SapCreateRequisition.Bapimerqaddrdelivery[] addressDeliv = new SapCreateRequisition.Bapimerqaddrdelivery[0];
-                //SapCreateRequisition.Bapiesucc[] contractLimits = new SapCreateRequisition.Bapiesucc[0];
-                //SapCreateRequisition.Bapiebantx[] reqText = new SapCreateRequisition.Bapiebantx[0];
-                //SapCreateRequisition.Bapiesuhc[] reqLimit = new SapCreateRequisition.Bapiesuhc[0];
-                //SapCreateRequisition.Bapiesllc[] reqService = new SapCreateRequisition.Bapiesllc[0];
-                //SapCreateRequisition.Bapieslltx[] reqServiceText = new SapCreateRequisition.Bapieslltx[0];
-                //SapCreateRequisition.Bapiesklc[] reqAccass = new SapCreateRequisition.Bapiesklc[0];
-
-                //foreach (OrderlinesDs.OrderLinesRow row in olDs.OrderLines.Rows)
-                foreach (var row in poCreate)
+                var authData = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.SAP);
+                var fixedFilter = ConfigurationManager.AppSettings["fixedEndPointFilter"];
+                var csrfToken = GetCSRFToken(authData).Result;
+                if (poCreate.unit_qty_chg > 0)
                 {
-                    if (row.unit_qty_chg > 0)
-                    {
-                        SAPRequisitionDTO reqItem = new SAPRequisitionDTO();
-                        //reqItem.PreqItem = "0000";
-                        reqItem.CreatedBy = "AGR";//po_to_create.Orders[0].UserId;
-                        reqItem.DocType = "NB";
-                        reqItem.PreqName = "AGR";
-                        reqItem.ShortText = row.description;
-                        reqItem.Material = PadWithZeros(row.item_no, 18);//row.ProductId;
-                        reqItem.Plant = sapCompanyCode;// po_to_create.Orders[0].OrderFromSupplierId;                        
-                        reqItem.StoreLoc = row.location_no;
-                        //reqItem.MatGrp = row.ProductGroup;
-                        reqItem.Quantity = (decimal)(double)row.unit_qty_chg;
-                        reqItem.Unit = row.unit;
-                        //if (row.item_no == "8504")
-                        //    reqItem.Unit = "M";
-                        //else
-                        //    reqItem.Unit = "ST";
-                        //0000062095
-                        reqItem.DelivDate = DateTime.Now.AddDays(10).ToString("yyyy-MM-dd");//po_to_create.Orders[0].EstDelivDate.ToString("dd.MM.yyyy");
-                        reqItem.GrPrTime = 340m;
-                        reqItem.CAmtBapi = 0m;
-                        reqItem.PriceUnit = 0m;// (decimal)row.PriceUnit;                                    
-                        reqItems.Add(reqItem);
-                    }
-                }
+                    SAPRequisitionDTO reqItem = new SAPRequisitionDTO();
+                    //reqItem.PreqItem = "0000";
+                    reqItem.CreatedBy = "AGR";//po_to_create.Orders[0].UserId;
+                    reqItem.DocType = "NB";
+                    reqItem.PreqName = "AGR";
+                    reqItem.ShortText = poCreate.description;
+                    reqItem.Material = PadWithZeros(poCreate.item_no, 18);//row.ProductId;
+                    reqItem.Plant = sapCompanyCode;// po_to_create.Orders[0].OrderFromSupplierId;                        
+                    reqItem.StoreLoc = poCreate.location_no;
+                    //reqItem.MatGrp = row.ProductGroup;
+                    reqItem.Quantity = (decimal)(double)poCreate.unit_qty_chg;
+                    reqItem.Unit = poCreate.unit;
+                    //if (row.item_no == "8504")
+                    //    reqItem.Unit = "M";
+                    //else
+                    //    reqItem.Unit = "ST";
+                    //0000062095
+                    reqItem.DelivDate = DateTime.Now.AddDays(10).ToString("yyyy-MM-dd");//po_to_create.Orders[0].EstDelivDate.ToString("dd.MM.yyyy");
+                    reqItem.GrPrTime = 340m;
+                    reqItem.CAmtBapi = 0m;
+                    reqItem.PriceUnit = 0m;// (decimal)row.PriceUnit;                                    
 
-                //SapCreateRequisition.Bapireturn[] reqReturn = new SapCreateRequisition.Bapireturn[0];
-                //SapCreateRequisition.Bapiebanc[] reqItemArray = reqItems.ToArray();
-                //if (reqItemArray.Length > 0)
-                //{
-                //    string reqSapNr = reqClient.RequisitionCreate("X", ref extension, ref accountAssignment, ref addressDeliv, ref contractLimits,
-                //        ref reqText, ref reqItemArray, ref reqLimit, ref reqService, ref reqServiceText, ref reqAccass, ref reqReturn, null);
-                //    if (ValidateReq(reqSapNr))
-                //    {
-                //        SapToStgWriter.SetAGR5OrderAsTransfered(oRow.id, reqSapNr, "Req");
-                //    }
-                //    else
-                //    {
-                //        SapToStgWriter.LogError("Error in Prod to Sap CreateRequisition.", this.ToString(), SapToStgWriter.ERROR_CODE.PROD_TO_SAP,
-                //            "Following is error message from Sap:", SapMessageToString(reqReturn));
-                //    }
-                //}
+                    var result = CallOdataEndpointPostStringReturn<SAPRequisitionDTO>("Requisitioncreate", fixedFilter, reqItem, authData, csrfToken).Result;
+                    return result;
+
+                }                
             }
             return null;
         }
@@ -123,80 +108,54 @@ namespace ErpConnector.Sap
         {
             try
             {
+                DateTime start = DateTime.Now;
                 var SapComanyCode = DataWriter.GetSetting("SapCompanyCode");
-                //SapToStgWriter db = new SapToStgWriter();
-                //string reqResult = "test";
-                //OrdersDs po_to_create = db.GetOrder();                
-
-                //SapToStgWriter.LogError("Processing " + po_to_create.Orders.Count + " orders", this.ToString(), SapToStgWriter.ERROR_CODE.PROD_TO_SAP,
-                //                    "", "");
-                //SapToStgWriter.LogError("Processing " + oDs.orders.Count + " orders", this.ToString(), SapToStgWriter.ERROR_CODE.PROD_TO_SAP,
-                  //                  "", "");
-                
-                foreach (var line in po_to_create)
+                if (po_to_create.Any())
                 {
-
-                    if (line.order_id > 0)
+                    AxBaseException result = null;
+                    var first = po_to_create.First(x=>x.unit_qty_chg > 0);
+                    if (first.order_id > 0)
                     {
                         try
                         {
-                                                       
+
                             //DataWriter.LogError("Processing order nr " + oRow.id, this.ToString(), SapToStgWriter.ERROR_CODE.PROD_TO_SAP,
                             //        "", "");
-                            if (line.vendor_location_type.ToLower() != "vendor")
+                            if (first.vendor_location_type.ToLower() != "vendor")
                             {
-                                //SapCreateReservation.ZWS_AGR_RESERVATION_CREATEClient resClient = new SapCreateReservation.ZWS_AGR_RESERVATION_CREATEClient();
-                                //SetCredentials(resClient.ClientCredentials.UserName);
-                                //List<SapCreateReservation.Bapiresbc> resItems = new List<SapCreateReservation.Bapiresbc>();
-                                //SapCreateReservation.Bapirkpfc resHeader = new SapCreateReservation.Bapirkpfc();
-                                var resHeader = new SAPResHeaderDTO();
-                                //resHeader.ResNo = "0000";
-                                resHeader.Plant = SapComanyCode;
-                                resHeader.ResDate = DateTime.Now.ToString("yyyy-MM-dd");//po_to_create.Orders[0].DateUpdated.ToString("dd.MM.yyyy");
-                                resHeader.MoveType = "311";
-                                resHeader.CreatedBy = "AGR";
-                                resHeader.ProfitCtr = "0000916299";
-                                resHeader.MovePlant = SapComanyCode;
-                                //resHeader.MoveStloc = oRow.OrderFromSupplierId;
-                                resHeader.MoveStloc = line.location_no; // supplierid
-
-
-                                //foreach (OrderlinesDs.OrderLinesRow row in olDs.OrderLines.Rows)
-                              //  foreach (OrderlinesAGR5Ds.order_linesRow row in olDs.order_lines.Rows)
-                                //{
-                                  //  if (row.unit_qty_chg > 0)
-                                   // {
-                                   //     SapCreateReservation.Bapiresbc resItem = new SapCreateReservation.Bapiresbc();
-                                //        resItem.Plant = SapComanyCode;
-                                //        resItem.StoreLoc = oRow.order_from_location_no; // 0200
-                                //        //resItem.StoreLoc = oRow.SupplierId;
-                                //        resItem.Unit = row.meins;
-                                //        //if (row.item_no == "8504")
-                                //        //    resItem.Unit = "M";
-                                //        //else
-                                //        //    resItem.Unit = "ST";
-                                //        resItem.ShortText = row.description;
-                                //        resItem.Quantity = (decimal)(double)row.unit_qty_chg;
-                                //        resItem.Material = PadWithZeros(row.item_no, 18);
-                                //        resItems.Add(resItem);
-                                //    }
-                                //}
-                                //SapCreateReservation.Bapireturn[] returnValues = new SapCreateReservation.Bapireturn[0];
-
-                                //SapCreateReservation.Bapiresbc[] resItemArray = resItems.ToArray();
-                                //resHeader.ResNo = resClient.ReservationCreate("X", null, resHeader, ref resItemArray, ref returnValues);
-                                //if (returnValues.Length == 0)
-                                //{
-                                //    SapToStgWriter.SetAGR5OrderAsTransfered(oRow.id, resHeader.ResNo, "Res");
-                                //}
-                                //else
-                                //{
-                                //    SapToStgWriter.LogError("Error in Prod to Sap CreateReservation.", this.ToString(), SapToStgWriter.ERROR_CODE.PROD_TO_SAP,
-                                //        "Following is error message from Sap:", SapMessageToString(returnValues));
-                                //}
+                                var res = CreateTO(po_to_create, SapComanyCode);
+                                if (res.Exception == null && !string.IsNullOrEmpty(res.SimpleResult))
+                                {
+                                    SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, res.SimpleResult, "Res", null, null);
+                                }
+                                else
+                                {
+                                    result = res.Exception;
+                                }
                             }
                             else
                             {
+                                foreach (var po in po_to_create)
+                                {
+                                    var req = CreatePO(po, SapComanyCode);
+                                    if (req != null && req.Exception == null && !string.IsNullOrEmpty(req.SimpleResult))
+                                    {
+                                        SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, req.SimpleResult, "Req", po.item_no, po.location_no);
+                                    }
+                                    else
+                                    {
+                                        DataWriter.LogErpActionStep(actionId, string.Format("Create PO orderid = {0}, item_no = {1}, location_no = {2}.",po.order_id, po.item_no, po.location_no),
+                                            start, false, result.ErrorMessage, result.StackTrace);
+                                    }
+                                }
+                            }
+                            if (result == null)
+                            {
+                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, true, null, null);
+                            }
+                            else
+                            {
+                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, false, result.ErrorMessage, result.StackTrace);
                             }
 
                         }
@@ -205,6 +164,10 @@ namespace ErpConnector.Sap
                             DataWriter.LogError("Error on transfer", e.StackTrace, this, e.HResult);
                         }
                         //SapToStgWriter.SetOrderAsTransfered(orderId);
+                    }
+                    else
+                    {
+                        DataWriter.LogErpActionStep(actionId, "No items to transfer for order_id = " + first.order_id, start, false, null, null);
                     }
                 }
 
@@ -223,6 +186,82 @@ namespace ErpConnector.Sap
                 str = "0" + str;
             }
             return str;
+        }
+
+        private async Task<string> GetCSRFToken(ServiceData authData)
+        {
+            using (HttpClientHandler handler = new HttpClientHandler())
+            {
+                handler.CookieContainer = cookieContainer;
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(authData.AuthMethod, authData.AuthToken);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Add("x-csrf-token", "Fetch");
+
+                    string result = null;
+                    using (var response = await client.GetAsync(authData.BaseUrl))
+                    {
+                        var headers = response.Headers;
+                        if (headers.Contains("x-csrf-token"))
+                        {
+                            result = headers.GetValues("x-csrf-token").First();
+                        }
+                    }
+                    return result;
+                }
+            }
+        }
+
+        public async Task<GenericWriteObject<T>> CallOdataEndpointPostStringReturn<T>(string oDataEndpoint, string filters, T postDataObject, 
+            ServiceData authData, string csrfToken)
+        {
+            using (HttpClientHandler handler = new HttpClientHandler())
+            {
+                handler.CookieContainer = this.cookieContainer;
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(authData.AuthMethod, authData.AuthToken);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    if (!string.IsNullOrEmpty(csrfToken))
+                    {
+                        client.DefaultRequestHeaders.Add("x-csrf-token", csrfToken);
+                    }
+                    client.Timeout = new TimeSpan(0, 3, 0);
+
+                    string endpoint = authData.BaseUrl + authData.OdataUrlPostFix + oDataEndpoint + filters ?? "";
+                    var postData = JsonConvert.SerializeObject(postDataObject);
+                    var content = new StringContent(postData, Encoding.UTF8, "application/json");
+                    var result = new GenericWriteObject<T>();
+                    try
+                    {
+                        using (var response = await client.PostAsync(endpoint, content))
+                        {
+                            if (response.IsSuccessStatusCode)
+                            {
+                                result.SimpleResult = await response.Content.ReadAsStringAsync();
+                            }
+                            else
+                            {
+                                var errorResult = await response.Content.ReadAsStringAsync();
+                                result.Exception = new AxBaseException { ApplicationException = new Exception("Error when sending post request json = " + postData + " " + errorResult) };
+                            }
+                            return result;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        if (e is AggregateException)
+                        {
+                            return new GenericWriteObject<T> { Exception = new AxBaseException { ApplicationException = e.InnerException } };
+                        }
+                        else
+                        {
+                            return new GenericWriteObject<T> { Exception = new AxBaseException { ApplicationException = e } };
+                        }
+                    }
+                }
+            }
         }
 
     }

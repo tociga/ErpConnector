@@ -26,73 +26,123 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            var sapReservation = new SAPReservationWriteDTO
-            {
-                Header = new SAPResHeaderDTO { CreatedBy = "AGR", MovePlant = "1000", MoveStloc = "Test Location No", Plant = "1000", MoveType = "311", ProfitCtr = "0000916299", ResDate = DateTime.Now.ToString("yyyy-MM-dd") },
-                Lines = new List<SAPResLineDTO>()
-            };
-            sapReservation.Lines.Add(new SAPResLineDTO
-            {
-                Material = "Item no 1",
-                Plant = "1000",
-                Quantity = 100m,
-                ShortText = "Description from AGR",
-                StoreLoc = "Sending location no from AGR",
-                Unit = "M or ST"
-            });
-
-            sapReservation.Lines.Add(new SAPResLineDTO
-            {
-                Material = "Item no 2",
-                Plant = "1000",
-                Quantity = 50m,
-                ShortText = "Description from AGR",
-                StoreLoc = "Sending location no from AGR",
-                Unit = "M or ST"
-            });
-
-            var reservation = Newtonsoft.Json.JsonConvert.SerializeObject(sapReservation);
-            System.Diagnostics.Debug.WriteLine(reservation);
-
-            List<SAPRequisitionDTO> req = new List<SAPRequisitionDTO>();
-            req.Add(
-                new SAPRequisitionDTO
+            var tos = new List<POTOCreate>();
+            tos.Add(
+                new POTOCreate
                 {
-                    CreatedBy = "AGR",
-                    DocType = "NB",
-                    PreqName = "AGR",
-                    ShortText = "Description from AGR",
-                    Material = "Item no 1",
-                    Plant = "1000",
-                    StoreLoc = "Location no",
-                    Quantity = 150m,
-                    Unit = "M or ST",
-                    DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
-                    GrPrTime = 340m,
-                    CAmtBapi = 0m,
-                    PriceUnit = 0m
+                    item_no = "15468",
+                    order_id = 1,
+                    description = "Test TO1",
+                    location_no = "0302",
+                    order_from_location_no = "0200",
+                    vendor_location_type = "warehouse",
+                    est_delivery_date = DateTime.Now.Date,
+                    unit = "ST",
+                    unit_qty_chg = 100m,                    
+                }
+            ) ;
+
+            tos.Add(
+                new POTOCreate
+                {
+                    item_no = "25331",
+                    order_id = 1,
+                    description = "Test TO1",
+                    location_no = "0302",
+                    order_from_location_no = "0200",
+                    vendor_location_type = "warehouse",
+                    est_delivery_date = DateTime.Now.Date,
+                    unit = "ST",
+                    unit_qty_chg = 50m,
                 }
             );
-            req.Add(
-                new SAPRequisitionDTO
+
+            var sapCreate = new ErpConnector.Sap.SAPDataConnector();
+            //sapCreate.CreatePoTo(tos, -1);
+
+            var pos = new List<POTOCreate>();
+            pos.Add(
+                new POTOCreate
                 {
-                    CreatedBy = "AGR",
-                    DocType = "NB",
-                    PreqName = "AGR",
-                    ShortText = "Description from AGR",
-                    Material = "Item no 2",
-                    Plant = "1000",
-                    StoreLoc = "Location no",
-                    Quantity = 150m,
-                    Unit = "M or ST",
-                    DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
-                    GrPrTime = 340m,
-                    CAmtBapi = 0m,
-                    PriceUnit = 0m
+                    item_no = "42165",
+                    order_id = 2,
+                    description = "Test PO1",
+                    location_no = "0200",
+                    order_from_location_no = "1000081935",
+                    vendor_location_type = "vendor",
+                    est_delivery_date = DateTime.Now.Date,
+                    unit = "ST",
+                    unit_qty_chg = 50m,
                 }
             );
-            var requisition = JsonConvert.SerializeObject(req);
-            System.Diagnostics.Debug.WriteLine(requisition);
+            sapCreate.CreatePoTo(pos, -1);
+            //var sapReservation = new SAPReservationWriteDTO
+            //{
+            //    Header = new SAPResHeaderDTO { CreatedBy = "AGR", MovePlant = "1000", MoveStloc = "0302", Plant = "1000", MoveType = "311", ProfitCtr = "0000916299", ResDate = DateTime.Now.ToString("yyyy-MM-dd") },
+            //    Lines = new List<SAPResLineDTO>()
+            //};
+            //sapReservation.Lines.Add(new SAPResLineDTO
+            //{
+            //    Material = "15468",
+            //    Plant = "1000",
+            //    Quantity = 100m,
+            //    ShortText = "Description from AGR",
+            //    StoreLoc = "0200",
+            //    Unit = "ST"
+            //});
+
+            //sapReservation.Lines.Add(new SAPResLineDTO
+            //{
+            //    Material = "25331",
+            //    Plant = "1000",
+            //    Quantity = 50m,
+            //    ShortText = "Description from AGR",
+            //    StoreLoc = "0200",
+            //    Unit = "ST"
+            //});
+
+            //var reservation = Newtonsoft.Json.JsonConvert.SerializeObject(sapReservation);
+            //System.Diagnostics.Debug.WriteLine(reservation);
+
+            //List<SAPRequisitionDTO> req = new List<SAPRequisitionDTO>();
+            //req.Add(
+            //    new SAPRequisitionDTO
+            //    {
+            //        CreatedBy = "AGR",
+            //        DocType = "NB",
+            //        PreqName = "AGR",
+            //        ShortText = "Description from AGR",
+            //        Material = "Item no 1",
+            //        Plant = "1000",
+            //        StoreLoc = "Location no",
+            //        Quantity = 150m,
+            //        Unit = "M or ST",
+            //        DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
+            //        GrPrTime = 340m,
+            //        CAmtBapi = 0m,
+            //        PriceUnit = 0m
+            //    }
+            //);
+            //req.Add(
+            //    new SAPRequisitionDTO
+            //    {
+            //        CreatedBy = "AGR",
+            //        DocType = "NB",
+            //        PreqName = "AGR",
+            //        ShortText = "Description from AGR",
+            //        Material = "Item no 2",
+            //        Plant = "1000",
+            //        StoreLoc = "Location no",
+            //        Quantity = 150m,
+            //        Unit = "M or ST",
+            //        DelivDate = DateTime.Now.Date.AddDays(10).ToString("yyyy-MM-dd"),
+            //        GrPrTime = 340m,
+            //        CAmtBapi = 0m,
+            //        PriceUnit = 0m
+            //    }
+            //);
+            //var requisition = JsonConvert.SerializeObject(req);
+            //System.Diagnostics.Debug.WriteLine(requisition);
             //ServiceData authData = new ServiceData
             //{
             //    AuthMethod = "Basic",                

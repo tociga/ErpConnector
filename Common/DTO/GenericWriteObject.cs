@@ -11,5 +11,6 @@ namespace ErpConnector.Common.DTO
     {
         public T WriteObject { get; set; }
         public AxBaseException Exception { get; set; }
+        public string SimpleResult { get; set; }
     }
 }

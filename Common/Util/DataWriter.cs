@@ -534,7 +534,8 @@ namespace ErpConnector.Common.Util
                                 vendor_location_type = ReadString(reader, 10),
                                 site_id = ReadString(reader, 11),
                                 channel_id = ReadString(reader, 12),
-                                warehouse = ReadString(reader, 13)
+                                warehouse = ReadString(reader, 13),
+                                unit = reader.IsDBNull(14) ? "ST" : reader.GetString(14)
                             };
                             orders.Add(order);
                         }

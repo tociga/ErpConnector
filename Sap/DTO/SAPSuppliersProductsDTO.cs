@@ -8,7 +8,7 @@ namespace ErpConnector.Sap.DTO
 {
     public class SAPSuppliersProductsDTO
     {
-        public List<TSuppliersProductsDTO> tSuppliersProducts { get; set; }
+        public List<TSuppliersProductsDTO> tSupplierproducts { get; set; }
         public List<TBapiretDTO> tBapiret { get; set; }
     }
 }

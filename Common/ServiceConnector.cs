@@ -49,6 +49,8 @@ namespace ErpConnector.Common
 
         public static async Task<GenericWriteObject<T>> CallOdataEndpointPost<T, Y>(string oDataEndpoint, string filters, T postDataObject, ServiceData authData) where Y : JsonConverter
         {
+
+
             string baseUrl = authData.BaseUrl;
             string endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
 
@@ -114,7 +116,6 @@ namespace ErpConnector.Common
                 }
             }
         }
-
 
         public static async Task<AxBaseException> CallOdataEndpointPut(string oDataEndpoint, string filters, string putDataStr, ServiceData authData)
         {
@@ -723,17 +724,19 @@ namespace ErpConnector.Common
                 endpoint = baseUrl + authData.OdataUrlPostFix + endpoint;
                 DateTime firstDayOfMonth = new DateTime(startDate.Year, startDate.Month, 1);
                 var returnODataObject = new GenericWriteObject<Y>();
+                bool isFirstIteration = true;
                 for (DateTime d = firstDayOfMonth; d <= DateTime.Now.Date; d = d.AddMonths(1))
                 {
                     returnODataObject = await CallOdataEndpointAsyncComplexByDate<Y>(endpoint, authData, d, d.AddMonths(1).AddDays(-1));
-                    var results = returnODataObject.WriteObject;
+                    var results = returnODataObject.WriteObject;                    
                     foreach (var stepDetail in resultProperties)
                     {
                         if (results!= null && results.GetType().GetProperty(stepDetail.nested_property_name) != null)
                         {
-                            if (d == firstDayOfMonth)
+                            if (isFirstIteration)
                             {
                                 DataWriter.TruncateSingleTable(stepDetail.db_table);
+                                isFirstIteration = false;
                             }
                             Type genericType = typeof(List<>).MakeGenericType(stepDetail.GetReturnType());
                             MethodInfo method = typeof(DataWriter).GetMethod("WriteToTable", new Type[] { typeof(IList), typeof(string), typeof(object), typeof(string) });
