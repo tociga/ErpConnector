@@ -109,7 +109,7 @@ namespace ErpConnector.Sap
             try
             {
                 DateTime start = DateTime.Now;
-                var SapComanyCode = DataWriter.GetSetting("SapCompanyCode");
+                var SapComanyCode = "1000";// DataWriter.GetSetting("SapCompanyCode");
                 if (po_to_create.Any())
                 {
                     AxBaseException result = null;
@@ -152,6 +152,7 @@ namespace ErpConnector.Sap
                             if (result == null)
                             {
                                 DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, true, null, null);
+                                DataWriter.UpdateOrderStatus(first.order_id);
                             }
                             else
                             {
