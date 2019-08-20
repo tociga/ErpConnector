@@ -27,6 +27,16 @@ namespace ErpConnector.Common
             }
         }
 
+        public static int WebRequestTimeoutMin
+        {
+            get
+            {
+                int timeout = 3;
+                Int32.TryParse(ConfigurationManager.AppSettings["WebRequestTimeoutMin"], out timeout);
+                return timeout;
+            }
+        }
+
         private static string ApplyCrossCompanyFilter(string filter)
         {
             if (IsCrossCompany)
@@ -362,7 +372,7 @@ namespace ErpConnector.Common
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authData.AuthToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.Timeout = new TimeSpan(0, 3, 0);
+            client.Timeout = new TimeSpan(0, WebRequestTimeoutMin, 0);
             var result = new GenericJsonOdata<T>();
             try
             {
@@ -455,7 +465,7 @@ namespace ErpConnector.Common
             string token = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.D365).AuthToken;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));           
-            client.Timeout = new TimeSpan(0, 3, 0);
+            client.Timeout = new TimeSpan(0, WebRequestTimeoutMin, 0);
 
             System.Diagnostics.Debug.Write("Endpoint :" + endpoint + " ");
             System.Diagnostics.Debug.WriteLine("postData: " + postData);
