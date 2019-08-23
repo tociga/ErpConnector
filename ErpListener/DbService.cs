@@ -13,7 +13,7 @@ namespace ErpConnector.Listener
 {
     public class DbService
     {
-        public bool? Sync()
+        public bool Sync()
         {            
             try
             {
@@ -35,7 +35,7 @@ namespace ErpConnector.Listener
                                 DataWriter.UpdateActionStatus(action.id, 1, null);
                                 var orders = DataWriter.GetPoToToCreate(action.reference_id);
                                 var connectorTask = connector.CreatePoTo(orders, action.id);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
                                 DataWriter.UpdateOrderStatus(action.reference_id);
                                 break;
                             case "create_item":
@@ -43,7 +43,7 @@ namespace ErpConnector.Listener
                                 {
                                     DataWriter.UpdateActionStatus(action.id, 1, null);                                   
                                     connectorTask = connector.CreateItem(action.reference_id, action.id);
-                                    connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                    connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
                                     //var options = itemsToCreate.Select(x => x.option_id).Distinct();
                                     //foreach (int option in options)
                                     //{
@@ -59,7 +59,7 @@ namespace ErpConnector.Listener
                                 DataWriter.UpdateActionStatus(action.id, 1, null);
                                 var task = DataWriter.GetTask(action.reference_id);
                                 connectorTask = connector.ExecuteTask(task, action.id, DataWriter.GetDateById(action.date_reference_id), action.no_parallel_process);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
                                 EmailSender.SendEmail(action.id, action.created_at);
                                 break;
                             case "single_table":
@@ -71,14 +71,14 @@ namespace ErpConnector.Listener
                                 }
                                 var step = DataWriter.GetStep(action.reference_id);
                                 connectorTask = connector.GetSingleTable(step, action.id, date);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
                                 break;
                             case "update_plc":
                                 DataWriter.UpdateActionStatus(action.id, 1, null);                                
                                 AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 1);
                                 connectorTask = connector.UpdateProductLifecycleStatus(action.id, action.reference_id);
                                 var updateTask = connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));
-                                updateTask.ContinueWith((x) => AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 2)).Wait();
+                                updateTask.ContinueWith((x) => AxDbHandler.UpdateProductLifeCycleState(action.reference_id, action.id, 2));
                                 break;
                             default:
                                 DataWriter.UpdateActionStatus(action.id, 3, CreateBaseTaskException(new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) }));
