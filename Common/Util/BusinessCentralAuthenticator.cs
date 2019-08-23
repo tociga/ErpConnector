@@ -12,14 +12,15 @@ namespace ErpConnector.Common.Util
     {
         public static ServiceData GetBCServiceData()
         {
-            
+
             return new ServiceData
             {
                 AuthMethod = "Basic",
                 AuthToken = ConfigurationManager.AppSettings["client_secret"],
                 BaseUrl = ConfigurationManager.AppSettings["base_url"],
                 OdataUrlPostFix = "/",
-                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.BC
+                AuthType = ErpTasks.ErpTaskStep.AuthenticationType.BC,
+                CustomJsonConverter = new JsonConverters.EdmDateConverter()
             };
         }
 

@@ -228,6 +228,16 @@ namespace ErpConnector.Common.Util
             {
                 return ((DateTimeOffset)properties[i].GetValue(list.Current, null)).DateTime;
             }
+            else if (properties[i].PropertyType == typeof(Microsoft.OData.Edm.Date) || (underLyingType != null && underLyingType == typeof(Microsoft.OData.Edm.Date)))
+            {
+                var obj = properties[i].GetValue(list.Current, null);
+                if (obj == null)
+                {
+                    return null;
+                }
+                var EdmDate = (Microsoft.OData.Edm.Date)obj;
+                return new DateTime(EdmDate.Year, EdmDate.Month, EdmDate.Day);
+            }
             return properties[i].GetValue(list.Current, null);
         }
 

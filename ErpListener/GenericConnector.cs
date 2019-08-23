@@ -8,6 +8,7 @@ using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.ErpTasks;
 using ErpConnector.Ax;
 using ErpConnector.Sap;
+using ErpConnector.Nav;
 
 namespace ErpConnector.Listener
 {
@@ -29,6 +30,9 @@ namespace ErpConnector.Listener
                     break;
                 case ErpType.sap:
                     factory = new SAPDataConnector();
+                    break;
+                case ErpType.nav:
+                    factory = new NavConnector();
                     break;
                 default:
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);

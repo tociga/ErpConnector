@@ -26,6 +26,7 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
+            //AGR_Item
             var tos = new List<POTOCreate>();
             tos.Add(
                 new POTOCreate

@@ -365,7 +365,7 @@ namespace ErpConnector.Common
         private static async Task<GenericJsonOdata<T>> CallOdataEndpointAsync<T>(string requestUri, ServiceData authData)
         {
             HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authData.AuthToken);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(authData.AuthMethod, authData.AuthToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.Timeout = new TimeSpan(0, 3, 0);
             var result = new GenericJsonOdata<T>();
@@ -376,7 +376,14 @@ namespace ErpConnector.Common
                     var responseString = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode)
                     {
-                        result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+                        if (authData.CustomJsonConverter != null)
+                        {
+                            result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString, authData.CustomJsonConverter);
+                        }
+                        else
+                        {
+                            result = JsonConvert.DeserializeObject<GenericJsonOdata<T>>(responseString);
+                        }
                         return result;
                     }
                     else

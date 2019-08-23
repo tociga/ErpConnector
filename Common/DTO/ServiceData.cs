@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ErpConnector.Common.ErpTasks;
+using Newtonsoft.Json;
 
 namespace ErpConnector.Common.DTO
 {
@@ -23,5 +24,6 @@ namespace ErpConnector.Common.DTO
         public ErpTaskStep.AuthenticationType AuthType { get; set; }
         public object InjectionPropertyValue { get; set; }
         public string InjectionPropertyName { get; set; }
+        public JsonConverter CustomJsonConverter { get; set; }
     }
 }

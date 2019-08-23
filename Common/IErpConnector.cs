@@ -10,7 +10,8 @@ namespace ErpConnector.Common
     {
         ax,
         sap,
-        jira
+        jira,
+        nav
     }
     public interface IErpConnector
     {
