@@ -137,15 +137,19 @@ namespace ErpConnector.Sap
                             {
                                 foreach (var po in po_to_create)
                                 {
-                                    var req = CreatePO(po, SapComanyCode);
-                                    if (req != null && req.Exception == null && !string.IsNullOrEmpty(req.SimpleResult))
+                                    if (po.unit_qty_chg > 0)
                                     {
-                                        SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, req.SimpleResult, "Req", po.item_no, po.location_no);
-                                    }
-                                    else
-                                    {
-                                        DataWriter.LogErpActionStep(actionId, string.Format("Create PO orderid = {0}, item_no = {1}, location_no = {2}.",po.order_id, po.item_no, po.location_no),
-                                            start, false, result.ErrorMessage, result.StackTrace);
+                                        var req = CreatePO(po, SapComanyCode);
+                                        if (req != null && req.Exception == null && !string.IsNullOrEmpty(req.SimpleResult))
+                                        {
+                                            SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, req.SimpleResult, "Req", po.item_no, po.location_no);
+                                        }
+                                        else
+                                        {
+                                            result = req.Exception;
+                                            DataWriter.LogErpActionStep(actionId, string.Format("Create PO orderid = {0}, item_no = {1}, location_no = {2}.", po.order_id, po.item_no, po.location_no),
+                                                start, false, req.Exception.ErrorMessage, req.Exception.StackTrace);
+                                        }                                        
                                     }
                                 }
                             }
