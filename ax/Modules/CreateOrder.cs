@@ -1,6 +1,9 @@
 ﻿using ErpConnector.Ax.Authentication;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
+using ErpConnector.Common.Exceptions;
+using Microsoft.OData.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +38,26 @@ namespace ErpConnector.Ax.Modules
             }
 
             return ret;
+        }
+        protected override AxBaseException SaveChanges()
+        {
+            {
+                try
+                {
+                    context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
+
+                    return null;
+                }
+                catch (DataServiceRequestException ex)
+                {
+                    return JsonConvert.DeserializeObject<AxBaseException>(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    return new AxBaseException { ApplicationException = ex };
+                }
+            }
+
         }
         private bool orderExists(string custID, string targetAXLegalEntity)
         {
