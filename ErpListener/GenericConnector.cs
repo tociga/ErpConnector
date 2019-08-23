@@ -13,7 +13,8 @@ namespace ErpConnector.Listener
     public class GenericConnector
     {
         IErpConnector factory;
-        BlockingCollection<Task> connectorTasks;
+        BlockingCollection<Task> readConnectorTasks;
+        BlockingCollection<Task> writeConnectorTasks;
         public GenericConnector(string typeOfErp)
         {
             ErpType erpType;
@@ -31,13 +32,24 @@ namespace ErpConnector.Listener
                 default:
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);
             }
-            connectorTasks = new BlockingCollection<Task>();
-            Task.Factory.StartNew(() => StartConnector());
+            readConnectorTasks = new BlockingCollection<Task>();
+            writeConnectorTasks = new BlockingCollection<Task>();
+            Task.Factory.StartNew(() => StartReadConnector());
+            Task.Factory.StartNew(() => StartWriteConnector());
         }
 
-        private void StartConnector()
+        private void StartReadConnector()
         {
-            foreach(Task task in connectorTasks.GetConsumingEnumerable())
+            foreach(Task task in readConnectorTasks.GetConsumingEnumerable())
+            {
+                task.Start();
+                task.Wait();
+            }
+        }
+
+        private void StartWriteConnector()
+        {
+            foreach (Task task in writeConnectorTasks.GetConsumingEnumerable())
             {
                 task.Start();
                 task.Wait();
@@ -47,34 +59,34 @@ namespace ErpConnector.Listener
         public Task<AxBaseException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreatePoTo(po_to_create, actionId));
-            connectorTasks.Add(task);
+            writeConnectorTasks.Add(task);
             return task;            
         }
 
         public Task<AxBaseException> CreateItem(int itemCreateBatchId, int actionId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemCreateBatchId, actionId));
-            connectorTasks.Add(task);
+            writeConnectorTasks.Add(task);
             return task;
         }
 
         public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date, int? noParallelProcesses)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date, noParallelProcesses));
-            connectorTasks.Add(task);
+            readConnectorTasks.Add(task);
             return task;
         }
         public Task<AxBaseException> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.GetSingleTable(step, actionId, date));
-            connectorTasks.Add(task);
+            readConnectorTasks.Add(task);
             return task;
         }
 
         public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, int plcUdpdateId)
         {
             Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
-            connectorTasks.Add(task);
+            writeConnectorTasks.Add(task);
             return task;
         }
         //public string GetDBScript(string entity)
