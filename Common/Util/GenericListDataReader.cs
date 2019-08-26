@@ -236,7 +236,8 @@ namespace ErpConnector.Common.Util
                     return null;
                 }
                 var EdmDate = (Microsoft.OData.Edm.Date)obj;
-                return new DateTime(EdmDate.Year, EdmDate.Month, EdmDate.Day);
+                var date = new DateTime(EdmDate.Year, EdmDate.Month, EdmDate.Day);
+                return (date <= DateTime.MinValue || date >= DateTime.MaxValue) ? DateTime.Now.Date.AddDays(1) : date; 
             }
             return properties[i].GetValue(list.Current, null);
         }

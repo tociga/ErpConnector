@@ -292,7 +292,7 @@ namespace ErpConnector.Common
                     }
                     else
                     {
-                        nextLinkEndpoint = returnODataObject.NextLink + ApplyCrossCompanyFilter(filters);
+                        nextLinkEndpoint = returnODataObject.NextLink;
                     }
                     returnODataObject = await CallOdataEndpointAsync<Y>(nextLinkEndpoint, authData);
                     DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
