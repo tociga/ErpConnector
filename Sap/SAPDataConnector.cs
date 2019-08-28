@@ -66,41 +66,44 @@ namespace ErpConnector.Sap
             return null;
         }
 
-        private GenericWriteObject<SAPRequisitionDTO> CreatePO(POTOCreate poCreate, string sapCompanyCode)
+        private GenericWriteObject<List<SAPRequisitionDTO>> CreatePO(List<POTOCreate> poCreate, string sapCompanyCode)
         {
             if (poCreate != null)
             {
                 var authData = Authenticator.GetAuthData(Common.ErpTasks.ErpTaskStep.AuthenticationType.SAP);
                 var fixedFilter = ConfigurationManager.AppSettings["fixedEndPointFilter"];
                 var csrfToken = GetCSRFToken(authData).Result;
-                if (poCreate.unit_qty_chg > 0)
+                var reqItems = new List<SAPRequisitionDTO>();
+                foreach(var po in poCreate)
                 {
-                    SAPRequisitionDTO reqItem = new SAPRequisitionDTO();
-                    //reqItem.PreqItem = "0000";
-                    reqItem.CreatedBy = "AGR";//po_to_create.Orders[0].UserId;
-                    reqItem.DocType = "NB";
-                    reqItem.PreqName = "AGR";
-                    reqItem.ShortText = poCreate.description;
-                    reqItem.Material = PadWithZeros(poCreate.item_no, 18);//row.ProductId;
-                    reqItem.Plant = sapCompanyCode;// po_to_create.Orders[0].OrderFromSupplierId;                        
-                    reqItem.StoreLoc = poCreate.location_no;
-                    //reqItem.MatGrp = row.ProductGroup;
-                    reqItem.Quantity = (decimal)(double)poCreate.unit_qty_chg;
-                    reqItem.Unit = poCreate.unit;
-                    //if (row.item_no == "8504")
-                    //    reqItem.Unit = "M";
-                    //else
-                    //    reqItem.Unit = "ST";
-                    //0000062095
-                    reqItem.DelivDate = DateTime.Now.AddDays(10).ToString("yyyy-MM-dd");//po_to_create.Orders[0].EstDelivDate.ToString("dd.MM.yyyy");
-                    reqItem.GrPrTime = 340m;
-                    reqItem.CAmtBapi = 0m;
-                    reqItem.PriceUnit = 0m;// (decimal)row.PriceUnit;                                    
-
-                    var result = CallOdataEndpointPostStringReturn<SAPRequisitionDTO>("Requisitioncreate", fixedFilter, reqItem, authData, csrfToken).Result;
-                    return result;
-
-                }                
+                    if (po.unit_qty_chg > 0)
+                    {
+                        SAPRequisitionDTO reqItem = new SAPRequisitionDTO();
+                        //reqItem.PreqItem = "0000";
+                        reqItem.CreatedBy = "AGR";//po_to_create.Orders[0].UserId;
+                        reqItem.DocType = "NB";
+                        reqItem.PreqName = "AGR";
+                        reqItem.ShortText = po.description;
+                        reqItem.Material = PadWithZeros(po.item_no, 18);//row.ProductId;
+                        reqItem.Plant = sapCompanyCode;// po_to_create.Orders[0].OrderFromSupplierId;                        
+                        reqItem.StoreLoc = po.location_no;
+                        //reqItem.MatGrp = row.ProductGroup;
+                        reqItem.Quantity = (decimal)(double)po.unit_qty_chg;
+                        reqItem.Unit = po.unit;
+                        //if (row.item_no == "8504")
+                        //    reqItem.Unit = "M";
+                        //else
+                        //    reqItem.Unit = "ST";
+                        //0000062095
+                        reqItem.DelivDate = DateTime.Now.AddDays(10).ToString("yyyy-MM-dd");//po_to_create.Orders[0].EstDelivDate.ToString("dd.MM.yyyy");
+                        reqItem.GrPrTime = 340m;
+                        reqItem.CAmtBapi = 0m;
+                        reqItem.PriceUnit = 0m;// (decimal)row.PriceUnit; 
+                        reqItems.Add(reqItem);
+                    }
+                }
+                var result = CallOdataEndpointPostStringReturn<List<SAPRequisitionDTO>>("Requisitioncreate", fixedFilter, reqItems, authData, csrfToken).Result;
+                return result;
             }
             return null;
         }
@@ -126,7 +129,7 @@ namespace ErpConnector.Sap
                                 var res = CreateTO(po_to_create, SapComanyCode);
                                 if (res.Exception == null && !string.IsNullOrEmpty(res.SimpleResult))
                                 {
-                                    SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, res.SimpleResult, "Res", null, null);
+                                    SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, res.SimpleResult, "Res");
                                 }
                                 else
                                 {
@@ -135,23 +138,15 @@ namespace ErpConnector.Sap
                             }
                             else
                             {
-                                foreach (var po in po_to_create)
+                                var req = CreatePO(po_to_create, SapComanyCode);
+                                if (req != null && req.Exception == null && !string.IsNullOrEmpty(req.SimpleResult))
                                 {
-                                    if (po.unit_qty_chg > 0)
-                                    {
-                                        var req = CreatePO(po, SapComanyCode);
-                                        if (req != null && req.Exception == null && !string.IsNullOrEmpty(req.SimpleResult))
-                                        {
-                                            SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, req.SimpleResult, "Req", po.item_no, po.location_no);
-                                        }
-                                        else
-                                        {
-                                            result = req.Exception;
-                                            DataWriter.LogErpActionStep(actionId, string.Format("Create PO orderid = {0}, item_no = {1}, location_no = {2}.", po.order_id, po.item_no, po.location_no),
-                                                start, false, req.Exception.ErrorMessage, req.Exception.StackTrace);
-                                        }                                        
-                                    }
+                                    SAPDbHandler.SetAGR5OrderAsTransfered(first.order_id, req.SimpleResult, "Req");
                                 }
+                                else
+                                {
+                                    result = req.Exception;
+                                }                                        
                             }
                             if (result == null)
                             {

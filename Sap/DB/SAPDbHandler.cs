@@ -27,7 +27,7 @@ namespace ErpConnector.Sap.DB
                 return ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
             }
         }
-        public static void SetAGR5OrderAsTransfered(int orderId, string erpTranNr, string transferType, string itemNo, string locationNo)
+        public static void SetAGR5OrderAsTransfered(int orderId, string erpTranNr, string transferType)
         {
             SqlCommand cmd = null;
             try
@@ -48,11 +48,6 @@ namespace ErpConnector.Sap.DB
                         cmd.Parameters["@erp_transaction_nr"].Value = erpTranNr;
                         cmd.Parameters["@transfer_type"].Value = transferType;
 
-                        if (!string.IsNullOrEmpty(itemNo) && !string.IsNullOrEmpty(locationNo))
-                        {
-                            cmd.Parameters.AddWithValue("@item_no", itemNo);
-                            cmd.Parameters.AddWithValue("@location_no", locationNo);
-                        }
                         cmd.ExecuteNonQuery();
                     }
                 }
