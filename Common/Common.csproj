@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ErpConnector.Common</RootNamespace>
     <AssemblyName>ErpConnector.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -71,6 +71,33 @@
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
+    <Compile Include="Constants\AGRConstants.cs" />
+    <Compile Include="DTO\AGROrderHeaderDTO.cs" />
+    <Compile Include="DTO\AGROrderLineDTO.cs" />
+    <Compile Include="DTO\AGROrderResponseDTO.cs" />
+    <Compile Include="DTO\CustomData\CustomAttributeValuesDTO.cs" />
+    <Compile Include="DTO\CustomData\CustomTimeSeriesValuesDTO.cs" />
+    <Compile Include="DTO\CustomData\LocationCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\ProductCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\SKUCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\TimeSeriesCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\VendorCustomDataDTO.cs" />
+    <Compile Include="DTO\HistoriesConnectedItemsDTO.cs" />
+    <Compile Include="DTO\HistoriesSalesStockDTO.cs" />
+    <Compile Include="DTO\ItemDetailsDTO.cs" />
+    <Compile Include="DTO\ItemDetailsV2.cs" />
+    <Compile Include="DTO\ItemGroupDetailsDTO.cs" />
+    <Compile Include="DTO\ItemOrderRoutesDTO.cs" />
+    <Compile Include="DTO\ItemOrderRoutesV2DTO.cs" />
+    <Compile Include="DTO\ItemsDTO.cs" />
+    <Compile Include="DTO\ItemsV2DTO.cs" />
+    <Compile Include="DTO\LocationsDTO.cs" />
+    <Compile Include="DTO\ReservedDTO.cs" />
+    <Compile Include="DTO\StocksDTO.cs" />
+    <Compile Include="DTO\SyncDTO.cs" />
+    <Compile Include="DTO\UndeliveredDTO.cs" />
+    <Compile Include="DTO\VendorsDTO.cs" />
+    <Compile Include="ErpTaskCompletedArgs.cs" />
     <Compile Include="JsonConverters\EdmDateConverter.cs" />
     <Compile Include="DTO\ErpActionStep.cs" />
     <Compile Include="ErpTasks\ErpTaskStepDetails.cs" />
@@ -82,6 +109,7 @@
     <Compile Include="DTO\ServiceData.cs" />
     <Compile Include="ErpGenericConnector.cs" />
     <Compile Include="ExternalTask\ExternalTaskExec.cs" />
+    <Compile Include="Services\DataContractService.cs" />
     <Compile Include="TaskExecute.cs" />
     <Compile Include="DTO\GenericJsonOdata.cs" />
     <Compile Include="DTO\GenericWriteObject.cs" />

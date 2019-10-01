@@ -1,8 +1,10 @@
-﻿using ErpConnector.Common.AGREntities;
+﻿using ErpConnector.Common;
+using ErpConnector.Common.AGREntities;
 using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.Exceptions;
 using ErpConnector.Common.Util;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -12,6 +14,48 @@ namespace ErpConnector.Listener
 {
     public class DbService
     {
+        BlockingCollection<Task<int>> writeTasks;
+        BlockingCollection<Task<int>> readTasks;
+        public DbService()
+        {
+            writeTasks = new BlockingCollection<Task<int>>();
+            readTasks = new BlockingCollection<Task<int>>();
+
+            Task.Factory.StartNew(() => RunWriteTasks());
+            Task.Factory.StartNew(() => RunReadTasks());
+        }
+
+        public void RunWriteTasks()
+        {
+            foreach(var task in writeTasks.GetConsumingEnumerable())
+            {
+                try
+                {
+                    task.Start();
+                    task.Wait();
+                }
+                catch(Exception)
+                {
+                    DataWriter.UpdateActionStatus(task.Result, 3, task, null);
+                }
+            }
+        }
+        public void RunReadTasks()
+        {
+            foreach (var task in readTasks.GetConsumingEnumerable())
+            {
+                try
+                {
+                    task.Start();
+                    task.Wait();
+                }
+                catch (Exception)
+                {
+                    DataWriter.UpdateActionStatus(task.Result, 3, task, null);
+                }
+            }
+        }
+
         public bool? Sync()
         {
             try
@@ -25,24 +69,25 @@ namespace ErpConnector.Listener
                     {
                         // Run transfer
                         var erpType = ConfigurationManager.AppSettings["erp_type"];
-                        var connector = new GenericConnector(erpType);
-
+                        var connector = new GenericConnector(erpType, Factory_ErpTaskCompletedEvent);
 
                         switch (action.action_type)
                         {
                             case "create_po_to":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
+                                DataWriter.UpdateActionStatus(action.id, 1, null, null);
                                 var orders = DataWriter.GetPoToToCreate(action.reference_id);
                                 var connectorTask = connector.CreatePoTo(orders, action.id);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                writeTasks.Add(connectorTask);
+                                //connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
                                 DataWriter.UpdateOrderStatus(action.reference_id);
                                 break;
                             case "create_item":
                                 if (includeBAndM)
                                 {
-                                    DataWriter.UpdateActionStatus(action.id, 1, null);
+                                    DataWriter.UpdateActionStatus(action.id, 1, null, null);
                                     connectorTask = connector.CreateItem(action.reference_id, action.id);
-                                    connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                    writeTasks.Add(connectorTask);
+                                    //connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
                                     //var options = itemsToCreate.Select(x => x.option_id).Distinct();
                                     //foreach (int option in options)
                                     //{
@@ -51,18 +96,19 @@ namespace ErpConnector.Listener
                                 }
                                 else
                                 {
-                                    DataWriter.UpdateActionStatus(action.id, 2, null);
+                                    DataWriter.UpdateActionStatus(action.id, 2, null, null);
                                 }
                                 break;
                             case "action_task":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
+                                DataWriter.UpdateActionStatus(action.id, 1, null, null);
                                 var task = DataWriter.GetTask(action.reference_id);
                                 connectorTask = connector.ExecuteTask(task, action.id, DataWriter.GetDateById(action.date_reference_id), action.no_parallel_process);
-                                connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
-                                EmailSender.SendEmail(action.id, action.created_at);
+                                readTasks.Add(connectorTask);
+                                //connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
+                                connectorTask.ContinueWith((x)=>EmailSender.SendEmail(action.id, action.created_at));
                                 break;
                             case "single_table":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);
+                                DataWriter.UpdateActionStatus(action.id, 1, null, null);
                                 DateTime date = DateTime.MaxValue;
                                 if (action.date_reference_id.HasValue)
                                 {
@@ -70,15 +116,16 @@ namespace ErpConnector.Listener
                                 }
                                 var step = DataWriter.GetStep(action.reference_id);
                                 var a = connector.GetSingleTable(step, action.id, date);
-                                DataWriter.UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
+                                readTasks.Add(a);
+                                //DataWriter.UpdateActionStatus(action.id, 2, CreateBaseTaskException(a));
                                 break;
                             case "update_plc":
-                                DataWriter.UpdateActionStatus(action.id, 1, null);                                
+                                DataWriter.UpdateActionStatus(action.id, 1, null, null);                                
                                 connectorTask = connector.UpdateProductLifecycleStatus(action.id, action.reference_id);
-                                var updateTask = connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark));                                
+                                writeTasks.Add(connectorTask);
                                 break;
                             default:
-                                DataWriter.UpdateActionStatus(action.id, 3, CreateBaseTaskException(new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) }));
+                                DataWriter.UpdateActionStatus(action.id, 3, null, new AxBaseException { ApplicationException = new Exception("Unknown action type =" + action.action_type) });
                                 break;
                         }
                     }
@@ -92,9 +139,9 @@ namespace ErpConnector.Listener
             return true;
         }
 
-        public async Task<AxBaseException> CreateBaseTaskException(AxBaseException a)
+        private void Factory_ErpTaskCompletedEvent(object sender, ErpTaskCompletedArgs args)
         {
-            return a;
+            DataWriter.UpdateActionStatus(args.ActionId, args.Status, null, args.Exception);
         }
 
     }

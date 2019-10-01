@@ -9,78 +9,65 @@ using ErpConnector.Common.ErpTasks;
 using ErpConnector.Ax;
 using ErpConnector.Sap;
 using ErpConnector.Nav;
+using ErpConnector.Jira;
 
 namespace ErpConnector.Listener
 {
     public class GenericConnector
     {
-        IErpConnector factory;
-        BlockingCollection<Task> connectorTasks;
-        public GenericConnector(string typeOfErp)
+        private ErpGenericConnector factory;
+        public GenericConnector(string typeOfErp, ErpGenericConnector.ErpTaskCompleted taskCompleted)
         {
-            ErpType erpType;
-            Enum.TryParse(typeOfErp, out erpType);
+            factory = GetConnector(typeOfErp);
+            factory.ErpTaskCompletedEvent += taskCompleted;
+        }
+
+
+        private ErpGenericConnector GetConnector(string typeOfErp)
+        {
+            Enum.TryParse(typeOfErp, out ErpType erpType);
             switch (erpType)
             {
                 case ErpType.ax:
-                    factory = new AxODataConnector();
-                    break;
+                    return new AxODataConnector();
                 case ErpType.jira:
-                    factory = new ErpGenericConnector();
-                    break;
+                    return new JiraConnector();
                 case ErpType.sap:
-                    factory = new SAPDataConnector();
-                    break;
+                    return new SAPDataConnector();
                 case ErpType.nav:
-                    factory = new NavConnector();
-                    break;
+                    return new NavConnector();
                 default:
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);
             }
-            connectorTasks = new BlockingCollection<Task>();
-            Task.Factory.StartNew(() => StartConnector());
         }
 
-        private void StartConnector()
-        {
-            foreach(Task task in connectorTasks.GetConsumingEnumerable())
-            {
-                task.Start();
-                task.Wait();
-                // hvað gerist ef villa gerist hér.
-            }
-        }
-
-        public Task<AxBaseException> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
-        {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreatePoTo(po_to_create, actionId));
-            connectorTasks.Add(task);
+        public Task<int> CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        {            
+            Task<int> task = new Task<int>(() => factory.CreatePoTo(po_to_create, actionId));
+            task.Start();
             return task;            
         }
 
-        public Task<AxBaseException> CreateItem(int itemCreateBatchId, int actionId)
+        public Task<int> CreateItem(int itemCreateBatchId, int actionId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.CreateItems(itemCreateBatchId, actionId));
-            connectorTasks.Add(task);
+            Task<int> task = new Task<int>(() => factory.CreateItems(itemCreateBatchId, actionId));
             return task;
         }
 
-        public Task<AxBaseException> ExecuteTask(ErpTask erpTask, int actionId, DateTime date, int? noParallelProcesses)
+        public Task<int> ExecuteTask(ErpTask erpTask, int actionId, DateTime date, int? noParallelProcesses)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.TaskList(actionId, erpTask, date, noParallelProcesses));
-            connectorTasks.Add(task);
+            Task<int> task = new Task<int>(() => factory.TaskList(actionId, erpTask, date, noParallelProcesses));
             return task;
         }
-        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        public Task<int> GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            AxBaseException task = factory.GetSingleTable(step, actionId, date);
+            Task<int> task = new Task<int>(()=> factory.GetSingleTable(step, actionId, date));
             return task;
         }
 
-        public Task<AxBaseException> UpdateProductLifecycleStatus(int actionId, int plcUdpdateId)
+        public Task<int> UpdateProductLifecycleStatus(int actionId, int plcUdpdateId)
         {
-            Task<AxBaseException> task = new Task<AxBaseException>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
-            connectorTasks.Add(task);
+            Task<int> task = new Task<int>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
             return task;
         }
         //public string GetDBScript(string entity)

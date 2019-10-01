@@ -24,59 +24,64 @@ namespace TestApplication
 {
     class Program
     {
+        public static void TestWebApi()
+        {
+            ErpConnectorApi.Startup.Start();
+        }
         static void Main(string[] args)
         {
-            //AGR_ItemCategory
-            var tos = new List<POTOCreate>();
-            tos.Add(
-                new POTOCreate
-                {
-                    item_no = "15468",
-                    order_id = 1,
-                    description = "Test TO1",
-                    location_no = "0302",
-                    order_from_location_no = "0200",
-                    vendor_location_type = "warehouse",
-                    est_delivery_date = DateTime.Now.Date,
-                    unit = "ST",
-                    unit_qty_chg = 100m,                    
-                }
-            ) ;
+            TestWebApi();
+            ////AGR_ItemCategory
+            //var tos = new List<POTOCreate>();
+            //tos.Add(
+            //    new POTOCreate
+            //    {
+            //        item_no = "15468",
+            //        order_id = 1,
+            //        description = "Test TO1",
+            //        location_no = "0302",
+            //        order_from_location_no = "0200",
+            //        vendor_location_type = "warehouse",
+            //        est_delivery_date = DateTime.Now.Date,
+            //        unit = "ST",
+            //        unit_qty_chg = 100m,                    
+            //    }
+            //) ;
 
-            tos.Add(
-                new POTOCreate
-                {
-                    item_no = "25331",
-                    order_id = 1,
-                    description = "Test TO1",
-                    location_no = "0302",
-                    order_from_location_no = "0200",
-                    vendor_location_type = "warehouse",
-                    est_delivery_date = DateTime.Now.Date,
-                    unit = "ST",
-                    unit_qty_chg = 50m,
-                }
-            );
+            //tos.Add(
+            //    new POTOCreate
+            //    {
+            //        item_no = "25331",
+            //        order_id = 1,
+            //        description = "Test TO1",
+            //        location_no = "0302",
+            //        order_from_location_no = "0200",
+            //        vendor_location_type = "warehouse",
+            //        est_delivery_date = DateTime.Now.Date,
+            //        unit = "ST",
+            //        unit_qty_chg = 50m,
+            //    }
+            //);
 
-            var sapCreate = new ErpConnector.Sap.SAPDataConnector();
-            //sapCreate.CreatePoTo(tos, -1);
+            //var sapCreate = new ErpConnector.Sap.SAPDataConnector();
+            ////sapCreate.CreatePoTo(tos, -1);
 
-            var pos = new List<POTOCreate>();
-            pos.Add(
-                new POTOCreate
-                {
-                    item_no = "42165",
-                    order_id = 2,
-                    description = "Test PO1",
-                    location_no = "0200",
-                    order_from_location_no = "1000081935",
-                    vendor_location_type = "vendor",
-                    est_delivery_date = DateTime.Now.Date,
-                    unit = "ST",
-                    unit_qty_chg = 50m,
-                }
-            );
-            sapCreate.CreatePoTo(pos, -1);
+            //var pos = new List<POTOCreate>();
+            //pos.Add(
+            //    new POTOCreate
+            //    {
+            //        item_no = "42165",
+            //        order_id = 2,
+            //        description = "Test PO1",
+            //        location_no = "0200",
+            //        order_from_location_no = "1000081935",
+            //        vendor_location_type = "vendor",
+            //        est_delivery_date = DateTime.Now.Date,
+            //        unit = "ST",
+            //        unit_qty_chg = 50m,
+            //    }
+            //);
+            //sapCreate.CreatePoTo(pos, -1);
             //var sapReservation = new SAPReservationWriteDTO
             //{
             //    Header = new SAPResHeaderDTO { CreatedBy = "AGR", MovePlant = "1000", MoveStloc = "0302", Plant = "1000", MoveType = "311", ProfitCtr = "0000916299", ResDate = DateTime.Now.ToString("yyyy-MM-dd") },

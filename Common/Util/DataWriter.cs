@@ -11,18 +11,28 @@ using ErpConnector.Common.Exceptions;
 using System.Threading.Tasks;
 using ErpConnector.Common.DTO;
 using System.Collections;
+using System.Threading;
+using ErpConnector.Common.Constants;
 
 namespace ErpConnector.Common.Util
 {
     public static class DataWriter
     {
-        static string ConnectionString
+        static string StgConnectionString
         {
             get
             {
                 return ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
             }
         }
+        static string ProdConnectionString
+        {
+            get
+            {
+                return ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
+            }
+        }
+
         public static DateTime GetDateById(int? dateId)
         {
             if (!dateId.HasValue)
@@ -73,7 +83,7 @@ namespace ErpConnector.Common.Util
                 }
             }
         }
-        public static void UpdateActionStatus(int id, int status, Task<AxBaseException> a)
+        public static void UpdateActionStatus(int id, int status, Task a, AxBaseException e)
         {
             string errorMessage = null;
             string errorStackTrace = null;
@@ -94,17 +104,17 @@ namespace ErpConnector.Common.Util
                     }
                 }
             }
-            else if (a != null && a.Result != null && a.Result.ApplicationException != null)
+            else if (e != null && e.ApplicationException != null)
             {
                 status = 3;
-                errorMessage = a.Result.ApplicationException.Message;
-                errorStackTrace = a.Result.ApplicationException.StackTrace;
+                errorMessage = e.ApplicationException.Message;
+                errorStackTrace = e.ApplicationException.StackTrace;
             }
-            else if (a != null && a.Result != null && a.Result.error != null && a.Result.error.innererror != null)
+            else if (e != null && e.error != null && e.error.innererror != null)
             {
                 status = 3;
-                errorMessage = a.Result.error.innererror.message;
-                errorStackTrace = a.Result.error.innererror.stacktrace;
+                errorMessage = e.error.innererror.message;
+                errorStackTrace = e.error.innererror.stacktrace;
             }
 
             var connectionString = ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
@@ -257,7 +267,7 @@ namespace ErpConnector.Common.Util
                         propInfo.SetValue(listItem, Convert.ChangeType(value, propInfo.PropertyType));
                     }
                 }
-                using (var con = new SqlConnection(ConnectionString))
+                using (var con = new SqlConnection(StgConnectionString))
                 {
                     using (var copy = new SqlBulkCopy(con))
                     {
@@ -278,7 +288,7 @@ namespace ErpConnector.Common.Util
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(ConnectionString))
+                using (SqlConnection con = new SqlConnection(StgConnectionString))
                 {
                     using (var cmd = new SqlCommand("ctr.getDataTransferSetting_Str", con))
                     {
@@ -298,7 +308,7 @@ namespace ErpConnector.Common.Util
 
         public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success, string errorMessage, string errorStackTrace)
         {
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 using (var cmd = new SqlCommand("erp.insert_erp_action_step", con))
                 {
@@ -319,7 +329,7 @@ namespace ErpConnector.Common.Util
 
         public static Int64 GetMaxRecId(string tableName)
         {
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 using (var cmd = new SqlCommand("[erp].[find_max_rec_id]", con))
                 {
@@ -339,7 +349,7 @@ namespace ErpConnector.Common.Util
         }
         public static void TruncateSingleTable(string tableName)
         {
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 using (var cmd = new SqlCommand("[erp].[truncate_single_erp_table]", con))
                 {
@@ -369,7 +379,7 @@ namespace ErpConnector.Common.Util
         {
             string query = "select top 1 * from " + destTable;
             List<string> result = new List<string>();
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 con.Open();
 
@@ -402,7 +412,7 @@ namespace ErpConnector.Common.Util
         {
             string query = "select top 1 * from " + destTable;
             List<string> result = new List<string>();
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 con.Open();
                 using (var adapter = new SqlDataAdapter(query, con))
@@ -431,7 +441,7 @@ namespace ErpConnector.Common.Util
         public static List<string> GetIdsFromEntities(string procedure)
         {
             List<string> result = new List<string>();
-            using (var con = new SqlConnection(ConnectionString))
+            using (var con = new SqlConnection(StgConnectionString))
             {
                 using (var cmd = new SqlCommand(procedure, con))
                 {
@@ -721,6 +731,175 @@ namespace ErpConnector.Common.Util
             }
         }
         #endregion
+        #region Api specific Functions
+        public static void RunNonQueryWithoutParamsStg(string storedProcedure, bool longTimeOut)
+        {
+            using (var con = new SqlConnection(StgConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand(storedProcedure, con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    if (longTimeOut)
+                    {
+                        cmd.CommandTimeout = 3600;
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static async Task<SyncDTO> MergeSyncTask(SyncDTO syncDTO)
+        {
+            using (var con = new SqlConnection(StgConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("erp.sync_log_update", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@id", syncDTO.id.HasValue ? (object)syncDTO.id.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@status", (short)syncDTO.status);
+                    cmd.Parameters.AddWithValue("@message", syncDTO.message);
+
+                    var reader = await cmd.ExecuteReaderAsync();
+                    if (reader.HasRows && reader.Read())
+                    {
+                        syncDTO.id = reader.GetInt32(0);
+                    }
+
+                    return syncDTO;
+                }
+            }
+        }
+
+        public static async Task WriteDTO<T>(IDataReader reader, CancellationToken token, string fullTableName)
+        {
+            using (var con = new SqlConnection(StgConnectionString))
+            {
+                con.Open();
+                using (var copy = new SqlBulkCopy(con))
+                {
+                    var mappings = GetDynamicBulkCopyColumnMapping<T>();
+                    foreach (var m in mappings)
+                    {
+                        copy.ColumnMappings.Add(m);
+                    }
+                    copy.BulkCopyTimeout = 360;
+                    copy.DestinationTableName = fullTableName;
+
+                    await copy.WriteToServerAsync(reader, token);
+                }
+            }
+        }
+        public static async Task<IList<AGROrderHeaderDTO>> GetAGROrderHeaders(CancellationToken token)
+        {
+            using (var con = new SqlConnection(ProdConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("[dbo].[get_orders_to_transfer]", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    var reader = await cmd.ExecuteReaderAsync(token);
+                    var results = new List<AGROrderHeaderDTO>();
+                    while (reader.Read())
+                    {
+                        results.Add
+                            (
+                                new AGROrderHeaderDTO
+                                {
+                                    agr_order_id = reader.GetInt32(0),
+                                    order_from_location_no = reader.GetString(2),
+                                    order_to_location_no = reader.GetString(1),
+                                    est_deliv_date = reader.GetDateTime(3),
+                                    order_type = (AGRConstants.AGR_ORDER_TYPE)reader.GetInt32(4)
+                                }
+                            );
+                    }
+                    return results;
+                }
+            }
+        }
+
+        public static async Task<IList<AGROrderLineDTO>> GetAGROrderLines(int orderId, CancellationToken token)
+        {
+            using (var con = new SqlConnection(ProdConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("[dbo].[get_orders_to_transfer]", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@order_id", orderId);
+                    var reader = await cmd.ExecuteReaderAsync(token);
+                    var results = new List<AGROrderLineDTO>();
+                    while (reader.Read())
+                    {
+                        results.Add
+                            (
+                                new AGROrderLineDTO
+                                {
+                                    agr_order_id = reader.GetInt32(0),
+                                    item_no = reader.GetString(1),
+                                    order_to_location_no = ReadString(reader, 2),
+                                    color = ReadString(reader, 4),
+                                    size = ReadString(reader, 5),
+                                    style = ReadString(reader, 6),
+                                    qty = ReadDecimal(reader, 8).Value
+                                }
+                            );
+                    }
+                    return results;
+                }
+            }
+
+        }
+        public static async Task LogAGROrderCallback(AGROrderResponseDTO response, CancellationToken token)
+        {
+            await LogAGROrderAction(response, token, "call_back");
+        }
+        public static async Task LogAGROrderAction(AGROrderResponseDTO response, CancellationToken token, string action)
+        {
+            using (var con = new SqlConnection(StgConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("[log].[insert_order_transfer_log]", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@order_id", response.agr_order_id);
+                    cmd.Parameters.AddWithValue("@action", action);
+                    cmd.Parameters.AddWithValue("@success", response.erp_order_status == AGRConstants.ERP_ORDER_STATUS.COMPLETED);
+                    cmd.Parameters.AddWithValue("@order_type", response.agr_order_type);
+                    cmd.Parameters.AddWithValue("@error_message", response.error_message);
+                    cmd.Parameters.AddWithValue("@error_stack_trace", response.error_message);
+                    await cmd.ExecuteNonQueryAsync(token);
+                }
+            }
+        }
+
+        public static async Task UpdateOrderStatus(AGROrderResponseDTO response, CancellationToken token)
+        {
+            using (var con = new SqlConnection(ProdConnectionString))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("[dbo].[orders_update_transfer_status]", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@order_id", response.agr_order_id);
+                    if (response.erp_order_status == AGRConstants.ERP_ORDER_STATUS.COMPLETED)
+                    {
+                        cmd.Parameters.AddWithValue("@status", 2);
+                        cmd.Parameters.AddWithValue("@description", "ERP Order number: " + response.erp_order_no);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@status", 1);
+                        cmd.Parameters.AddWithValue("@description", "Order creation failed on the ERP side. See [log].[order_transfer_log] for details");
+                    }
+                    await cmd.ExecuteNonQueryAsync(token);
+                }
+            }
+        }
+        #endregion
+        #region Utility Functions
         public static string ReadString(IDataReader reader, int index)
         {
             if (reader.IsDBNull(index))
@@ -761,7 +940,6 @@ namespace ErpConnector.Common.Util
             }
             return reader.GetBoolean(index);
         }
-
-
+        #endregion
     }
 }

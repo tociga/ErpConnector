@@ -107,7 +107,7 @@ namespace ErpConnector.Sap
             }
             return null;
         }
-        public override AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        public override int CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             try
             {
@@ -176,7 +176,7 @@ namespace ErpConnector.Sap
             {
                 DataWriter.LogError("Error in Prod to Sap Transfer", e.StackTrace, this, e.HResult);
             }
-            return null;
+            return actionId;
         }
 
         private string PadWithZeros(string str, int count)

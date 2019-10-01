@@ -15,10 +15,11 @@ namespace ErpConnector.Common
     }
     public interface IErpConnector
     {
-        AxBaseException CreatePoTo(List<POTOCreate> po_to_create,int actionId);
-        AxBaseException CreateItems(int itemToCreateId, int actionId);
-        AxBaseException TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
-        AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
-        AxBaseException UpdateProductLifecycleState(int plcUdateId, int actionId);
+        int CreatePoTo(List<POTOCreate> po_to_create,int actionId);
+        int CreateItems(int itemToCreateId, int actionId);
+        int TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
+        int GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
+        int UpdateProductLifecycleState(int plcUdateId, int actionId);
+        void OnTaskCompleted(object sender, ErpTaskCompletedArgs args);
     }
 }

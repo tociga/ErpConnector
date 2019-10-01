@@ -4,6 +4,7 @@ using Topshelf;
 using System.Timers;
 using System.Configuration;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace ErpConnector.Listener
 {
@@ -40,6 +41,7 @@ namespace ErpConnector.Listener
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             }
             //TODO: Implement your service start routine.
+            Task.Factory.StartNew(() => ErpConnectorApi.Startup.Start());
             return true;
         }
 

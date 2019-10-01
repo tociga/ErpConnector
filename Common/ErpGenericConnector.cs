@@ -12,8 +12,12 @@ using ErpConnector.Common.AGREntities;
 
 namespace ErpConnector.Common
 {
-    public class ErpGenericConnector : IErpConnector
+    public abstract class ErpGenericConnector : IErpConnector
     {
+        #region
+        public delegate void ErpTaskCompleted(object sender, ErpTaskCompletedArgs args);
+        public event ErpTaskCompleted ErpTaskCompletedEvent;
+        #endregion
         #region Initialization
         private bool includesFashion;
         private bool includeB_M;
@@ -30,183 +34,79 @@ namespace ErpConnector.Common
         //{
         //    return ScriptGeneratorModule.GenerateScript(entity);
         //}
-        public AxBaseException TaskList(int actionId, ErpTask erpTasks, DateTime date, int? no_of_paralle_processes)
+        public int TaskList(int actionId, ErpTask erpTasks, DateTime date, int? no_of_paralle_processes)
         {
-            //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
-            //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-            TaskExecute exec = new TaskExecute(erpTasks.Steps, 1, actionId, date);
-            exec.Execute();
+            AxBaseException result = null;
+            try
+            {
+                //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
+                //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
+                TaskExecute exec = new TaskExecute(erpTasks.Steps, 1, actionId, date);
+                exec.Execute();
 
-            //foreach (var erpStep in erpTasks.Steps)
-            //{
-            //    ExecuteTask(actionId, erpStep, date); // possible to do some parallel processing.
-            //}
-            return null;
+                //foreach (var erpStep in erpTasks.Steps)
+                //{
+                //    ExecuteTask(actionId, erpStep, date); // possible to do some parallel processing.
+                //}
+            }
+            catch (Exception e)
+            {
+                result = new AxBaseException { ApplicationException = e };
+            }
+            finally
+            {
+                OnTaskCompleted(null, new ErpTaskCompletedArgs { Exception = result, ActionId = actionId, Status = result == null ? 2 : 3 });
+            }
+            return actionId;
         }
 
-        public AxBaseException GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
+        public int GetSingleTable(ErpTaskStep step, int actionId, DateTime date)
         {
-            //if (date == DateTime.MaxValue)
-            //{
-            //    DataWriter.TruncateSingleTable(step.DbTable);
-            //}
-            List<ErpTaskStep> steps = new List<ErpTaskStep>();
-            steps.Add(step);
-            TaskExecute exec = new TaskExecute(steps, 1, actionId, date);
-            exec.Execute();
-            return null;
-
-        }
-        public AxBaseException GetBom(int actionId)
-        {
-            //DataWriter.TruncateTables(false, false, false, false, false, true, false, false, false);
-            //return BomTransfer.GetBom(actionId);
-            throw new NotImplementedException();
-        }
-
-        public void GetPoTo(int actionId)
-        {
-            //DataWriter.TruncateTables(false, false, false, false, false, false, true, false, false);
-            //POTransfer.GetPosAndTos(_context, actionId);
-            throw new NotImplementedException();
+            AxBaseException result = null;
+            try
+            {
+                if (date == DateTime.MaxValue)
+                {
+                    DataWriter.TruncateSingleTable(step.DbTable);
+                }
+                result = TaskExecute.ExecuteTask(actionId, step, date);                
+            }
+            catch (Exception e)
+            {
+                result =  new AxBaseException { ApplicationException = e };
+            }
+            finally
+            {
+                OnTaskCompleted(null, new ErpTaskCompletedArgs { Exception = result, ActionId = actionId, Status = result== null ? 2 : 3 });                
+            }
+            return actionId;
         }
 
-        public void GetFullIoTrans(int actionId)
-        {
-            //ProductHistory ph = new ProductHistory(actionId);
-            //ph.WriteInventTrans();
-            //ph.WriteInventTransOrigin();
-            //ph.WriteInventSumFull();
-            //if (includeB_M)
-            //{
-            //    SalesValueTransactions.WriteSalesValueTrans(actionId);
-            //    SalesValueTransactions.WriteSalesValueTransLines(actionId);
-            //}
-            throw new NotImplementedException();
-        }
         #endregion
 
 
 
 
-        public AxBaseException DailyRefresh(DateTime date, int actionId)
-        {
-            //var pim = PimFull(actionId);
-            //if (pim != null)
-            //{
-            //    return pim;
-            //}
-            //TransactionRefresh(date, actionId);
-            //return null;
-            throw new NotImplementedException();
-        }
-
-        public AxBaseException FullTransfer(int actionId)
-        {
-            //var pim = PimFull(actionId);
-            //if (pim != null)
-            //{
-            //    return pim;
-            //}
-            //TransactionFull(actionId);
-            //return null;
-            throw new NotImplementedException();
-        }
-
-        public AxBaseException PimFull(int actionId)
-        {
-            //DataWriter.TruncateTables(true, false, false, true, true, true, false, true, true);
-            //var cat = ItemCategoryTransfer.WriteCategories(actionId);
-            //if (cat != null)
-            //{
-            //    return cat;
-            //}
-
-            //var loc = LocationsAndVendorsTransfer.WriteLocationsAndVendors(actionId);
-            //if (loc != null)
-            //{
-            //    return loc;
-            //}
-
-            //var items = ItemTransfer.WriteItems(includesFashion, actionId);
-            //if (items != null)
-            //{
-            //    return items;
-            //}
-
-            //var attr = ItemAttributeLookup.ReadItemAttributes(includesFashion, includeB_M, actionId);
-            //if (attr != null)
-            //{
-            //    return attr;
-            //}
-
-            //var bom = GetBom(actionId);
-            //if (bom != null)
-            //{
-            //    return bom;
-            //}
-            //var price = PriceHistory.GetPriceHistory(actionId, includeB_M);
-            //if (price != null)
-            //{
-            //    return price;
-            //}
-            //return null;
-            throw new NotImplementedException();
-        }
-
-        public AxBaseException TransactionFull(int actionId)
-        {
-            //DataWriter.TruncateTables(false, true, true, false, false, false, true, true, false);
-            //GetFullIoTrans(actionId);
-            //GetPoTo(actionId);
-            //return null;
-            throw new NotImplementedException();
-        }
-
-        public AxBaseException TransactionRefresh(DateTime date, int actionId)
-        {
-            //DataWriter.TruncateTables(false, false, true, false, false, false, false, false, false);
-            //ProductHistory ph = new ProductHistory(actionId);
-            //ph.WriteInventSumRefresh(date);
-            //ph.WriteInventTransRefresh(date);
-            //ph.WriteInventTransOrigin();
-            //POTransfer.RefreshPurchLines(date, actionId);
-            //POTransfer.PullPurchTable(actionId);
-            //POTransfer.PullAGROrders(actionId);
-            //POTransfer.PullAGROrderLines(actionId);
-
-            //if (includeB_M)
-            //{
-            //    SalesValueTransactions.WriteSalesValueTransRefresh(date, actionId);
-            //    SalesValueTransactions.WriteSalesValueTransLinesRefresh(date, actionId);
-            //}
-            //return null;
-            throw new NotImplementedException();
-        }
-        public AxBaseException UpdateProduct(int actionId)
-        {
-            //DataWriter.TruncateTables(false, false, false, false, false, false, false, false, true);
-            //var attributes = ItemAttributeLookup.UpdateProductAttributes(actionId);
-            //if (attributes != null)
-            //{
-            //    return attributes;
-            //}
-            //return null;
-            throw new NotImplementedException();
-        }
-
-        public virtual AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId)
+        public virtual int CreatePoTo(List<POTOCreate> po_to_create, int actionId)
         {
             throw new NotImplementedException();
         }
 
-        public virtual AxBaseException CreateItems(int tempId, int actionId)
+        public virtual int CreateItems(int tempId, int actionId)
         {
             throw new NotImplementedException();
         }
-        public virtual AxBaseException UpdateProductLifecycleState(int actionId, int plcUpdateId)
+        public virtual int UpdateProductLifecycleState(int actionId, int plcUpdateId)
         {
             throw new NotImplementedException();
+        }
+                
+        public void OnTaskCompleted(object sender, ErpTaskCompletedArgs args)
+        {
+            if(ErpTaskCompletedEvent !=null)
+            {
+                ErpTaskCompletedEvent(sender, args);
+            }
         }
     //    public AxBaseException UpdateIssueAccount()
     //    {
@@ -215,20 +115,20 @@ namespace ErpConnector.Common
     //        foreach (var i in issuesWithoutAccount)
     //        {
     //            StringBuilder sb = new StringBuilder();
-    //            sb.Append("{ \"fields\": { \"customfield_11330\":");
+    //            sb.Append("{ \"fields\": { \"cusiftomfield_11330\":");
     //            sb.Append(i.account_id);
     //            sb.Append("} }");
 
-    //            string endpoint = "issue/" + i.issue_key;
-    //            var result = ServiceConnector.CallOdataEndpointPut(endpoint, null, sb.ToString(), authData).Result;
-    //            if (result != null)
-    //            {
-    //                return result;
-    //            }
-    //        }
-            
+        //            string endpoint = "issue/" + i.issue_key;
+        //            var result = ServiceConnector.CallOdataEndpointPut(endpoint, null, sb.ToString(), authData).Result;
+        //            if (result != null)
+        //            {
+        //                return result;
+        //            }
+        //        }
 
-    //        return null;
-    //    }
+
+        //        return null;
+        //    }
     }
 }
