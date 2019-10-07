@@ -80,7 +80,7 @@ namespace ErpConnector.Ax.DTO
         public DateTime LocalDeliveryDate { get; set; }
         public long ManualEntryChangepolicy { get; set; }
         public string MarkupGroup { get; set; }
-        public int MatchingAgreement { get; set; }
+        public long MatchingAgreement { get; set; }
         public int MCRDropShipment { get; set; }
         public string MultiLineDisc { get; set; }
         public string NumberSequenceGroup { get; set; }

@@ -13,11 +13,26 @@ namespace ErpConnector.Ax.DB
 {
     public class AxDbHandler
     {
+        static string STG_ConnectionString
+        {
+            get
+            {
+                return ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString;
+            }
+        }
+
+        static string PROD_ConnectionString
+        {
+            get
+            {
+                return ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
+            }
+        }
+
         public static List<ItemToCreate> GetItemsToCreate(int? temp_id)
         {
             List<ItemToCreate> items = new List<ItemToCreate>();
-            var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
-            using (var con = new SqlConnection(connectionString))
+            using (var con = new SqlConnection(PROD_ConnectionString))
             {
                 using (var cmd = new SqlCommand("bm.get_products_to_transfer"))
                 {
@@ -87,8 +102,7 @@ namespace ErpConnector.Ax.DB
         public static List<AGRProductLifeCycleState> GetProductLifeCycleStateUpdates(int plc_update_id)
         {
             List<AGRProductLifeCycleState> plc = new List<AGRProductLifeCycleState>();
-            var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
-            using (var con = new SqlConnection(connectionString))
+            using (var con = new SqlConnection(PROD_ConnectionString))
             {
                 con.Open();
                 using (var cmd = new SqlCommand("bm.get_product_lifecycle_update", con))
@@ -103,12 +117,13 @@ namespace ErpConnector.Ax.DB
                             new AGRProductLifeCycleState
                             {
                                 product_lifecycle_state_update_id = DataWriter.ReadInt(reader, 0).Value,
-                                product_no = DataWriter.ReadString(reader, 1),
-                                product_size_id = DataWriter.ReadString(reader, 2),
-                                product_color_id = DataWriter.ReadString(reader, 3),
-                                product_style_id = DataWriter.ReadString(reader, 4),
-                                product_config_id = DataWriter.ReadString(reader, 5),
-                                lifecycle_status = DataWriter.ReadString(reader, 6)
+                                product_id = DataWriter.ReadInt(reader, 1).Value,
+                                product_no = DataWriter.ReadString(reader, 2),
+                                product_size_id = DataWriter.ReadString(reader, 3),
+                                product_color_id = DataWriter.ReadString(reader, 4),
+                                product_style_id = DataWriter.ReadString(reader, 5),
+                                product_config_id = DataWriter.ReadString(reader, 6),
+                                lifecycle_status = DataWriter.ReadString(reader, 7)
                             });
                     }
                 }
@@ -116,9 +131,8 @@ namespace ErpConnector.Ax.DB
             return plc;
         }
         public static void UpdateProductLifeCycleState(int plcId, int actionId, int status)
-        {
-            var connectionString = ConfigurationManager.ConnectionStrings["prod_connection"].ConnectionString;
-            using (var con = new SqlConnection(connectionString))
+        {            
+            using (var con = new SqlConnection(PROD_ConnectionString))
             {
                 con.Open();
                 using (var cmd = new SqlCommand("bm.update_product_lifecycle_update", con))
@@ -133,6 +147,70 @@ namespace ErpConnector.Ax.DB
             }
         }
 
+        public static void UpdateProductMasterLifecycleState(string productMasterNo, string plcState)
+        {
+            using (var con = new SqlConnection(STG_ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[ax].[update_product_master_lifecycle_state]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 300;
+                    cmd.Parameters.AddWithValue("@product_master_no", productMasterNo);
+                    cmd.Parameters.AddWithValue("@lifecycle_state", plcState);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static void UpdateProductVariantLifecycleState(string productMasterNo, string size, string color, string style, string config, string plcState)
+        {
+            using (var con = new SqlConnection(STG_ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[ax].[update_product_variant_lifecycle_state]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 300;
+                    cmd.Parameters.AddWithValue("@product_master_no", productMasterNo);
+                    cmd.Parameters.AddWithValue("@product_color_id", color);
+                    cmd.Parameters.AddWithValue("@product_size_id", size);
+                    cmd.Parameters.AddWithValue("@product_style_id", style);
+                    cmd.Parameters.AddWithValue("@product_config_id", config);
+                    cmd.Parameters.AddWithValue("@lifecycle_state", plcState);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static void RefreshPLCStateBulkStg(string ids)
+        {
+            using (var con = new SqlConnection(PROD_ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[bm].[stg_refresh_product_lifecycle_state_bulk]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 600;
+                    cmd.Parameters.AddWithValue("@product_id", ids);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        public static void RefreshPLCStateStg(string productNo)
+        {
+            using (var con = new SqlConnection(PROD_ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[bm].[stg_refresh_product_lifecycle_state]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 600;
+                    cmd.Parameters.AddWithValue("@product_no", productNo);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
     }
 }

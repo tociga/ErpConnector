@@ -12,7 +12,7 @@ namespace ErpConnector.Ax
 {
     public delegate void LogMessage(string msg, ConsoleColor color = ConsoleColor.Green, bool leadingLine = true);
 
-    public abstract class AXODataContextConnector<T>
+    public abstract class AXODataContextConnector<T> 
     {
         protected LogMessage logMessageHandler;
 
@@ -46,23 +46,7 @@ namespace ErpConnector.Ax
 
         protected abstract bool CreateRecords(string targetAXLegalEntity, List<T> dataFile);
 
-        protected virtual AxBaseException SaveChanges()
-        {
-            try
-            {
-                context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
-
-                return null;
-            }
-            catch (DataServiceRequestException ex)
-            {
-                return JsonConvert.DeserializeObject<AxBaseException>(ex.InnerException.Message);
-            }
-            catch (Exception ex)
-            {
-                return new AxBaseException { ApplicationException = ex };
-            }
-        }
+        protected abstract AxBaseException SaveChanges();
 
         private void logException(Exception ex)
         {

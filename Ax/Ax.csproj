@@ -105,6 +105,19 @@
     <Compile Include="Authentication\OAuthHelper.cs" />
     <Compile Include="AXODataContext.cs" />
     <Compile Include="AXODataContextConnector.cs" />
+    <Compile Include="Custom\FM\FMContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FMContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Custom\LSS\LSSConnector.cs" />
+    <Compile Include="Custom\LSS\LSSContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LSSContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Custom\LSS\Modules\LSSODataContextConnector.cs" />
+    <Compile Include="Custom\LSS\Modules\LSSODataContext.cs" />
     <Compile Include="D365Entities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -129,6 +142,7 @@
     <Compile Include="DTO\OpenSalesPriceJournalLinesDTO.cs" />
     <Compile Include="DTO\PriceDiscTableDTO.cs" />
     <Compile Include="DTO\ProdTableDTO.cs" />
+    <Compile Include="DTO\ProductMasterWriteDTO.cs" />
     <Compile Include="DTO\PurchLinesDTO.cs" />
     <Compile Include="DTO\PurchTableDTO.cs" />
     <Compile Include="DTO\RetailTransactionSalesLinesDTO.cs" />
@@ -137,8 +151,8 @@
     <Compile Include="DTO\SalesTableDTO.cs" />
     <Compile Include="DTO\VendorDTO.cs" />
     <Compile Include="Modules\CreateOrder.cs" />
-    <Compile Include="Modules\UpdateProductMaster.cs" />
-    <Compile Include="Modules\UpdateReleasedProductVariants.cs" />
+    <Compile Include="Custom\LSS\Modules\UpdateProductMaster.cs" />
+    <Compile Include="Custom\LSS\Modules\UpdateReleasedProductVariants.cs" />
     <Compile Include="Utils\D365Authenticator.cs" />
     <Compile Include="Utils\EnumConverter.cs" />
     <Compile Include="AxODataConnector.cs" />
@@ -164,7 +178,6 @@
     <Compile Include="DTO\ItemPurchSetupDTO.cs" />
     <Compile Include="DTO\ProductMasterDTO.cs" />
     <Compile Include="DTO\ProductMasterReadDTO.cs" />
-    <Compile Include="DTO\ProductMasterWriteDTO.cs" />
     <Compile Include="DTO\ReleasedDistinctProductsDTO.cs" />
     <Compile Include="DTO\ReleasedDistinctProductsReadDTO.cs" />
     <Compile Include="DTO\ReleasedDistinctProductsWriteDTO.cs" />
@@ -188,6 +201,8 @@
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Custom\FM\FMContext.ttinclude" />
+    <None Include="Custom\LSS\LSSContext.ttinclude" />
     <None Include="D365Entities.ttinclude" />
     <None Include="packages.config" />
     <None Include="Web.config" />
@@ -202,15 +217,30 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Custom\FM\FMContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FMContext.cs</LastGenOutput>
+    </Content>
+    <Content Include="Custom\LSS\LSSContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LSSContext.cs</LastGenOutput>
+    </Content>
     <Content Include="D365Entities.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>D365Entities.cs</LastGenOutput>
     </Content>
+    <Content Include="MetaData\D365_standard_v10_pu29.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="MetaData\FortnumAndMasonMetaData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="MetaData\LssMetaData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="MetaData\LssMetaDataLifeCycleState.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
