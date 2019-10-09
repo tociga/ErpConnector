@@ -10,6 +10,7 @@ using ErpConnector.Ax;
 using ErpConnector.Sap;
 using ErpConnector.Nav;
 using ErpConnector.Jira;
+using ErpConnector.Ax.Custom.LSS;
 
 namespace ErpConnector.Listener
 {
@@ -36,7 +37,11 @@ namespace ErpConnector.Listener
                     return new SAPDataConnector();
                 case ErpType.nav:
                     return new NavConnector();
-                default:
+                case ErpType.ax_lss:
+                    return new LSSConnector();
+                case ErpType.ax_fm:
+                    return new AxODataConnector();
+                default: 
                     throw new NotImplementedException("ErpListener has not been implemented for ERP type: " + typeOfErp);
             }
         }
@@ -69,6 +74,11 @@ namespace ErpConnector.Listener
         {
             Task<int> task = new Task<int>(() => factory.UpdateProductLifecycleState(plcUdpdateId, actionId));
             return task;
+        }
+
+        public Task<int> RetryTaskSteps(int actionId, List<ErpTaskStep> steps, DateTime date, int? noParallelProcesses)
+        {
+            return ExecuteTask(new ErpTask { Steps = steps }, actionId, date, noParallelProcesses);
         }
         //public string GetDBScript(string entity)
         //{

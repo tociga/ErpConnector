@@ -11,7 +11,9 @@ namespace ErpConnector.Common
         ax,
         sap,
         jira,
-        nav
+        nav,
+        ax_lss,
+        ax_fm
     }
     public interface IErpConnector
     {
@@ -19,7 +21,7 @@ namespace ErpConnector.Common
         int CreateItems(int itemToCreateId, int actionId);
         int TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
         int GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
-        int UpdateProductLifecycleState(int plcUdateId, int actionId);
+        int UpdateProductLifecycleState(int plcUdateId, int actionId);        
         void OnTaskCompleted(object sender, ErpTaskCompletedArgs args);
     }
 }

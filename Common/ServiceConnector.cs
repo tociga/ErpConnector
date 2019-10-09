@@ -269,20 +269,20 @@ namespace ErpConnector.Common
 
         //}
 
-        public static async Task<AxBaseException> CallOdataEndpoint<T,Y>(string oDataEndpoint, string filters, string dbTable, int actionId, ServiceData authData) where T: GenericJsonOdata<Y>
+        public static async Task<AxBaseException> CallOdataEndpoint<T,Y>(ErpTaskStep step, int actionId, ServiceData authData) where T: GenericJsonOdata<Y>
         {
             DateTime startTime = DateTime.Now;
             try
             {
                 var baseUrl = authData.BaseUrl;
-                var endpoint = baseUrl + authData.OdataUrlPostFix + oDataEndpoint + ApplyCrossCompanyFilter(filters) ?? "";
+                var endpoint = baseUrl + authData.OdataUrlPostFix + step.EndPoint + ApplyCrossCompanyFilter(step.EndpointFilter) ?? "";
 
                 var returnODataObject = await CallOdataEndpointAsync<Y>(endpoint, authData);
 				if (returnODataObject.value.Any())
                 {
-                    DataWriter.TruncateSingleTable(dbTable);
+                    DataWriter.TruncateSingleTable(step.DbTable);
                 }
-                DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), step.DbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                 string nextLinkEndpoint = null;
                 while (!string.IsNullOrEmpty(returnODataObject.NextLink))
                 {
@@ -295,7 +295,7 @@ namespace ErpConnector.Common
                         nextLinkEndpoint = returnODataObject.NextLink;
                     }
                     returnODataObject = await CallOdataEndpointAsync<Y>(nextLinkEndpoint, authData);
-                    DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                    DataWriter.WriteToTable<Y>(returnODataObject.value.GetDataReader<Y>(), step.DbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     if (returnODataObject.Exception != null)
                     {
                         break;
@@ -303,43 +303,43 @@ namespace ErpConnector.Common
                 }
                 if (returnODataObject.Exception != null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, true, null, null,step.Id);
                 }
                 return returnODataObject.Exception;
             }
             catch(Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
 
         }
 
-        public static async Task<AxBaseException> CallOdataEndpointWithPageSize<T>(string oDataEndpoint, int maxNumber, string dbTable, int actionId, ServiceData authData)
+        public static async Task<AxBaseException> CallOdataEndpointWithPageSize<T>(ErpTaskStep step, int actionId, ServiceData authData)
         {
             DateTime startTime = DateTime.Now;
             try
             {
-                var filter = "?$top=" + maxNumber;// 1000 &$top = 1000
+                var filter = "?$top=" + step.MaxPageSize;// 1000 &$top = 1000
                 var baseUrl = authData.BaseUrl;
-                var endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
+                var endpoint = baseUrl + "/data/" + step.EndPoint + ApplyCrossCompanyFilter(filter);
 
                 var returnODataObject = await CallOdataEndpointAsync<T>(endpoint, authData);
                 if (returnODataObject.value.Any())
                 {
-                    DataWriter.TruncateSingleTable(dbTable);
+                    DataWriter.TruncateSingleTable(step.DbTable);
                 }
-                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable);
+                DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), step.DbTable);
                 for(int i = 1; returnODataObject.value.Count > 0; i++)
                 {
-                    filter = "?$skip=" + i * maxNumber +"&$top=" + maxNumber;
-                    endpoint = baseUrl + "/data/" + oDataEndpoint + ApplyCrossCompanyFilter(filter);
+                    filter = "?$skip=" + i * step.MaxPageSize +"&$top=" + step.MaxPageSize;
+                    endpoint = baseUrl + "/data/" + step.EndPoint + ApplyCrossCompanyFilter(filter);
                     returnODataObject = await CallOdataEndpointAsync<T>(endpoint, authData);
-                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), dbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
+                    DataWriter.WriteToTable<T>(returnODataObject.value.GetDataReader<T>(), step.DbTable, authData.InjectionPropertyValue, authData.InjectionPropertyName);
                     if (returnODataObject.Exception != null)
                     {
                         break;
@@ -347,17 +347,17 @@ namespace ErpConnector.Common
                 }
                 if (returnODataObject.Exception != null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, true, null, null, step.Id);
                 }
                 return returnODataObject.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
 
@@ -571,43 +571,43 @@ namespace ErpConnector.Common
             return result;
         }
 
-        public static async Task<AxBaseException> CallService<T>(int actionId, string webMethod, string serviceName,  string dbTable, int pageSize, ServiceData authData)
+        public static async Task<AxBaseException> CallService<T>(int actionId, ErpTaskStep step, ServiceData authData)
         {
             DateTime startTime = DateTime.Now;
             try
             {
                 long recId = 0;
                 GenericJsonOdata<T> result = new GenericJsonOdata<T>();
-                result = await WriteFromService<T>(0, 500, webMethod, serviceName, dbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
+                result = await WriteFromService<T>(0, 500, step.ServiceMethod, step.ServiceName, step.DbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
                 if (result.value.Any())
                 {
-                    DataWriter.TruncateSingleTable(dbTable);
+                    DataWriter.TruncateSingleTable(step.DbTable);
                 }                
                 while (result.value.Any() && result.Exception == null)
                 {
-                    result = await WriteFromService<T>(recId, pageSize, webMethod, serviceName, dbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
-                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
-                    recId = DataWriter.GetMaxRecId(dbTable);                    
+                    result = await WriteFromService<T>(recId, step.MaxPageSize.Value, step.ServiceMethod, step.ServiceName, step.DbTable, DateTime.MinValue, DateTime.MinValue, authData, false);
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), step.DbTable);
+                    recId = DataWriter.GetMaxRecId(step.DbTable);                    
                 }
 
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId,  dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, true, null, null, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace, step.Id);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
         }
 
-        public static async Task<AxBaseException> CallServiceByDate<T>(DateTime date, int actionId, string webMethod, string serviceName,  string dbTable, ServiceData authData, Func<DateTime, DateTime> nextPeriod = null )
+        public static async Task<AxBaseException> CallServiceByDate<T>(DateTime date, int actionId, ErpTaskStep step, ServiceData authData, Func<DateTime, DateTime> nextPeriod = null )
         {
             if (nextPeriod == null)
             {
@@ -620,27 +620,27 @@ namespace ErpConnector.Common
                 bool firstResult = false;
                 for (DateTime d = date.Date; d < DateTime.Now.Date && result.Exception == null; d = nextPeriod(d))
                 {
-                    result = await WriteFromService<T>(0, 10000, webMethod, serviceName, dbTable, d, nextPeriod(d), authData, true);
+                    result = await WriteFromService<T>(0, 10000, step.ServiceMethod, step.ServiceName, step.DbTable, d, nextPeriod(d), authData, true);
                     if (!firstResult && result.value.Any())
                     {
-                        DataWriter.TruncateSingleTable(dbTable);
+                        DataWriter.TruncateSingleTable(step.DbTable);
                         firstResult = true;
                     }
-                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), dbTable);
+                    DataWriter.WriteToTable<T>(result.value.GetDataReader(), step.DbTable);
                 }
                 if (result.Exception == null)
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, true, null, null, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, result.Exception.ErrorMessage, result.Exception.StackTrace, step.Id);
                 }
                 return result.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, dbTable, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.DbTable, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
 
@@ -651,18 +651,17 @@ namespace ErpConnector.Common
             return d.AddDays(1);
         }
 
-        public static async Task<AxBaseException> CallOdataEndpointComplex<T, Y>(string endpoint, string filters, List<ErpTaskStepDetails> resultProperties, int actionId, ServiceData authData, 
-            string stepName) where T : GenericJsonOdata<Y>
+        public static async Task<AxBaseException> CallOdataEndpointComplex<T, Y>(ErpTaskStep step, int actionId, ServiceData authData) where T : GenericJsonOdata<Y>
         {
             DateTime startTime = DateTime.Now;
             try
             {
                 var baseUrl = authData.BaseUrl;
-                endpoint = baseUrl + authData.OdataUrlPostFix + endpoint;
+                var endpoint = baseUrl + authData.OdataUrlPostFix + step.EndPoint;
 
                 var returnODataObject = await CallOdataEndpointAsyncComplex<Y>(endpoint, authData);
                 var results = returnODataObject.WriteObject;
-                foreach (var stepDetail in resultProperties)
+                foreach (var stepDetail in step.Details)
                 {
                     if (results != null && results.GetType().GetProperty(stepDetail.nested_property_name) != null)
                     {
@@ -706,29 +705,29 @@ namespace ErpConnector.Common
                 //}
                 if (returnODataObject.Exception != null)
                 {                    
-                    DataWriter.LogErpActionStep(actionId, stepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.StepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, stepName, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.StepName, startTime, true, null, null, step.Id);
                 }
                 return returnODataObject.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, stepName, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.StepName, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
 
         }
-        public static async Task<AxBaseException> CallOdataEndpointComplexByDate<T, Y>(string endpoint, string filters, List<ErpTaskStepDetails> resultProperties, int actionId, ServiceData authData,
-            string stepName, DateTime startDate) where T : GenericJsonOdata<Y>
+        public static async Task<AxBaseException> CallOdataEndpointComplexByDate<T, Y>(ErpTaskStep step, string filters, List<ErpTaskStepDetails> resultProperties, int actionId, ServiceData authData,
+            DateTime startDate) where T : GenericJsonOdata<Y>
         {
             DateTime startTime = DateTime.Now;
             try
             {
                 var baseUrl = authData.BaseUrl;
-                endpoint = baseUrl + authData.OdataUrlPostFix + endpoint;
+                var endpoint = baseUrl + authData.OdataUrlPostFix + step.EndPoint;
                 DateTime firstDayOfMonth = new DateTime(startDate.Year, startDate.Month, 1);
                 var returnODataObject = new GenericWriteObject<Y>();
                 bool isFirstIteration = true;
@@ -765,17 +764,17 @@ namespace ErpConnector.Common
                 }
                 if (returnODataObject.Exception != null)
                 {
-                    DataWriter.LogErpActionStep(actionId, stepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace);
+                    DataWriter.LogErpActionStep(actionId, step.StepName, startTime, false, returnODataObject.Exception.ErrorMessage, returnODataObject.Exception.StackTrace, step.Id);
                 }
                 else
                 {
-                    DataWriter.LogErpActionStep(actionId, stepName, startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, step.StepName, startTime, true, null, null, step.Id);
                 }
                 return returnODataObject.Exception;
             }
             catch (Exception e)
             {
-                DataWriter.LogErpActionStep(actionId, stepName, startTime, false, e.Message, e.StackTrace);
+                DataWriter.LogErpActionStep(actionId, step.StepName, startTime, false, e.Message, e.StackTrace, step.Id);
                 return new AxBaseException { ApplicationException = e };
             }
 

@@ -306,7 +306,7 @@ namespace ErpConnector.Common.Util
             }
         }
 
-        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success, string errorMessage, string errorStackTrace)
+        public static void LogErpActionStep(int actionId, string step, DateTime startTime, bool success, string errorMessage, string errorStackTrace, int erpActionTaskStepId)
         {
             using (var con = new SqlConnection(StgConnectionString))
             {
@@ -321,6 +321,7 @@ namespace ErpConnector.Common.Util
                     cmd.Parameters.AddWithValue("@start_time", startTime);
                     cmd.Parameters.AddWithValue("@error_message", errorMessage);
                     cmd.Parameters.AddWithValue("@error_stack_trace", errorStackTrace);
+                    cmd.Parameters.AddWithValue("@erp_action_task_step_id", erpActionTaskStepId);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -485,6 +486,7 @@ namespace ErpConnector.Common.Util
                         a.updated_at = reader.GetDateTime(6);
                         a.date_reference_id = ReadInt(reader, 7);
                         a.no_parallel_process = ReadInt(reader, 8);
+                        a.on_failure_retry_attempts = ReadInt(reader, 9);
                         actions.Add(a);
                     }
                 }
@@ -701,7 +703,51 @@ namespace ErpConnector.Common.Util
             }
         }
 
-        public static List<ErpActionStep> GetActionSteps(int actionId)
+        public static List<ErpTaskStep> GetFailedSteps(int taskId, int actionId, int iteration)
+        {
+            var details = GetTaskStepDetails(taskId);
+            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
+            {
+                using (var cmd = new SqlCommand("[erp].[get_failed_steps]", con))
+                {
+                    con.Open();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@action_task_id", taskId);
+                    cmd.Parameters.AddWithValue("@erp_action_id", actionId);
+                    cmd.Parameters.AddWithValue("@iteration", iteration);
+                    var reader = cmd.ExecuteReader();
+                    List<ErpTaskStep> result = new List<ErpTaskStep>();
+                    while (reader.Read())
+                    {
+                        result.Add(
+                            new ErpTaskStep
+                            {
+                                Id = reader.GetInt32(0),
+                                StepName = reader.GetString(1),
+                                EndPoint = ReadString(reader, 2),
+                                ServiceMethod = ReadString(reader, 3),
+                                ServiceName = ReadString(reader, 4),
+                                TaskType = (ErpTaskStep.ErpTaskType)reader.GetInt32(5),
+                                ReturnTypeStr = reader.GetString(6),
+                                ReturnTypeAssembly = ReadString(reader, 7),
+                                DbTable = ReadString(reader, 8),
+                                EndpointFilter = ReadString(reader, 9),
+                                MaxPageSize = ReadInt(reader, 10),
+                                PeriodIncrement = (ErpTaskStep.PeriodIncrementType)(reader.IsDBNull(11) ? 0 : reader.GetInt32(11)),
+                                Priority = reader.GetInt32(12),
+                                AuthenitcationType = (ErpTaskStep.AuthenticationType)(reader.IsDBNull(13) ? 1 : reader.GetInt32(13)),
+                                ExternalProcess = ReadString(reader, 14),
+                                ExternalProcessArgument = ReadString(reader, 15),
+                                BaseTypeProcedure = ReadString(reader, 16),
+                                InjectionPropertyName = ReadString(reader, 17),
+                                Details = details.Where(x => x.erp_action_task_step_id == reader.GetInt32(0)).ToList()
+                            });
+                    }
+                    return result;
+                }
+            }
+        }
+        public static List<ErpActionLogStep> GetActionSteps(int actionId)
         {
             using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["stg_connection"].ConnectionString))
             {
@@ -711,11 +757,11 @@ namespace ErpConnector.Common.Util
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@erp_action_id", actionId);
                     var reader = cmd.ExecuteReader();
-                    List<ErpActionStep> result = new List<ErpActionStep>();
+                    List<ErpActionLogStep> result = new List<ErpActionLogStep>();
                     while (reader.Read())
                     {
                         result.Add(
-                            new ErpActionStep
+                            new ErpActionLogStep
                             {
                                 StepName = ReadString(reader, 0),
                                 DBTable = ReadString(reader, 1),
@@ -723,7 +769,9 @@ namespace ErpConnector.Common.Util
                                 StartTime = reader.GetDateTime(3),
                                 EndTime = ReadDateTime(reader, 4),
                                 Success = ReadBoolean(reader, 5),
-                                ErrorMessage = ReadString(reader, 6)
+                                ErrorMessage = ReadString(reader, 6),
+                                ErpActionTaskStepId = ReadInt(reader,7),
+                                iteration = ReadInt(reader,8),
                             });
                     }
                     return result;

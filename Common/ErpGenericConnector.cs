@@ -41,7 +41,7 @@ namespace ErpConnector.Common
             {
                 //DataWriter.TruncateTables(erpTasks.truncate_items, erpTasks.truncate_sales_trans_dump, erpTasks.truncate_sales_trans_refresh, erpTasks.truncate_locations_and_vendors,
                 //    erpTasks.truncate_lookup_info, erpTasks.truncate_bom, erpTasks.truncate_po_to, erpTasks.truncate_price, erpTasks.truncate_attribute_refresh);
-                TaskExecute exec = new TaskExecute(erpTasks.Steps, 1, actionId, date);
+                TaskExecute exec = new TaskExecute(erpTasks.Steps, no_of_paralle_processes.HasValue ? no_of_paralle_processes.Value : 1, actionId, date);
                 exec.Execute();
 
                 //foreach (var erpStep in erpTasks.Steps)

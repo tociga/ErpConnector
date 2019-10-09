@@ -115,7 +115,7 @@ namespace ErpConnector.Common
                 DateTime start = DateTime.Now;
                 var baseEx= ExternalTaskExec.ExecTask(erpStep);
                 DataWriter.LogErpActionStep(actionId, erpStep.StepName, start, baseEx == null, baseEx == null ? null : baseEx.ApplicationException.InnerException.Message,
-                    baseEx == null ? null : baseEx.ApplicationException.InnerException.StackTrace);
+                    baseEx == null ? null : baseEx.ApplicationException.InnerException.StackTrace, erpStep.Id);
                 return baseEx;
             }
             else
@@ -128,8 +128,8 @@ namespace ErpConnector.Common
                         MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointWithPageSize");
                         MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
 
-                        Object[] parameters = new Object[5];
-                        parameters = new object[] { erpStep.EndPoint, erpStep.MaxPageSize.Value, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        Object[] parameters = new Object[3];
+                        parameters = new object[] { erpStep, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
                         result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                     else
@@ -139,8 +139,8 @@ namespace ErpConnector.Common
                         MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
                         MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
 
-                        Object[] parameters = new Object[5];
-                        parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
+                        Object[] parameters = new Object[3];
+                        parameters = new object[] { erpStep, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
                         result=((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                 }
@@ -148,7 +148,7 @@ namespace ErpConnector.Common
                 {
                     MethodInfo method = typeof(ServiceConnector).GetMethod("CallService");
                     MethodInfo generic = method.MakeGenericMethod(erpStep.ReturnType);
-                    result=((Task<AxBaseException>)generic.Invoke(null, new Object[6] { actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, erpStep.MaxPageSize, Authenticator.GetAuthData(erpStep.AuthenitcationType) })).Result;
+                    result=((Task<AxBaseException>)generic.Invoke(null, new Object[3] { actionId, erpStep, Authenticator.GetAuthData(erpStep.AuthenitcationType) })).Result;
                 }
                 else if (erpStep.TaskType == ErpTaskStep.ErpTaskType.CUSTOM_SERVICE_BY_DATE)
                 {
@@ -179,24 +179,25 @@ namespace ErpConnector.Common
                             }
 
                     }
-                    Object[] parameters = new Object[7] { date, actionId, erpStep.ServiceMethod, erpStep.ServiceName, erpStep.DbTable, Authenticator.GetAuthData(erpStep.AuthenitcationType), action };
+                    Object[] parameters = new Object[5] { date, actionId, erpStep, Authenticator.GetAuthData(erpStep.AuthenitcationType), action };
                     result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                 }
                 else if ( erpStep.TaskType == ErpTaskStep.ErpTaskType.ITERATIVE_ENDPOINT)
                 {
                     var list = DataWriter.GetIdsFromEntities(erpStep.BaseTypeProcedure);
+                    var endPointTemplate = erpStep.EndPoint;
                     foreach (var id in list)
                     {
-                        string endpoint = erpStep.EndPoint.Replace("{key}", id);
+                        erpStep.EndPoint = endPointTemplate.Replace("{key}", id);
                         Type genericType = erpStep.GenericObjectType.MakeGenericType(erpStep.ReturnType);
                         MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpoint");
                         MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
 
-                        Object[] parameters = new Object[5];
+                        Object[] parameters = new Object[3];
                         var authData = Authenticator.GetAuthData(erpStep.AuthenitcationType);
                         authData.InjectionPropertyName = erpStep.InjectionPropertyName;
                         authData.InjectionPropertyValue = id;
-                        parameters = new object[] { endpoint, erpStep.EndpointFilter, erpStep.DbTable, actionId, authData };
+                        parameters = new object[] { erpStep, actionId, authData };
                         result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
                     }
                 }
@@ -206,8 +207,8 @@ namespace ErpConnector.Common
                     MethodInfo method = typeof(ServiceConnector).GetMethod("CallOdataEndpointComplex");
                     MethodInfo generic = method.MakeGenericMethod(genericType, erpStep.ReturnType);
 
-                    Object[] parameters = new Object[6];
-                    parameters = new object[] { erpStep.EndPoint, erpStep.EndpointFilter, erpStep.Details, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType), erpStep.StepName };
+                    Object[] parameters = new Object[3];
+                    parameters = new object[] { erpStep, actionId, Authenticator.GetAuthData(erpStep.AuthenitcationType) };
                     result = ((Task<AxBaseException>)generic.Invoke(null, parameters)).Result;
 
                     

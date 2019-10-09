@@ -56,6 +56,23 @@ namespace ErpConnector.Listener
             }
         }
 
+        public int RetryFailedSteps(int taskId, GenericConnector connector, int actionId, DateTime date, int? noParallelProcess, int? retryAttempts)
+        {
+            if (retryAttempts.HasValue && retryAttempts.Value > 0)
+            {
+                int counter = 1;
+                var steps = DataWriter.GetFailedSteps(taskId, actionId, 1);
+                while (counter <= retryAttempts && steps.Count > 0)
+                {
+                    var task = connector.RetryTaskSteps(actionId, steps, date, noParallelProcess);
+                    task.Start();
+                    task.Wait();
+                    counter++;
+                    steps = DataWriter.GetFailedSteps(taskId, actionId, counter);
+                }
+            }
+            return -1;
+        }
         public bool? Sync()
         {
             try
@@ -102,10 +119,11 @@ namespace ErpConnector.Listener
                             case "action_task":
                                 DataWriter.UpdateActionStatus(action.id, 1, null, null);
                                 var task = DataWriter.GetTask(action.reference_id);
-                                connectorTask = connector.ExecuteTask(task, action.id, DataWriter.GetDateById(action.date_reference_id), action.no_parallel_process);
+                                DateTime startDate = DataWriter.GetDateById(action.date_reference_id);
+                                connectorTask = connector.ExecuteTask(task, action.id, startDate, action.no_parallel_process);
                                 readTasks.Add(connectorTask);
-                                //connectorTask.ContinueWith((mark) => DataWriter.UpdateActionStatus(action.id, 2, mark)).Wait();
-                                connectorTask.ContinueWith((x)=>EmailSender.SendEmail(action.id, action.created_at));
+                                var retryTask = connectorTask.ContinueWith((y) => RetryFailedSteps(action.reference_id, connector, action.id, startDate, action.no_parallel_process, action.on_failure_retry_attempts));                                
+                                retryTask.ContinueWith((x)=>EmailSender.SendEmail(action.id, action.created_at));
                                 break;
                             case "single_table":
                                 DataWriter.UpdateActionStatus(action.id, 1, null, null);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Common.DTO
 {
-    public class ErpActionStep
+    public class ErpActionLogStep
     {
         public string StepName { get; set; }
         public string DBTable { get; set; }
@@ -15,5 +15,7 @@ namespace ErpConnector.Common.DTO
         public DateTime? EndTime { get; set; }
         public bool? Success { get; set; }
         public string ErrorMessage { get; set; }
+        public int? ErpActionTaskStepId { get; set; }
+        public int? iteration { get; set; }
     }
 }

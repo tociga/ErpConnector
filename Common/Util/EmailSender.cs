@@ -31,7 +31,9 @@ namespace ErpConnector.Common.Util
                 //Create body
                 StringBuilder sb = new StringBuilder();
                 var erpActionStep = DataWriter.GetActionSteps(actionId);
-                bool success = erpActionStep.Count(x => x.Success.HasValue && x.Success.Value) == erpActionStep.Count;
+                var maxIteration = erpActionStep.Max(x => x.iteration);
+                var lastIterationSteps = erpActionStep.Where(x => x.iteration == maxIteration).ToList();
+                bool success = lastIterationSteps.Count(x => x.Success.HasValue && x.Success.Value) == lastIterationSteps.Count;
                 if (sendEmail == SendEmailType.Always || (sendEmail == SendEmailType.OnError && !success))
                 {
                     var environment = System.Configuration.ConfigurationManager.AppSettings["NotificationEnvironment"];
@@ -76,7 +78,7 @@ namespace ErpConnector.Common.Util
                 DataWriter.LogError(e.Message, e.StackTrace, "Email Sender", e.HResult);
             }
         }
-        private static string CreateErrorBody(List<ErpActionStep> steps )
+        private static string CreateErrorBody(List<ErpActionLogStep> steps )
         {
             StringBuilder sb = new StringBuilder();
             if (steps.Count > 0)
@@ -92,7 +94,7 @@ namespace ErpConnector.Common.Util
 
             return sb.ToString();
         }
-        private static string CreateTableline(ErpActionStep step, bool isHeader)
+        private static string CreateTableline(ErpActionLogStep step, bool isHeader)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<tr>");

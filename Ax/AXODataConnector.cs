@@ -101,13 +101,13 @@ namespace ErpConnector.Ax
 
                     if (erpMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace, -1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs { Exception = erpMaster.Exception, ActionId = actionId, Status = 3 });
                         return actionId;
                     }
                     else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != masterData.product_no.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null, -1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs
                         {
                             Exception =
@@ -122,7 +122,7 @@ namespace ErpConnector.Ax
                         return actionId;
                     }
 
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null,-1);
                     startTime = DateTime.Now;
                     var releasedMaster = new ReleasedProductMasterWriteDTO(master.ProductNumber, master.ProductSearchName,
                         masterData.primar_vendor_no, masterData.sale_price, masterData.cost_price);
@@ -130,12 +130,12 @@ namespace ErpConnector.Ax
 
                     if (erpReleasedMaster.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, erpReleasedMaster.Exception.ErrorMessage, erpReleasedMaster.Exception.StackTrace);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, erpReleasedMaster.Exception.ErrorMessage, erpReleasedMaster.Exception.StackTrace,-1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs { Exception = erpReleasedMaster.Exception, ActionId = actionId, Status = 3 });
                     }
                     else if (erpReleasedMaster.WriteObject.ItemNumber.ToLower().Trim() != master.ProductNumber.ToLower().Trim())
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, null, null);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, false, null, null,-1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs
                         {
                             Exception =
@@ -149,7 +149,7 @@ namespace ErpConnector.Ax
                         });
                         return actionId;
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Master", startTime, true, null, null,-1);
                 }
 
                 foreach (var item in itemsToCreate)
@@ -172,11 +172,11 @@ namespace ErpConnector.Ax
 
                     if (erpVariants.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace,-1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs { Exception = erpVariants.Exception, ActionId = actionId, Status = 3 });
                         return actionId;
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null,-1);
                 }
             }
             OnTaskCompleted(this, new ErpTaskCompletedArgs { ActionId = actionId, Status = 2 });

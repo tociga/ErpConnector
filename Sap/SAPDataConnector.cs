@@ -150,12 +150,12 @@ namespace ErpConnector.Sap
                             }
                             if (result == null)
                             {
-                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, true, null, null);
+                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, true, null, null,-1);
                                 DataWriter.UpdateOrderStatus(first.order_id);
                             }
                             else
                             {
-                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, false, result.ErrorMessage, result.StackTrace);
+                                DataWriter.LogErpActionStep(actionId, "Create PO or TO orderid = " + first.order_id, start, false, result.ErrorMessage, result.StackTrace,-1);
                             }
 
                         }
@@ -167,7 +167,7 @@ namespace ErpConnector.Sap
                     }
                     else
                     {
-                        DataWriter.LogErpActionStep(actionId, "No items to transfer for order_id = " + first.order_id, start, false, null, null);
+                        DataWriter.LogErpActionStep(actionId, "No items to transfer for order_id = " + first.order_id, start, false, null, null,-1);
                     }
                 }
 

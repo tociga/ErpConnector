@@ -64,13 +64,13 @@ namespace ErpConnector.Ax.Custom.LSS
 
                         if (erpMaster.Exception != null)
                         {
-                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace);
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, erpMaster.Exception.ErrorMessage, erpMaster.Exception.StackTrace,-1);
                             OnTaskCompleted(this, new ErpTaskCompletedArgs { Exception = erpMaster.Exception, ActionId = actionId, Status = 3 });
                             return actionId;
                         }
                         else if (erpMaster.WriteObject.ProductNumber.ToLower().Trim() != plcPerMaster.First().product_no.ToLower().Trim())
                         {
-                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null);
+                            DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, false, null, null,-1);
                             OnTaskCompleted(this, new ErpTaskCompletedArgs
                             {
                                 Exception =
@@ -86,7 +86,7 @@ namespace ErpConnector.Ax.Custom.LSS
                             return actionId;
                         }
 
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Product Master", startTime, true, null, null,-1);
                         startTime = DateTime.Now;
                     }
                     List<ReleasedProductVariant> variantList = new List<ReleasedProductVariant>();
@@ -137,11 +137,11 @@ namespace ErpConnector.Ax.Custom.LSS
                     var erpVariants = UpdateVariants(variantList);
                     if (erpVariants.Exception != null)
                     {
-                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace);
+                        DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, false, erpVariants.Exception.ErrorMessage, erpVariants.Exception.StackTrace,-1);
                         OnTaskCompleted(this, new ErpTaskCompletedArgs { Exception = erpVariants.Exception, ActionId = actionId, Status = 3 });
                         return actionId;
                     }
-                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null);
+                    DataWriter.LogErpActionStep(actionId, "Item create: write Released Product Variant", startTime, true, null, null,-1);
                     AxDbHandler.UpdateProductLifeCycleState(plcUpdateId, actionId, 2);
                     OnTaskCompleted(this, new ErpTaskCompletedArgs { ActionId = actionId, Status = 2 });
                     return actionId;
