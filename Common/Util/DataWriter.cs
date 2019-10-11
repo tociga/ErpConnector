@@ -769,9 +769,9 @@ namespace ErpConnector.Common.Util
                                 StartTime = reader.GetDateTime(3),
                                 EndTime = ReadDateTime(reader, 4),
                                 Success = ReadBoolean(reader, 5),
-                                ErrorMessage = ReadString(reader, 6),
-                                ErpActionTaskStepId = ReadInt(reader,7),
-                                iteration = ReadInt(reader,8),
+                                ErrorMessage = ReadString(reader, 6),                               
+                                ErpActionTaskStepId = ReadInt(reader,8),
+                                iteration = ReadInt(reader,9),
                             });
                     }
                     return result;

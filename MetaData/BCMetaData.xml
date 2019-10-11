@@ -15830,7 +15830,6 @@
             <EntityType Name="AGR_Item">
                 <Key>
                     <PropertyRef Name="No" />
-                    <PropertyRef Name="AuxiliaryIndex1" />
                 </Key>
                 <Property Name="No" Type="Edm.String" Nullable="false" MaxLength="20">
                     <Annotation Term="NAV.LabelId" String="Nr." />
@@ -15965,21 +15964,6 @@
                         <EnumMember>NAV.NavType/Real</EnumMember>
                     </Annotation>
                     <Annotation Term="NAV.AllowEdit" Bool="false" />
-                </Property>
-                <Property Name="Vend_Lead_Time_Calculation" Type="Edm.String" MaxLength="32">
-                    <Annotation Term="NAV.LabelId" String="Útreikn. afhendingartíma" />
-                    <Annotation Term="NAV.NavType">
-                        <EnumMember>NAV.NavType/String</EnumMember>
-                    </Annotation>
-                    <Annotation Term="NAV.AllowEdit" Bool="false" />
-                </Property>
-                <Property Name="AuxiliaryIndex1" Type="Edm.String" Nullable="false" MaxLength="20">
-                    <Annotation Term="NAV.LabelId" String="Nr." />
-                    <Annotation Term="NAV.NavType">
-                        <EnumMember>NAV.NavType/String</EnumMember>
-                    </Annotation>
-                    <Annotation Term="NAV.AllowEdit" Bool="false" />
-                    <Annotation Term="NAV.IsRequired" Bool="true" />
                 </Property>
                 <Annotation Term="NAV.LabelId" String="AGR_Item" />
                 <Annotation Term="NAV.IsReadOnly" Bool="true" />
@@ -16283,6 +16267,13 @@
                 </Property>
                 <Property Name="Name" Type="Edm.String" MaxLength="50">
                     <Annotation Term="NAV.LabelId" String="Heiti" />
+                    <Annotation Term="NAV.NavType">
+                        <EnumMember>NAV.NavType/String</EnumMember>
+                    </Annotation>
+                    <Annotation Term="NAV.AllowEdit" Bool="false" />
+                </Property>
+                <Property Name="Lead_Time_Calculation" Type="Edm.String" MaxLength="32">
+                    <Annotation Term="NAV.LabelId" String="Útreikn. afhendingartíma" />
                     <Annotation Term="NAV.NavType">
                         <EnumMember>NAV.NavType/String</EnumMember>
                     </Annotation>
