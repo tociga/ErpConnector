@@ -39,6 +39,8 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <#@ Import Namespace="Microsoft.OData.Edm.Vocabularies.Community.V1" #>
 <#@ Import Namespace="System.Text"#>
 <#@ Import Namespace="System.Net"#>
+<#@ template debug="true" hostSpecific="true" #>
+<#@ import namespace="System.Diagnostics" #>
 <#
     CodeGenerationContext context;
     if (!string.IsNullOrWhiteSpace(this.Edmx))
@@ -2639,7 +2641,8 @@ internal static class Utils
     /// <returns>The clr type name of the type reference.</returns>
     internal static string GetClrTypeName(IEdmTypeReference edmTypeReference, bool useDataServiceCollection, ODataClientTemplate clientTemplate, CodeGenerationContext context, bool addNullableTemplate = true, bool needGlobalPrefix = true, bool isOperationParameter = false)
     {
-        string clrTypeName;
+        //Debugger.Launch();
+		string clrTypeName;
         IEdmType edmType = edmTypeReference.Definition;
         IEdmPrimitiveType edmPrimitiveType = edmType as IEdmPrimitiveType;
         if (edmPrimitiveType != null)

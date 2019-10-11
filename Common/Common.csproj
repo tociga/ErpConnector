@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ErpConnector.Common</RootNamespace>
     <AssemblyName>ErpConnector.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,15 +32,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.13.9.1126, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.13.9\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.Platform, Version=3.13.9.1126, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.13.9\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.OData.Edm, Version=7.5.1.20914, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Edm.7.5.1\lib\portable-net45+win8+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -51,21 +66,81 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AGREntities\AGRProductLifeCycleState.cs" />
     <Compile Include="AGREntities\ErpActionResult.cs" />
     <Compile Include="AGREntities\ErpActions.cs" />
     <Compile Include="AGREntities\ItemToCreate.cs" />
     <Compile Include="AGREntities\POTOCreate.cs" />
+    <Compile Include="Constants\AGRConstants.cs" />
+    <Compile Include="DTO\AGROrderHeaderDTO.cs" />
+    <Compile Include="DTO\AGROrderLineDTO.cs" />
+    <Compile Include="DTO\AGROrderResponseDTO.cs" />
+    <Compile Include="DTO\CustomData\CustomAttributeValuesDTO.cs" />
+    <Compile Include="DTO\CustomData\CustomTimeSeriesValuesDTO.cs" />
+    <Compile Include="DTO\CustomData\LocationCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\ProductCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\SKUCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\TimeSeriesCustomDataDTO.cs" />
+    <Compile Include="DTO\CustomData\VendorCustomDataDTO.cs" />
+    <Compile Include="DTO\HistoriesConnectedItemsDTO.cs" />
+    <Compile Include="DTO\HistoriesSalesStockDTO.cs" />
+    <Compile Include="DTO\ItemDetailsDTO.cs" />
+    <Compile Include="DTO\ItemDetailsV2.cs" />
+    <Compile Include="DTO\ItemGroupDetailsDTO.cs" />
+    <Compile Include="DTO\ItemOrderRoutesDTO.cs" />
+    <Compile Include="DTO\ItemOrderRoutesV2DTO.cs" />
+    <Compile Include="DTO\ItemsDTO.cs" />
+    <Compile Include="DTO\ItemsV2DTO.cs" />
+    <Compile Include="DTO\LocationsDTO.cs" />
+    <Compile Include="DTO\ReservedDTO.cs" />
+    <Compile Include="DTO\StocksDTO.cs" />
+    <Compile Include="DTO\SyncDTO.cs" />
+    <Compile Include="DTO\UndeliveredDTO.cs" />
+    <Compile Include="DTO\VendorsDTO.cs" />
+    <Compile Include="ErpTaskCompletedArgs.cs" />
+    <Compile Include="JsonConverters\EdmDateConverter.cs" />
+    <Compile Include="DTO\ErpActionStep.cs" />
+    <Compile Include="ErpTasks\ErpTaskStepDetails.cs" />
+    <Compile Include="DTO\GenericJiraIssueObject.cs" />
+    <Compile Include="DTO\GenericJiraLinks.cs" />
+    <Compile Include="DTO\GenericJiraObjectList.cs" />
+    <Compile Include="DTO\GenericJiraServiceDeskObject.cs" />
+    <Compile Include="DTO\JiraObjectMetaData.cs" />
+    <Compile Include="DTO\ServiceData.cs" />
+    <Compile Include="ErpGenericConnector.cs" />
+    <Compile Include="ExternalTask\ExternalTaskExec.cs" />
+    <Compile Include="Services\DataContractService.cs" />
+    <Compile Include="TaskExecute.cs" />
+    <Compile Include="DTO\GenericJsonOdata.cs" />
+    <Compile Include="DTO\GenericWriteObject.cs" />
+    <Compile Include="ErpTasks\ErpTask.cs" />
+    <Compile Include="ErpTasks\ErpTaskStep.cs" />
     <Compile Include="Exceptions\AxBaseException.cs" />
     <Compile Include="Exceptions\AxInnerException.cs" />
     <Compile Include="Exceptions\AxWebExceptions.cs" />
     <Compile Include="IErpConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="ServiceConnector.cs" />
+    <Compile Include="Util\Authenticator.cs" />
+    <Compile Include="Util\BusinessCentralAuthenticator.cs" />
+    <Compile Include="Util\CollectionExtensions.cs" />
+    <Compile Include="Util\D365Authenticator.cs" />
+    <Compile Include="Util\DataWriter.cs" />
+    <Compile Include="Util\EmailSender.cs" />
+    <Compile Include="Util\GeneralAuthenticator.cs" />
+    <Compile Include="Util\GenericListDataReader.cs" />
+    <Compile Include="Util\IGenericDataReader.cs" />
+    <Compile Include="Util\JiraAuthenticator.cs" />
+    <Compile Include="Util\JiraIssueAuthenticator.cs" />
+    <Compile Include="Util\SAPAuthenticator.cs" />
+    <Compile Include="Util\ScriptGenerator.cs" />
+    <Compile Include="Util\ScriptGeneratorModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

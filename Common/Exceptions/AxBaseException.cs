@@ -11,5 +11,35 @@ namespace ErpConnector.Common.Exceptions
         public AxWebExceptions error { get; set; }
 
         public Exception ApplicationException { get; set; }
+        public string ErrorMessage
+        {
+            get
+            {
+                if (ApplicationException != null)
+                {
+                    return ApplicationException.Message;
+                }
+                else if (error != null && error.innererror != null)
+                {
+                    return error.innererror.message;
+                }
+                return "";
+            }
+        }
+        public string StackTrace
+        {
+            get
+            {
+                if (ApplicationException != null)
+                {
+                    return ApplicationException.StackTrace;
+                }
+                else if (error != null && error.innererror != null)
+                {
+                    return error.innererror.stacktrace;
+                }
+                return "";
+            }
+        }
     }
 }

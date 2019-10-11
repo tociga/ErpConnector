@@ -13,27 +13,27 @@ namespace ErpConnector.Ax.Modules
         public static AxBaseException WriteCategories(int actionId)
         {
             var roles = ServiceConnector.CallOdataEndpoint<CategoryRoleDTO>("RetailEcoResCategoryHierarchyRole", "", "[ax].[ECORESCATEGORYHIERARCHYROLE]", actionId).Result;
-            if (roles != null)
-            {
-                return roles;
-            }
+            //if (roles != null)
+            //{
+            //    return roles;
+            //}
             var hierarchy = ServiceConnector.CallOdataEndpoint<RetailEcoResCategoryHierarchy>("RetailEcoResCategoryHierarchy", "", "[ax].[ECORESCATEGORYHIERARCHY]", actionId).Result;
-            if (hierarchy != null)
-            {
-                return hierarchy;
-            }
+            //if (hierarchy != null)
+            //{
+            //    return hierarchy;
+            //}
 
             var category = ServiceConnector.CallOdataEndpoint<RetailEcoResCategory>("RetailEcoResCategory", "", "[ax].[ECORESCATEGORY]", actionId).Result;
-            if (category != null)
-            {
-                return category;
-            }
+            //if (category != null)
+            //{
+            //    return category;
+            //}
 
             var prodCat = ServiceConnector.CallOdataEndpoint<AGREcoResProductCategory>("AGREcoResProductCategories", "", "[ax].[ECORESPRODUCTCATEGORY]", actionId).Result;
-            if (prodCat != null)
-            {
-                return prodCat;
-            }
+            //if (prodCat != null)
+            //{
+            //    return prodCat;
+            //}
             return null;
         }
 

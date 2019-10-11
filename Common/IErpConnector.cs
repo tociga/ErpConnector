@@ -1,4 +1,5 @@
 ﻿using ErpConnector.Common.AGREntities;
+using ErpConnector.Common.ErpTasks;
 using ErpConnector.Common.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -8,20 +9,19 @@ namespace ErpConnector.Common
     public enum ErpType
     {
         ax,
-        sap
+        sap,
+        jira,
+        nav,
+        ax_lss,
+        ax_fm
     }
     public interface IErpConnector
     {
-        AxBaseException FullTransfer(int actionId);
-        //void GetPoTo();
-        //string GetDBScript(string entity);
-        //void GetBom();
-        AxBaseException DailyRefresh(DateTime date, int actionId);
-        AxBaseException PimFull(int actionId);
-        AxBaseException TransactionRefresh(DateTime date, int actionId);
-        AxBaseException TransactionFull(int actionId);
-        AxBaseException CreatePoTo(List<POTOCreate> po_to_create, int actionId);
-        AxBaseException CreateItems(List<ItemToCreate> itemsToCreate, int actionId);
-        AxBaseException UpdateProduct(int actionId);
+        int CreatePoTo(List<POTOCreate> po_to_create,int actionId);
+        int CreateItems(int itemToCreateId, int actionId);
+        int TaskList(int actionId, ErpTask erpTask, DateTime date, int? noParallelProcesses);
+        int GetSingleTable(ErpTaskStep step, int actionId, DateTime date);
+        int UpdateProductLifecycleState(int plcUdateId, int actionId);        
+        void OnTaskCompleted(object sender, ErpTaskCompletedArgs args);
     }
 }

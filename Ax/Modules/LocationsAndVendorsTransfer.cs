@@ -15,54 +15,54 @@ namespace ErpConnector.Ax.Modules
             var channel = ServiceConnector.CallOdataEndpoint<RetailChannel>("RetailChannels",
                // "?$filter=ChannelType eq Microsoft.Dynamics.DataEntities.RetailChannelType'RetailStore'",
                 "", "[ax].[RETAILCHANNELTABLE]", actionId).Result;
-            if (channel != null)
-            {
-                return channel;
-            }
+            //if (channel != null)
+            //{
+            //    return channel;
+            //}
 
             //var assortment = ReadRetailAssortment(context);
             var assortment = ServiceConnector.CallOdataEndpoint<RetailAssortment>("RetailAssortments",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'"
                 , "[ax].[RETAILASSORTMENTTABLE]", actionId).Result;
 
-            if (assortment != null)
-            {
-                return assortment;
-            }
+            //if (assortment != null)
+            //{
+            //    return assortment;
+            //}
             //var locSetup = context.Locations.ToList().GetDataReader<Location>();
             var locSetup = ServiceConnector.CallOdataEndpoint<Location>("Locations", "", "[ax].[INVENTLOCATION]", actionId).Result;
-            if (locSetup != null)
-            {
-                return locSetup;
-            }
-            //var dir = context.DirParties.ToList().GetDataReader<DirParty>();            
+            //if (locSetup != null)
+            //{
+            //    return locSetup;
+            //}
+            //var dir = context.DirParties.ToList().GetDataReader<DirParty>();
             var dir = ServiceConnector.CallOdataEndpoint<DirParty>("DirParties", "", "[ax].[DIRPARTYTABLE]", actionId).Result;
-            if (dir != null)
-            {
-                return dir;
-            }
+            //if (dir != null)
+            //{
+            //    return dir;
+            //}
             //var vendor = context.Vendors.ToList().GetDataReader<Vendor>();
-            var vendor = ServiceConnector.CallOdataEndpoint<Vendor>("Vendors", "", "[ax].[VENDTABLE]", actionId).Result;
-            if (vendor != null)
-            {
-                return vendor;
-            }
+            var vendor = ServiceConnector.CallOdataEndpointWithPageSize<Vendor>("Vendors", 200, "[ax].[VENDTABLE]", actionId).Result;
+            //if (vendor != null)
+            //{
+            //    return vendor;
+            //}
 
             var channelLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentChannelLine>("RetailAssortmentChannelLines",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", "[ax].[RETAILASSORTMENTCHANNELLINE]", actionId)
                 .Result;
-            if (channelLines != null)
-            {
-                return channelLines;
-            }
+            //if (channelLines != null)
+            //{
+            //    return channelLines;
+            //}
 
             var productLines = ServiceConnector.CallOdataEndpoint<RetailAssortmentProductLine>("RetailAssortmentProductLines",
                 "?$filter=Status eq Microsoft.Dynamics.DataEntities.RetailAssortmentStatusType'Published'", "[ax].[RETAILASSORTMENTPRODUCTLINE]", actionId)
                 .Result;
-            if (productLines != null)
-            {
-                return productLines;
-            }
+            //if (productLines != null)
+            //{
+            //    return productLines;
+            //}
             return null;
         }
 

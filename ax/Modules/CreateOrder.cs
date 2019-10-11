@@ -1,6 +1,9 @@
 ﻿using ErpConnector.Ax.Authentication;
 using ErpConnector.Ax.DTO;
 using ErpConnector.Ax.Microsoft.Dynamics.DataEntities;
+using ErpConnector.Common.Exceptions;
+using Microsoft.OData.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace ErpConnector.Ax.Modules
 {
-    public class CreateOrder : AXODataContextConnector
+    public class CreateOrder<T> : AXODataContextConnector<T> where T: AGROrderDTO
     {
         public CreateOrder(OAuthHelper oAuthenticationHelper, LogMessage logMessageHandler, bool enableCrossCompany) : base(oAuthenticationHelper, logMessageHandler, enableCrossCompany)
         {
         }
-        protected override bool CreateRcords(string targetAXLegalEntity, System.Collections.ArrayList dataFile)
+        protected override bool CreateRecords(string targetAXLegalEntity, List<T> dataFile)
         {
             bool ret = false;
 
@@ -36,6 +39,26 @@ namespace ErpConnector.Ax.Modules
 
             return ret;
         }
+        protected override AxBaseException SaveChanges()
+        {
+            {
+                try
+                {
+                    context.SaveChanges(SaveChangesOptions.PostOnlySetProperties | SaveChangesOptions.BatchWithSingleChangeset);
+
+                    return null;
+                }
+                catch (DataServiceRequestException ex)
+                {
+                    return JsonConvert.DeserializeObject<AxBaseException>(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    return new AxBaseException { ApplicationException = ex };
+                }
+            }
+
+        }
         private bool orderExists(string custID, string targetAXLegalEntity)
         {
             var query = from entity in this.context.AGROrders
@@ -55,6 +78,7 @@ namespace ErpConnector.Ax.Modules
             order.OrderType = argOrder.OrderType; // AGROrderType.PO;
             order.ReceiveDate = argOrder.ReceiveDate; // DateTime.Now.Date.AddDays(20);
             order.OrderStatus = argOrder.OrderStatus; // AGROrderStatus.Created;
+            order.DataAreaId = targetAXLegalEntity;
 
             foreach (AGROrderLineDTO agrOrderLine in argOrder.ArgOrderLine)
             {
@@ -67,6 +91,8 @@ namespace ErpConnector.Ax.Modules
                 line.Qty = agrOrderLine.Qty;
                 line.Size = agrOrderLine.Size;
                 line.Style = agrOrderLine.Style;
+                line.OrderTo = agrOrderLine.OrderTo;
+                line.DataAreaId = targetAXLegalEntity;
             }
 
             logMessageHandler(string.Format("Created distinct AGROrder '{0}' in company '{1}'.", argOrder.ARGId, targetAXLegalEntity));
