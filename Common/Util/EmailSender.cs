@@ -1,6 +1,7 @@
 ﻿using ErpConnector.Common.DTO;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -16,7 +17,9 @@ namespace ErpConnector.Common.Util
         {
             try
             {
-                var sendEmailStr = System.Configuration.ConfigurationManager.AppSettings["SendEmail"];
+                var sendEmailStr = ConfigurationManager.AppSettings["SendEmail"];
+                var emailFromAddress = ConfigurationManager.AppSettings["NotificationSendFrom"];
+                var pwd = ConfigurationManager.AppSettings["NotificationPassword"];
                 SendEmailType sendEmail = SendEmailType.Always;
                 if (!Enum.TryParse<SendEmailType>(sendEmailStr, out sendEmail))
                 {
@@ -46,7 +49,6 @@ namespace ErpConnector.Common.Util
                     }
 
 
-                    var emailFromAddress = "erpconnector@agrdynamics.com";
                     var emailToAddresses = System.Configuration.ConfigurationManager.AppSettings["NotificationEmailAddresses"];
                     string[] emailAddressArray = emailToAddresses.Split(',');
                     MailAddress emailFrom = new MailAddress(emailFromAddress);
@@ -56,7 +58,7 @@ namespace ErpConnector.Common.Util
                         MailMessage mail = new MailMessage(emailFrom, emailTo);
                         mail.ReplyToList.Add(new MailAddress("servicedesk@agrdynamics.com"));
                         SmtpClient client = new SmtpClient();
-                        NetworkCredential c = new NetworkCredential(emailFromAddress, "!ErpNotification2019");
+                        NetworkCredential c = new NetworkCredential(emailFromAddress, pwd);
 
                         client.DeliveryMethod = SmtpDeliveryMethod.Network;
                         client.UseDefaultCredentials = false;

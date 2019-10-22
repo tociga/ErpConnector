@@ -9,6 +9,7 @@ namespace ErpConnector.Common.AGREntities
     public class AGRProductLifeCycleState
     {
         public int product_lifecycle_state_update_id { get; set; }
+        public int product_id { get; set; }
         public string product_no { get; set; }
         public string product_size_id { get; set; }
         public string product_color_id { get; set; }
