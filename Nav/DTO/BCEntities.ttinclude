@@ -124,6 +124,7 @@ public string MetadataDocumentUri
             // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
             // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
             // value then hit Ctrl-S to save the .tt file to refresh the code generation.
+            // This is very confusing
             // ********************************************************************************************************
             throw new ArgumentException(string.Format("The value \"{0}\" is not a valid MetadataDocumentUri because is it not a valid absolute Uri. The MetadataDocumentUri must be set to an absolute Uri referencing the $metadata endpoint of an OData service.", value));
         }
@@ -881,7 +882,7 @@ public class CodeGenerationContext
                 HttpWebResponse webResponse = e.Response as HttpWebResponse;
                 if (webResponse != null && webResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    throw new WebException("Failed to access the metadata document. The OData service requires authentication for accessing it. Please download the metadata, store it into a local file, and set the value of “MetadataDocumentUri” in the .odata.config file to the file path. After that, run custom tool again to generate the OData Client code.");
+                    throw new WebException("Failed to access the metadata document. The OData service requires authentication for accessing it. Please download the metadata, store it into a local file, and set the value of Â“MetadataDocumentUriÂ” in the .odata.config file to the file path. After that, run custom tool again to generate the OData Client code.");
                 }
                 else
                 {
